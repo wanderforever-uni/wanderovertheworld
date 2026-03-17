@@ -3,44 +3,43 @@
 
 <head>
 
-<title>WANDER</title>
+<title>wander</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
 
 <style>
 
 body{
 margin:0;
-background:black;
+background:white;
 text-align:center;
-font-family:sans-serif;
-color:black;
 }
 
 /* title */
 
 h1{
+font-family:'Dancing Script', cursive;
+font-size:70px;
 margin-top:40px;
-font-size:60px;
-letter-spacing:10px;
+margin-bottom:40px;
+font-weight:normal;
 }
 
 /* slideshow */
 
 .slideshow{
-width:95%;
-max-width:1500px;
-margin:40px auto;
+width:100%;
 }
 
 .slideshow img{
 width:100%;
-height:650px;
-object-fit:cover;
+height:auto;
 }
 
-/* space below image */
+/* space below */
 
 .bottom-space{
-height:120px;
+height:150px;
 }
 
 </style>
@@ -49,7 +48,7 @@ height:120px;
 
 <body>
 
-<h1>WANDER</h1>
+<h1>wander</h1>
 
 <div class="slideshow">
 <img id="slide">
@@ -75,11 +74,15 @@ const images = [
 ];
 
 let current = 0;
+
 const slide = document.getElementById("slide");
 
 function showImage(){
+
 slide.src = images[current];
+
 current = (current + 1) % images.length;
+
 }
 
 showImage();
