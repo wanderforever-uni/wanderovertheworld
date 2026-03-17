@@ -1,115 +1,104 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>WANDER</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
 <style>
 
 body{
 margin:0;
-font-family:sans-serif;
-background:white;
+background:black;
+color:white;
+font-family:Arial, Helvetica, sans-serif;
+text-align:center;
 }
 
-/* tiêu đề */
+/* Title */
 
-.header{
-width:100%;
-height:120px;
-display:flex;
-justify-content:center;
-align-items:center;
+h1{
+margin-top:40px;
+font-size:60px;
+letter-spacing:10px;
 }
 
-.title{
-font-size:70px;
-font-family:'Pacifico', cursive;
-}
-
-/* slideshow */
+/* Slideshow container */
 
 .slideshow{
-position:relative;
 width:100%;
-height:70vh;
+max-width:1400px;
+margin:40px auto;
 overflow:hidden;
 }
 
-.slide{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:0;
-transition:opacity 2s;
-}
+/* Image */
 
-.slide.active{
+.slideshow img{
+width:100%;
+height:650px;
+object-fit:cover;
+transition:opacity 1.5s ease, transform 6s ease;
 opacity:1;
 }
 
-/* khoảng trống phía dưới */
+/* space below */
 
-.space{
-height:300px;
-background:white;
+.bottom-space{
+height:120px;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="header">
-<div class="title">Wander</div>
-</div>
+<h1>WANDER</h1>
 
 <div class="slideshow">
-
-<img class="slide active" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1745781230148-cd467af9ac58?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1620065487644-1080510335f5?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1621584728858-616080e4bd01?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1703825864792-5880081beaaf?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1528164344705-47542687000d?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1590850093323-ccc35c610511?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1610312278520-bcc893a3ff1d?w=3840&auto=format&fit=crop">
-
-<img class="slide" src="https://images.unsplash.com/photo-1570742544137-3a469196c32b?w=3840&auto=format&fit=crop">
-
-<!-- cá mập (crop ngang) -->
-<img class="slide" src="https://images.unsplash.com/photo-1712901394300-2511501c4a8a?w=3840&auto=format&fit=crop">
-
+<img id="slide">
 </div>
 
-<div class="space"></div>
+<div class="bottom-space"></div>
 
 <script>
 
-let slides=document.querySelectorAll(".slide");
-let index=0;
+const images = [
 
-setInterval(function(){
+"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1174&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1745781230148-cd467af9ac58?q=80&w=1471&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1620065487644-1080510335f5?q=80&w=1332&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1621584728858-616080e4bd01?q=80&w=1470&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1703825864792-5880081beaaf?q=80&w=1074&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1528164344705-47542687000d?q=80&w=1492&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1590850093323-ccc35c610511?q=80&w=1074&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1610312278520-bcc893a3ff1d?q=80&w=1447&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1570742544137-3a469196c32b?q=80&w=1469&auto=format&fit=crop",
+"https://images.unsplash.com/photo-1655722723123-c68bdb4f3ce0?q=80&w=1170&auto=format&fit=crop"
 
-slides[index].classList.remove("active");
+];
 
-index=(index+1)%slides.length;
+let current = 0;
+const slide = document.getElementById("slide");
 
-slides[index].classList.add("active");
+function changeImage(){
 
-},5000);
+slide.style.opacity = 0;
+
+setTimeout(() => {
+
+slide.src = images[current];
+slide.style.transform = "scale(1.08)";
+slide.style.opacity = 1;
+
+current = (current + 1) % images.length;
+
+},800);
+
+}
+
+slide.src = images[0];
+
+setInterval(changeImage,5000);
 
 </script>
 
