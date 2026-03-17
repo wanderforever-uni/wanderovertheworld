@@ -10,20 +10,25 @@
 
 body{
 margin:0;
-font-family:Arial;
+overflow:hidden;
 }
 
 .title{
 font-family:'Pacifico', cursive;
 font-size:70px;
+color:white;
+position:absolute;
+top:40px;
+width:100%;
 text-align:center;
-margin:30px;
+text-shadow:0 0 15px rgba(0,0,0,0.7);
+z-index:2;
 }
 
 .hero{
 width:100%;
-height:auto;
-display:block;
+height:100vh;
+object-fit:cover;
 }
 
 </style>
@@ -34,7 +39,55 @@ display:block;
 
 <div class="title">WANDER</div>
 
-<img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=4000" class="hero">
+<img id="heroImage" class="hero">
+
+<script>
+
+const images = [
+
+"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1590071089561-208a52b6c9d1?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1505842465776-3f3b7f90f6de?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=4000&auto=format",
+
+"https://images.unsplash.com/photo-1560275619-4662e36fa65c?w=4000&auto=format"
+
+];
+
+let index = 0;
+
+const hero = document.getElementById("heroImage");
+
+function changeImage(){
+
+hero.src = images[index];
+
+index++;
+
+if(index >= images.length){
+index = 0;
+}
+
+}
+
+changeImage();
+
+setInterval(changeImage,30000);
+
+</script>
 
 </body>
 
