@@ -12,24 +12,22 @@
 body{
 margin:0;
 font-family:sans-serif;
-background:black;
+background:white;
 }
 
-/* vùng chữ */
+/* tiêu đề */
 
 .header{
 width:100%;
-height:15vh;
+height:120px;
 display:flex;
 justify-content:center;
 align-items:center;
-background:white;
 }
 
 .title{
 font-size:70px;
 font-family:'Pacifico', cursive;
-color:#222;
 }
 
 /* slideshow */
@@ -37,7 +35,7 @@ color:#222;
 .slideshow{
 position:relative;
 width:100%;
-height:85vh;
+height:70vh;
 overflow:hidden;
 }
 
@@ -54,7 +52,15 @@ transition:opacity 2s;
 opacity:1;
 }
 
+/* khoảng trống phía dưới */
+
+.space{
+height:300px;
+background:white;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -65,18 +71,30 @@ opacity:1;
 
 <div class="slideshow">
 
-<img class="slide active" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1174&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1745781230148-cd467af9ac58?q=80&w=1471&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1620065487644-1080510335f5?q=80&w=1332&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1621584728858-616080e4bd01?q=80&w=1470&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1703825864792-5880081beaaf?q=80&w=1074&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1528164344705-47542687000d?q=80&w=1492&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1590850093323-ccc35c610511?q=80&w=1074&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1610312278520-bcc893a3ff1d?q=80&w=1447&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1570742544137-3a469196c32b?q=80&w=1469&auto=format&fit=crop">
-<img class="slide" src="https://images.unsplash.com/photo-1712901394300-2511501c4a8a?q=80&w=627&auto=format&fit=crop">
+<img class="slide active" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1745781230148-cd467af9ac58?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1620065487644-1080510335f5?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1621584728858-616080e4bd01?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1703825864792-5880081beaaf?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1528164344705-47542687000d?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1590850093323-ccc35c610511?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1610312278520-bcc893a3ff1d?w=3840&auto=format&fit=crop">
+
+<img class="slide" src="https://images.unsplash.com/photo-1570742544137-3a469196c32b?w=3840&auto=format&fit=crop">
+
+<!-- cá mập (crop ngang) -->
+<img class="slide" src="https://images.unsplash.com/photo-1712901394300-2511501c4a8a?w=3840&auto=format&fit=crop">
 
 </div>
+
+<div class="space"></div>
 
 <script>
 
