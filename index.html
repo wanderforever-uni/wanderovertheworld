@@ -1,322 +1,118 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
 <title>wander</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-
 <style>
-
+/* =========================
+   GLOBAL
+========================= */
 body{
-margin:0;
-text-align:center;
+  margin:0;
+  text-align:center;
+  background:#fff;
+  font-family:sans-serif;
 }
 
 h1{
-font-family:'Satisfy',cursive;
-font-size:70px;
-font-weight:normal;
-margin-top:40px;
-margin-bottom:40px;
+  font-family:'Satisfy', cursive;
+  font-size:70px;
+  font-weight:normal;
+  margin:40px 0;
 }
 
 img{
-width:100%;
-height:auto;
+  width:100%;
+  height:auto;
 }
 
 .bottom{
-height:120px;
+  height:120px;
 }
 
-   /* CONTROL PANEL */
+/* =========================
+   FLOAT CONTROL PANEL
+========================= */
 #controlPanel{
-position:fixed;
-right:20px;
-bottom:40px;
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:15px;
-z-index:999;
+  position:fixed;
+  right:20px;
+  bottom:30px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:9999;
 }
 
 .btn{
-font-size:28px;
-cursor:pointer;
-transition:0.3s;
+  font-size:28px;
+  margin:10px 0;
+  cursor:pointer;
+  transition:0.3s;
 }
 
 .btn:hover{
-transform:scale(1.2);
+  transform:scale(1.2);
 }
 
+/* Order để rocket luôn dưới cùng */
+.rocket{ order:3; }
+#volumeBtn{ order:2; }
+#musicBtn{ order:1; }
+
+/* volume slider */
 #volumeSlider{
-display:none;
-writing-mode: bt-lr;
-height:100px;
+  display:none;
+  height:100px;
 }
 
-/* TIME PANEL */
+/* =========================
+   TIME PANEL
+========================= */
 #timePanel{
-position:fixed;
-left:20px;
-top:50%;
-transform:translateY(-50%);
-display:flex;
-gap:20px;
-font-family:'Courier New', monospace;
-font-size:20px;
-text-align:center;
-z-index:999;
+  position:fixed;
+  left:20px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  gap:15px;
+  z-index:9999;
+  font-family:monospace;
+  font-size:18px;
+  color:black;
 }
 
 #time, #date{
-display:flex;
-flex-direction:column;
+  display:flex;
+  flex-direction:column;
+  text-align:center;
 }
-   
 </style>
-
 </head>
-
 <body>
 
+<!-- TITLE -->
 <h1>wander</h1>
 
+<!-- SLIDESHOW -->
 <img id="slide">
 
-<!-- youtube player ẩn -->
+<!-- YOUTUBE PLAYER HIDDEN -->
 <div id="player" style="display:none;"></div>
 
 <div class="bottom"></div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
-
-<script>
-
-/* =========================
-   SLIDESHOW ẢNH
-========================= */
-
-let images = [];
-let current = 0;
-
-/* random thứ tự */
-function shuffle(array){
-for(let i=array.length-1;i>0;i--){
-const j=Math.floor(Math.random()*(i+1));
-[array[i],array[j]]=[array[j],array[i]];
-}
-}
-
-/* đổi ảnh */
-function changeImage(){
-
-document.getElementById("slide").src = images[current];
-
-current = (current + 1) % images.length;
-
-}
-
-/* đọc file images.json */
-
-fetch("images.json")
-.then(response=>response.json())
-.then(data=>{
-
-shuffle(data);
-
-images = data.slice(0,10);
-
-changeImage();
-
-setInterval(changeImage,5000);
-
-});
-
-
-/* =========================
-   NHẠC NỀN YOUTUBE
-========================= */
-
-let musicList = [];
-let currentTrack = 0;
-let player;
-
-/* lấy video ID */
-
-function getVideoId(url){
-let match = url.match(/v=([^&]+)/);
-return match ? match[1] : null;
-}
-
-/* youtube api ready */
-
-function onYouTubeIframeAPIReady(){
-
-fetch("music.json")
-.then(res=>res.json())
-.then(data=>{
-
-shuffle(data);
-
-musicList = data;
-
-let firstId = getVideoId(musicList[0]);
-
-player = new YT.Player('player',{
-height:'0',
-width:'0',
-videoId:firstId,
-events:{
-'onReady':startMusic,
-'onStateChange':onPlayerStateChange
-}
-});
-
-});
-
-}
-
-/* bắt đầu phát */
-
-function startMusic(){
-player.playVideo();
-}
-
-/* khi nhạc kết thúc */
-
-function onPlayerStateChange(event){
-
-if(event.data === YT.PlayerState.ENDED){
-
-setTimeout(()=>{
-
-currentTrack = (currentTrack+1)%musicList.length;
-
-let nextId = getVideoId(musicList[currentTrack]);
-
-player.loadVideoById(nextId);
-
-},10000);
-
-}
-
-}
-
-/* fix autoplay */
-
-document.body.addEventListener("click",()=>{
-if(player){
-player.playVideo();
-}
-},{once:true});
-
-   /* =========================
-   CONTROL FUNCTIONS
-========================= */
-
-// scroll to top
-function scrollToTop(){
-window.scrollTo({top:0, behavior:'smooth'});
-}
-
-// toggle volume slider
-function toggleVolume(){
-let slider = document.getElementById("volumeSlider");
-
-slider.style.display = (slider.style.display === "block") ? "none" : "block";
-}
-
-// change volume
-document.getElementById("volumeSlider").addEventListener("input", function(){
-if(player){
-player.setVolume(this.value);
-}
-});
-
-// play / pause
-let isPlaying = true;
-
-function toggleMusic(){
-if(!player) return;
-
-if(isPlaying){
-player.pauseVideo();
-}else{
-player.playVideo();
-}
-isPlaying = !isPlaying;
-}
-
-/* =========================
-   TIME (NEW YORK)
-========================= */
-
-function updateTime(){
-
-let now = new Date();
-
-// convert to New York time
-let options = {
-timeZone: "America/New_York",
-hour12: false,
-hour: "2-digit",
-minute: "2-digit",
-second: "2-digit",
-year: "numeric",
-month: "2-digit",
-day: "2-digit",
-weekday: "long"
-};
-
-let parts = new Intl.DateTimeFormat("en-US", options).formatToParts(now);
-
-let map = {};
-parts.forEach(p=> map[p.type]=p.value);
-
-// TIME
-document.getElementById("time").innerHTML = `
-<div>${map.hour}</div>
-<div>${map.minute}</div>
-<div>${map.second}</div>
-`;
-
-// DATE
-let year = map.year;
-
-document.getElementById("date").innerHTML = `
-<div>${year.slice(0,2)}</div>
-<div>${year.slice(2)}</div>
-<div>${map.month}</div>
-<div>${map.day}</div>
-<div>${map.weekday}</div>
-`;
-
-}
-
-// update every second
-setInterval(updateTime,1000);
-updateTime();
-   
-</script>
-
-   <!-- FLOAT CONTROL -->
+<!-- =========================
+     FLOAT CONTROL PANEL
+========================= -->
 <div id="controlPanel">
-
-  <!-- rocket -->
-  <div class="btn rocket" onclick="scrollToTop()">🚀</div>
-
-  <!-- cloud volume -->
-  <div class="btn cloud" onclick="toggleVolume()">☁️</div>
+  <!-- Cloud pause/play -->
+  <div class="btn cloud" id="musicBtn">☁️</div>
+  <!-- Cloud volume -->
+  <div class="btn cloud" id="volumeBtn">☁️</div>
   <input id="volumeSlider" type="range" min="0" max="100" value="50">
-
-  <!-- cloud play/pause -->
-  <div class="btn cloud" onclick="toggleMusic()">☁️</div>
-
+  <!-- Rocket -->
+  <div class="btn rocket" id="rocketBtn">🚀</div>
 </div>
 
 <!-- TIME + DATE -->
@@ -324,7 +120,154 @@ updateTime();
   <div id="time"></div>
   <div id="date"></div>
 </div>
-   
-</body>
 
+<!-- =========================
+     SCRIPTS
+========================= -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
+let images = [];
+let current = 0;
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i], array[j]]=[array[j], array[i]];
+  }
+}
+
+function changeImage(){
+  if(images.length===0) return;
+  document.getElementById("slide").src = images[current];
+  current = (current + 1) % images.length;
+}
+
+fetch("images.json")
+.then(res=>res.json())
+.then(data=>{
+  shuffle(data);
+  images = data.slice(0,10);
+  changeImage();
+  setInterval(changeImage,5000);
+});
+
+/* =========================
+   YOUTUBE MUSIC
+========================= */
+let musicList = [];
+let currentTrack = 0;
+let player;
+let playerReady = false;
+
+function getVideoId(url){
+  let regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/;
+  let match = url.match(regExp);
+  return match ? match[1] : null;
+}
+
+function onYouTubeIframeAPIReady(){
+  fetch("music.json")
+  .then(res=>res.json())
+  .then(data=>{
+    shuffle(data);
+    musicList = data;
+    let firstId = getVideoId(musicList[0]);
+    player = new YT.Player('player',{
+      height:'0',
+      width:'0',
+      videoId:firstId,
+      playerVars:{autoplay:1,controls:0},
+      events:{
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  });
+}
+
+function onPlayerReady(event){
+  playerReady = true;
+  event.target.mute();
+  event.target.playVideo();
+  setTimeout(()=>{ event.target.unMute(); },1000);
+}
+
+function onPlayerStateChange(event){
+  if(event.data === YT.PlayerState.ENDED){
+    setTimeout(()=>{
+      currentTrack = (currentTrack+1) % musicList.length;
+      let nextId = getVideoId(musicList[currentTrack]);
+      player.loadVideoById(nextId);
+    },10000);
+  }
+}
+
+/* =========================
+   BUTTON EVENTS
+========================= */
+document.getElementById("rocketBtn").onclick = ()=>{ window.scrollTo({top:0, behavior:'smooth'}); };
+document.getElementById("volumeBtn").onclick = ()=>{
+  let s = document.getElementById("volumeSlider");
+  s.style.display = s.style.display==='block'?'none':'block';
+};
+document.getElementById("volumeSlider").oninput = function(){
+  if(playerReady) player.setVolume(this.value);
+};
+document.getElementById("musicBtn").onclick = ()=>{
+  if(!playerReady) return;
+  let state = player.getPlayerState();
+  if(state===YT.PlayerState.PLAYING) player.pauseVideo();
+  else player.playVideo();
+};
+
+/* =========================
+   TIME NEW YORK
+========================= */
+function updateTime(){
+  let now = new Date();
+  let ny = new Intl.DateTimeFormat("en-US",{
+    timeZone:"America/New_York",
+    hour12:false,
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit",
+    weekday:"long"
+  }).formatToParts(now);
+
+  let obj={};
+  ny.forEach(p=> obj[p.type]=p.value);
+
+  document.getElementById("time").innerHTML=
+    `<div>${obj.hour}</div>
+     <div>${obj.minute}</div>
+     <div>${obj.second}</div>`;
+
+  let y = obj.year;
+  document.getElementById("date").innerHTML=
+    `<div>${y.slice(0,2)}</div>
+     <div>${y.slice(2)}</div>
+     <div>${obj.month}</div>
+     <div>${obj.day}</div>
+     <div>${obj.weekday}</div>`;
+}
+
+window.addEventListener("load",()=>{
+  updateTime();
+  setInterval(updateTime,1000);
+});
+
+/* =========================
+   FIX AUTOPLAY CLICK
+========================= */
+document.body.addEventListener("click", ()=>{
+  if(playerReady) player.playVideo();
+},{once:true});
+</script>
+</body>
 </html>
