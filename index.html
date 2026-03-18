@@ -1,187 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>wander</title>
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        body { margin:0; text-align:center; background:#fff; font-family:sans-serif; }
-        h1 { font-family:'Satisfy', cursive; font-size:70px; margin:40px 0; color: #000; }
-        img { width:100%; height:auto; display:block; }
-        
-        /* 1. ĐỒNG HỒ: Dùng mix-blend-mode để tự đổi màu theo nền */
-        #casioPanel { 
-            position:fixed; left:30px; top:50%; transform:translateY(-50%); 
-            display:flex; gap:20px; font-family:'Share Tech Mono', monospace; 
-            z-index: 999;
-            mix-blend-mode: difference;
-            color: #fff; 
-        }
-        .clock-box { display:flex; flex-direction:column; line-height:1.1; font-size:28px; }
-        .day-vertical { font-size:14px; writing-mode:vertical-rl; margin-top:5px; text-transform: uppercase; }
 
-        /* 2. BỘ ĐIỀU KHIỂN: KHÔNG dùng mix-blend-mode để giữ màu gốc của Emoji */
-        #controlPanel { 
-            position:fixed; right:30px; bottom:40px; 
-            display:flex; flex-direction:column-reverse; align-items:center; gap:15px; 
-            z-index: 1000;
-        }
-        .btn { font-size:32px; cursor:pointer; transition:0.3s; user-select:none; }
-        
-        .sub-menu { display:none; flex-direction:column; gap:15px; margin-bottom: 10px; }
-        .star-btn { position: relative; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        .star-label { position: absolute; font-size: 10px; font-family: 'Share Tech Mono', monospace; font-weight: bold; color: #000; pointer-events: none; }
+<title>wander</title>
 
-        #volumeSlider { writing-mode: bt-lr; appearance: slider-vertical; width:8px; height:80px; display:none; margin-bottom: 10px; }
+<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 
-        #player { position: absolute; top: -9999px; left: -9999px; }
+<style>
 
-        /* LỚP PHỦ TÀNG HÌNH ĐỂ KÍCH HOẠT NHẠC SAU KHI RELOAD */
-        #gatekeeper {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(255,255,255,0.01); /* Gần như tàng hình */
-            z-index: 99999; /* Nằm trên cùng */
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-        #gatekeeper span { 
-            font-family: 'Satisfy', cursive; font-size: 20px; color: #888; 
-            animation: pulse 2s infinite; 
-        }
-        @keyframes pulse { 0% {opacity: 0.3;} 50% {opacity: 1;} 100% {opacity: 0.3;} }
-    </style>
+body{
+margin:0;
+text-align:center;
+}
+
+h1{
+font-family:'Satisfy',cursive;
+font-size:70px;
+font-weight:normal;
+margin-top:40px;
+margin-bottom:40px;
+}
+
+img{
+width:100%;
+height:auto;
+}
+
+.bottom{
+height:120px;
+}
+
+</style>
+
 </head>
+
 <body>
 
-    <div id="gatekeeper">
-        <span>click to wander...</span>
-    </div>
+<h1>wander</h1>
 
-    <h1>wander</h1>
-    <img id="slide">
-    <div id="player"></div>
+<img id="slide">
 
-    <div id="casioPanel">
-        <div class="clock-box">
-            <span id="hh">00</span><span id="mm">00</span><span id="ss" style="font-size:18px; opacity:0.8;">00</span>
-        </div>
-        <div id="dateBox" class="clock-box">
-            <span id="y1">20</span><span id="y2">26</span><span id="month">01</span><span id="day">01</span>
-            <div id="weekday" class="day-vertical">MONDAY</div>
-        </div>
-    </div>
+<!-- youtube player ẩn -->
+<div id="player" style="display:none;"></div>
 
-    <div id="controlPanel">
-        <div class="btn" id="rocketBtn">🚀</div>
-        <div class="btn" id="playPauseBtn">☁️</div>
-        <div class="btn" id="navBtn">
-            <div class="sub-menu" id="navSub">
-                <div class="star-btn" id="nextBtn">⭐<span class="star-label">n</span></div>
-                <div class="star-btn" id="prevBtn">⭐<span class="star-label">p</span></div>
-            </div>
-            <span>☁️</span>
-        </div>
-        <div class="btn" id="volBtn">
-            <input type="range" id="volumeSlider" min="0" max="100" value="50">
-            <span>☁️</span>
-        </div>
-    </div>
+<div class="bottom"></div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        let musicList = [], currentTrack = 0, player, playerReady = false;
+<script src="https://www.youtube.com/iframe_api"></script>
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+<script>
 
-        function getVideoId(url) {
-            const reg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(reg);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
 
-        function onYouTubeIframeAPIReady() {
-            fetch("music.json").then(res => res.json()).then(data => {
-                shuffle(data); musicList = data;
-                player = new YT.Player('player', {
-                    height: '0', width: '0',
-                    videoId: getVideoId(musicList[0]),
-                    playerVars: { 'autoplay': 1, 'mute': 1, 'enablejsapi': 1 },
-                    events: {
-                        'onReady': (e) => { playerReady = true; e.target.playVideo(); },
-                        'onStateChange': (e) => { if(e.data === YT.PlayerState.ENDED) nextTrack(); }
-                    }
-                });
-            });
-        }
+let images = [];
+let current = 0;
 
-        // KÍCH HOẠT NHẠC VÀ XÓA LỚP PHỦ
-        document.getElementById("gatekeeper").onclick = function() {
-            if (playerReady && player) {
-                player.unMute();
-                player.setVolume(50);
-                player.playVideo();
-                this.style.display = "none"; // Xóa bỏ lớp phủ để dùng được các nút bên dưới
-            }
-        };
+/* random thứ tự */
+function shuffle(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+}
 
-        function nextTrack() {
-            currentTrack = (currentTrack + 1) % musicList.length;
-            player.loadVideoById(getVideoId(musicList[currentTrack]));
-            player.unMute();
-        }
+/* đổi ảnh */
+function changeImage(){
 
-        function prevTrack() {
-            currentTrack = (currentTrack - 1 + musicList.length) % musicList.length;
-            player.loadVideoById(getVideoId(musicList[currentTrack]));
-            player.unMute();
-        }
+document.getElementById("slide").src = images[current];
 
-        // ĐIỀU KHIỂN
-        document.getElementById("rocketBtn").onclick = () => window.scrollTo({top:0, behavior:'smooth'});
-        document.getElementById("playPauseBtn").onclick = () => {
-            if(!playerReady) return;
-            player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo();
-        };
-        document.getElementById("navBtn").onclick = () => {
-            const s = document.getElementById("navSub");
-            s.style.display = s.style.display === "flex" ? "none" : "flex";
-        };
-        document.getElementById("nextBtn").onclick = (e) => { e.stopPropagation(); nextTrack(); };
-        document.getElementById("prevBtn").onclick = (e) => { e.stopPropagation(); prevTrack(); };
-        document.getElementById("volBtn").onclick = () => {
-            const v = document.getElementById("volumeSlider");
-            v.style.display = v.style.display === "block" ? "none" : "block";
-        };
-        document.getElementById("volumeSlider").oninput = function() {
-            if(playerReady) player.setVolume(this.value);
-        };
+current = (current + 1) % images.length;
 
-        // CLOCK & SLIDESHOW
-        function updateClock() {
-            const now = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            document.getElementById("hh").innerText = pad(now.getHours());
-            document.getElementById("mm").innerText = pad(now.getMinutes());
-            document.getElementById("ss").innerText = pad(now.getSeconds());
-            const y = String(now.getFullYear());
-            document.getElementById("y1").innerText = y.slice(0,2);
-            document.getElementById("y2").innerText = y.slice(2);
-            document.getElementById("month").innerText = pad(now.getMonth()+1);
-            document.getElementById("day").innerText = pad(now.getDate());
-            document.getElementById("weekday").innerText = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][now.getDay()];
-        }
-        setInterval(updateClock, 1000); updateClock();
+}
 
-        fetch("images.json").then(r=>r.json()).then(d=>{
-            shuffle(d); let i=0; document.getElementById("slide").src=d[0];
-            setInterval(()=>{ i=(i+1)%d.length; document.getElementById("slide").src=d[i]; }, 5000);
-        });
-    </script>
+/* đọc file images.json */
+
+fetch("images.json")
+.then(response=>response.json())
+.then(data=>{
+
+shuffle(data);
+
+images = data.slice(0,10);
+
+changeImage();
+
+setInterval(changeImage,5000);
+
+});
+
+
+/* =========================
+   NHẠC NỀN YOUTUBE
+========================= */
+
+let musicList = [];
+let currentTrack = 0;
+let player;
+
+/* lấy video ID */
+
+function getVideoId(url){
+let match = url.match(/v=([^&]+)/);
+return match ? match[1] : null;
+}
+
+/* youtube api ready */
+
+function onYouTubeIframeAPIReady(){
+
+fetch("music.json")
+.then(res=>res.json())
+.then(data=>{
+
+shuffle(data);
+
+musicList = data;
+
+let firstId = getVideoId(musicList[0]);
+
+player = new YT.Player('player',{
+height:'0',
+width:'0',
+videoId:firstId,
+events:{
+'onReady':startMusic,
+'onStateChange':onPlayerStateChange
+}
+});
+
+});
+
+}
+
+/* bắt đầu phát */
+
+function startMusic(){
+player.playVideo();
+}
+
+/* khi nhạc kết thúc */
+
+function onPlayerStateChange(event){
+
+if(event.data === YT.PlayerState.ENDED){
+
+setTimeout(()=>{
+
+currentTrack = (currentTrack+1)%musicList.length;
+
+let nextId = getVideoId(musicList[currentTrack]);
+
+player.loadVideoById(nextId);
+
+},10000);
+
+}
+
+}
+
+/* fix autoplay */
+
+document.body.addEventListener("click",()=>{
+if(player){
+player.playVideo();
+}
+},{once:true});
+
+</script>
+
 </body>
+
 </html>
+
 
