@@ -227,6 +227,7 @@ player.playVideo();
 
 <!-- Floating icons -->
 <div id="floatingControls">
+  <button class="floatingBtn" id="rocketBtn">🚀</button>
   <button class="floatingBtn" id="cloudPause">☁️</button>
   <button class="floatingBtn" id="cloudVolume">☁️</button>
 </div>
@@ -242,6 +243,12 @@ player.playVideo();
 </div>
 
 <script>
+// ========= ROCKET ============
+// Scroll lên đầu trang
+document.getElementById("rocketBtn").addEventListener("click", () => {
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
 // ========= PAUSE/PLAY NHẠC ============
 let isPaused = false;
 document.getElementById("cloudPause").addEventListener("click", () => {
@@ -275,7 +282,7 @@ const timeBox = document.getElementById("timeBox");
 const dateBox = document.getElementById("dateBox");
 const weekdayBox = document.getElementById("weekday");
 
-// Hàm tính màu tương phản dựa trên độ sáng YIQ
+// Hàm tính màu tương phản YIQ
 function getContrastColor(rgbColor){
     const match = rgbColor.match(/\d+/g);
     if(!match) return 'white';
