@@ -190,9 +190,8 @@ function onYouTubeIframeAPIReady(){
 
 function onPlayerReady(event){
   playerReady = true;
-  event.target.mute();
-  event.target.playVideo();
-  setTimeout(()=>{ event.target.unMute(); },1000);
+  // Không tự động play/mute ở đây để tránh lỗi Policy
+  console.log("YouTube Player is ready!");
 }
 
 function onPlayerStateChange(event){
