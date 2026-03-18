@@ -5,31 +5,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 
 <style>
-body{
+body {
     margin:0;
     text-align:center;
     background:#fff;
 }
 
-h1{
+h1 {
     font-family:'Satisfy',cursive;
     font-size:70px;
     font-weight:normal;
-    margin-top:40px;
-    margin-bottom:40px;
+    margin:40px 0;
     color:#000;
 }
 
-img{
+img {
     width:100%;
     height:auto;
 }
 
-.bottom{
+.bottom {
     height:120px;
 }
 
-/* --- BỘ NÚT CUỐN THEO MÀN HÌNH --- */
+/* BỘ NÚT CUỐN THEO MÀN HÌNH */
 #control-panel {
     position: fixed;
     right: 20px;
@@ -41,21 +40,21 @@ img{
 }
 
 .control-btn {
-    font-size: 32px;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size:32px;
+    cursor:pointer;
+    user-select:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 /* Thanh volume ẩn */
 #volume-slider {
-    position: absolute;
-    bottom: 60px;
-    left: -25px;
-    width: 100px;
-    display: none;
+    position:absolute;
+    bottom:60px;
+    left:-25px;
+    width:100px;
+    display:none;
 }
 </style>
 </head>
@@ -71,86 +70,76 @@ img{
 
 <!-- BỘ NÚT CUỐN THEO MÀN HÌNH -->
 <div id="control-panel">
-    <!-- Tầng 2: Cloud Volume -->
-    <div class="control-btn" id="volume-btn" title="Adjust Volume">☁️
+    <!-- Cloud Volume -->
+    <div class="control-btn" id="volume-btn">☁️
         <input type="range" id="volume-slider" min="0" max="100" value="100">
     </div>
-    <!-- Tầng 1: Cloud Play/Pause -->
-    <div class="control-btn" id="playpause-btn" title="Play/Pause Music">☁️</div>
-    <!-- Dưới cùng: Rocket -->
-    <div class="control-btn" id="rocket-btn" title="Go to Top">🚀</div>
+    <!-- Cloud Play/Pause -->
+    <div class="control-btn" id="playpause-btn">☁️</div>
+    <!-- Rocket -->
+    <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
-// =========================
-// SLIDESHOW ẢNH
-// =========================
-let images = [];
-let current = 0;
+// ========== SLIDESHOW ==========
+let images=[], current=0;
 
-function shuffle(array){
-    for(let i=array.length-1;i>0;i--){
-        const j=Math.floor(Math.random()*(i+1));
-        [array[i],array[j]]=[array[j],array[i]];
+function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
     }
 }
 
 function changeImage(){
-    document.getElementById("slide").src = images[current];
-    current = (current + 1) % images.length;
+    if(images.length>0){
+        document.getElementById("slide").src = images[current];
+        current=(current+1)%images.length;
+    }
 }
 
 fetch("images.json")
-.then(response=>response.json())
+.then(r=>r.json())
 .then(data=>{
     shuffle(data);
-    images = data.slice(0,10);
+    images=data.slice(0,10);
     changeImage();
     setInterval(changeImage,5000);
 });
 
-// =========================
-// NHẠC NỀN YOUTUBE
-// =========================
-let musicList = [];
-let currentTrack = 0;
-let player;
+// ========== NHẠC YOUTUBE ==========
+let musicList=[], currentTrack=0, player;
 
 function getVideoId(url){
-    let match = url.match(/v=([^&]+)/);
-    return match ? match[1] : null;
+    let m=url.match(/v=([^&]+)/);
+    return m? m[1]:null;
 }
 
 function onYouTubeIframeAPIReady(){
     fetch("music.json")
-    .then(res=>res.json())
+    .then(r=>r.json())
     .then(data=>{
         shuffle(data);
-        musicList = data;
-        let firstId = getVideoId(musicList[0]);
-        player = new YT.Player('player',{
+        musicList=data;
+        let firstId=getVideoId(musicList[0]);
+        player=new YT.Player('player',{
             height:'0',
             width:'0',
             videoId:firstId,
             events:{
-                'onReady':startMusic,
+                'onReady':()=>player.playVideo(),
                 'onStateChange':onPlayerStateChange
             }
         });
     });
 }
 
-function startMusic(){
-    player.playVideo();
-}
-
 function onPlayerStateChange(event){
-    if(event.data === YT.PlayerState.ENDED){
+    if(event.data===YT.PlayerState.ENDED){
         setTimeout(()=>{
-            currentTrack = (currentTrack+1)%musicList.length;
-            let nextId = getVideoId(musicList[currentTrack]);
+            currentTrack=(currentTrack+1)%musicList.length;
+            let nextId=getVideoId(musicList[currentTrack]);
             player.loadVideoById(nextId);
         },10000);
     }
@@ -158,50 +147,36 @@ function onPlayerStateChange(event){
 
 // fix autoplay
 document.body.addEventListener("click",()=>{
-    if(player){
-        player.playVideo();
-    }
+    if(player) player.playVideo();
 },{once:true});
 
-// =========================
-// BỘ NÚT CUỐN THEO MÀN HÌNH
-// =========================
-let isPlaying = true;
+// ========== BỘ NÚT ==========
+let isPlaying=true;
+const rocketBtn=document.getElementById("rocket-btn");
+const playpauseBtn=document.getElementById("playpause-btn");
+const volumeBtn=document.getElementById("volume-btn");
+const volumeSlider=document.getElementById("volume-slider");
 
-const rocketBtn = document.getElementById("rocket-btn");
-const playpauseBtn = document.getElementById("playpause-btn");
-const volumeBtn = document.getElementById("volume-btn");
-const volumeSlider = document.getElementById("volume-slider");
-
-// Rocket scroll lên đầu trang
-rocketBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+// Rocket scroll top
+rocketBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:'smooth'}));
 
 // Play/Pause nhạc
-playpauseBtn.addEventListener("click", () => {
+playpauseBtn.addEventListener("click",()=>{
     if(player && player.getPlayerState){
-        if(isPlaying){
-            player.pauseVideo();
-            isPlaying = false;
-        } else {
-            player.playVideo();
-            isPlaying = true;
-        }
+        if(isPlaying){ player.pauseVideo(); isPlaying=false; }
+        else{ player.playVideo(); isPlaying=true; }
     }
 });
 
-// Hiện/ẩn thanh volume
-volumeBtn.addEventListener("click", (e) => {
+// Hiện/ẩn volume
+volumeBtn.addEventListener("click",(e)=>{
     e.stopPropagation();
-    volumeSlider.style.display = (volumeSlider.style.display === "none") ? "block" : "none";
+    volumeSlider.style.display=(volumeSlider.style.display==='none')?'block':'none';
 });
 
-// Điều chỉnh volume
-volumeSlider.addEventListener("input", () => {
-    if(player && player.setVolume){
-        player.setVolume(volumeSlider.value); // 0-100
-    }
+// Thay đổi volume
+volumeSlider.addEventListener("input",()=>{
+    if(player && player.setVolume) player.setVolume(volumeSlider.value);
 });
 </script>
 </body>
