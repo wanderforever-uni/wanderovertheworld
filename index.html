@@ -262,17 +262,27 @@ document.getElementById("cloudPause").addEventListener("click", () => {
   }
 });
 
-// ========= HIỆN/ẨN VOLUME ============
+<!-- Cloud volume button và slider hoạt động chắc chắn -->
+<button class="floatingBtn" id="cloudVolume">☁️</button>
+<input type="range" id="volumeSlider" min="0" max="100" value="50" style="display:none; transform: rotate(-90deg); width:100px; margin-bottom:10px;">
+
+<script>
+// Lấy các phần tử
 const volumeBtn = document.getElementById("cloudVolume");
 const volumeSlider = document.getElementById("volumeSlider");
 
+// Hiện/ẩn slider khi click icon
 volumeBtn.addEventListener("click", () => {
-  volumeSlider.style.display = (volumeSlider.style.display==="none")?"block":"none";
+  if(volumeSlider.style.display === "none"){
+    volumeSlider.style.display = "block";
+  } else {
+    volumeSlider.style.display = "none";
+  }
 });
 
-// ========= SLIDER ĐIỀU CHỈNH VOLUME ============
+// Khi slider thay đổi, cập nhật volume nhạc
 volumeSlider.addEventListener("input", () => {
-  if(player) {
+  if(player && typeof player.setVolume === "function"){
     player.setVolume(volumeSlider.value);
   }
 });
