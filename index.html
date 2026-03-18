@@ -88,36 +88,32 @@ input[type=range]{ width:80px; }
 </div>
 
 <!-- Đồng hồ vertical -->
-<div id="clockContainer" style="position:fixed; top:10px; left:10px; display:flex; gap:10px; font-family:'Digital 7', monospace; font-size:14px; z-index:999;">
-  <!-- Khung 1: thời gian hh/mm/ss -->
-  <div class="verticalNumbers clock">
-    <div><span class="hh">--</span></div>
-    <div><span class="mm">--</span></div>
-    <div><span class="ss">--</span></div>
+<div id="clockContainer" style="position:fixed; top:10px; left:10px; display:flex; gap:5px; font-family:'Digital 7', monospace; font-size:12px; z-index:999;">
+  <!-- Khung ngày/tháng/năm (4 dòng) + thứ -->
+  <div style="display:flex; flex-direction:column; gap:1px; align-items:center;">
+    <div class="year1">--</div>
+    <div class="year2">--</div>
+    <div class="month">--</div>
+    <div class="day">--</div>
+    <div class="dayName" style="writing-mode: vertical-rl; text-orientation: mixed; font-size:10px;">---</div>
   </div>
-
-  <!-- Khung 2: ngày tháng yy/yy/mm/dd + thứ -->
-  <div style="display:flex; gap:5px; align-items:center;">
-    <div class="verticalNumbers dateBox">
-      <div><span class="year1">--</span></div>
-      <div><span class="year2">--</span></div>
-      <div><span class="month">--</span><span class="day">--</span></div>
-    </div>
-    <div class="dayName" style="writing-mode: vertical-rl; text-orientation: mixed; font-size:12px;">---</div>
+  <!-- Khung thời gian hh/mm/ss -->
+  <div style="display:flex; flex-direction:column; gap:1px; align-items:center;">
+    <div class="hh">--</div>
+    <div class="mm">--</div>
+    <div class="ss">--</div>
   </div>
 </div>
 
 <script>
-// Chọn màu chữ tương phản với nền
 function updateClockColor(){
-  const bgColor = window.getComputedStyle(document.body).backgroundColor; // rgb(r,g,b)
+  const bgColor = window.getComputedStyle(document.body).backgroundColor;
   const rgb = bgColor.match(/\d+/g).map(Number);
   const luminance = 0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2];
   const textColor = luminance > 186 ? '#000' : '#fff';
-  document.querySelectorAll('#clockContainer span, #clockContainer .dayName').forEach(el=>el.style.color=textColor);
+  document.querySelectorAll('#clockContainer div').forEach(el=>el.style.color=textColor);
 }
 
-// Cập nhật thời gian & ngày
 function updateClock(){
   const now = new Date();
   const hh = ("0"+now.getHours()).slice(-2),
@@ -128,18 +124,13 @@ function updateClock(){
         day = ("0"+now.getDate()).slice(-2);
   const weekday = now.toLocaleDateString('en-US',{weekday:'long'});
 
-  // Thời gian
   document.querySelector('.hh').textContent = hh;
   document.querySelector('.mm').textContent = mm;
   document.querySelector('.ss').textContent = ss;
-
-  // Ngày
   document.querySelector('.year1').textContent = yy.slice(0,2);
   document.querySelector('.year2').textContent = yy.slice(2);
   document.querySelector('.month').textContent = month;
   document.querySelector('.day').textContent = day;
-
-  // Thứ
   document.querySelector('.dayName').textContent = weekday;
 
   updateClockColor();
