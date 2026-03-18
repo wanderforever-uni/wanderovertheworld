@@ -4,231 +4,265 @@
 <meta charset="UTF-8">
 <title>wander</title>
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Digital+7&display=swap" rel="stylesheet">
 <style>
-body {
+body{
   margin:0;
   text-align:center;
-  font-family: Arial, sans-serif;
-  background: #fff;
-  color: #000;
+  background-color:#fff; /* màu nền mặc định */
 }
-h1 { font-family: 'Satisfy', cursive; font-size: 70px; margin:40px 0; }
-img#slide { width:100%; height:auto; }
-.bottom { height:120px; }
 
-/* ---------- Nút nổi ---------- */
-#controlPanel {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  display:flex;
-  flex-direction: column;
-  align-items:center;
-  gap:10px;
-  z-index:999;
+/* tiêu đề */
+h1{
+  font-family:'Satisfy',cursive;
+  font-size:70px;
+  font-weight:normal;
+  margin-top:40px;
+  margin-bottom:40px;
 }
-.controlBtn {
-  font-size:32px;
-  cursor:pointer;
-  transition: transform 0.2s;
-}
-.controlBtn:hover { transform: scale(1.3); }
-.subControls { display:none; flex-direction: column; gap:5px; margin-bottom:5px; }
-input[type=range]{ width:80px; }
 
-/* ---------- Đồng hồ vertical ---------- */
-#clockContainer {
-  position: fixed;
-  left: 20px;
-  top: 20px;
-  display:flex;
-  gap:20px;
-  font-family: 'Digital 7', monospace;
-  z-index:999;
-  color: #000;
+/* slideshow ảnh */
+img#slide{
+  width:100%;
+  height:auto;
 }
-.clock, .dateBox { text-align:center; font-size:28px; line-height:1.3em; }
-.dateBox .dayName {
-  writing-mode: vertical-rl;
-  text-orientation: upright;
+
+/* nút emoji nổi */
+.emoji-btn{
+  position:fixed;
+  bottom:10px;
+  left:10px;
   font-size:24px;
+  cursor:pointer;
+  z-index:999;
+  user-select:none;
 }
-.verticalNumbers { display:flex; flex-direction: column; gap:5px; }
-.verticalNumbers div { display:flex; justify-content: center; gap:5px; }
 
-/* ---------- Hiệu ứng bay ---------- */
-@keyframes rocketFly { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(-400px) rotate(20deg); opacity:0; } }
-@keyframes starFly { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(-150px) rotate(360deg); opacity:0; } }
-.rocketAnim { position: fixed; font-size:30px; z-index:1000; animation: rocketFly 1s ease-out forwards; }
-.starAnim { position: fixed; font-size:24px; z-index:1000; animation: starFly 0.8s ease-out forwards; }
+/* 2 cột đồng hồ góc dưới */
+#clockContainer{
+  position:fixed;
+  bottom:10px;
+  right:10px;
+  display:flex;
+  gap:5px;
+  font-family:'Digital 7', monospace;
+  font-size:12px;
+  z-index:999;
+}
+
+#clockContainer .vertical{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  align-items:center;
+}
+
+#clockContainer .dayName{
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size:10px;
+}
 </style>
 </head>
 <body>
 
 <h1>wander</h1>
 <img id="slide">
-<div id="player" style="display:none;"></div>
-<div class="bottom"></div>
 
-<!-- Control Panel -->
-<div id="controlPanel">
-  <div class="controlBtn" id="btnReloadMusic">☁️</div>
-  <div class="controlBtn" id="btnVolume">☁️</div>
-  <div class="subControls" id="volumeControls">
-    <input type="range" min="0" max="100" value="50" id="volumeSlider">
-  </div>
-  <div class="controlBtn" id="btnTrack">☁️</div>
-  <div class="subControls" id="trackControls">
-    <div class="controlBtn" id="prevTrack">🌟</div>
-    <div class="controlBtn" id="nextTrack">🌟</div>
-  </div>
-  <div class="controlBtn" id="btnPausePlay">☁️</div>
-  <div class="controlBtn" id="btnTop">🚀</div>
-</div>
+<!-- youtube player ẩn -->
+<div id="player" style="display:none"></div>
 
-<!-- Đồng hồ vertical -->
-<div id="clockContainer" style="position:fixed; bottom:10px; left:10px; display:flex; gap:5px; font-family:'Digital 7', monospace; font-size:12px; z-index:999;">
-  <!-- Khung ngày/tháng/năm (4 dòng) + thứ -->
-  <div style="display:flex; flex-direction:column; gap:1px; align-items:center;">
+<!-- nút emoji -->
+<div class="emoji-btn" id="btnRocket">🚀</div>
+<div class="emoji-btn" id="btnCloud1" style="bottom:50px;">☁️</div>
+<div class="emoji-btn" id="btnCloud2" style="bottom:90px;">☁️</div>
+<div class="emoji-btn" id="btnCloud3" style="bottom:130px;">☁️</div>
+<div class="emoji-btn" id="btnCloud4" style="bottom:170px;">☁️</div>
+
+<!-- đồng hồ góc dưới -->
+<div id="clockContainer">
+  <div class="vertical dateBox">
     <div class="year1">--</div>
     <div class="year2">--</div>
     <div class="month">--</div>
     <div class="day">--</div>
-    <div class="dayName" style="writing-mode: vertical-rl; text-orientation: mixed; font-size:10px;">---</div>
+    <div class="dayName">---</div>
   </div>
-  <!-- Khung thời gian hh/mm/ss -->
-  <div style="display:flex; flex-direction:column; gap:1px; align-items:center;">
+  <div class="vertical clock">
     <div class="hh">--</div>
     <div class="mm">--</div>
     <div class="ss">--</div>
   </div>
 </div>
 
-<script>
-function getContrastingColor(rgb){
-    const luminance = 0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2];
-    return luminance > 186 ? '#000' : '#fff';
-}
-
-function updateClockColor(){
-    const bgColor = window.getComputedStyle(document.body).backgroundColor;
-    const rgb = bgColor.match(/\d+/g).map(Number);
-    const textColor = getContrastingColor(rgb);
-    document.querySelectorAll('#clockContainer div').forEach(el=>{
-        el.style.color = textColor;
-    });
-}
-
-function updateClock(){
-    const now = new Date();
-    const hh = ("0"+now.getHours()).slice(-2),
-          mm = ("0"+now.getMinutes()).slice(-2),
-          ss = ("0"+now.getSeconds()).slice(-2);
-    const yy = now.getFullYear().toString(),
-          month = ("0"+(now.getMonth()+1)).slice(-2),
-          day = ("0"+now.getDate()).slice(-2);
-    const weekday = now.toLocaleDateString('en-US',{weekday:'long'});
-
-    document.querySelector('.hh').textContent = hh;
-    document.querySelector('.mm').textContent = mm;
-    document.querySelector('.ss').textContent = ss;
-    document.querySelector('.year1').textContent = yy.slice(0,2);
-    document.querySelector('.year2').textContent = yy.slice(2);
-    document.querySelector('.month').textContent = month;
-    document.querySelector('.day').textContent = day;
-    document.querySelector('.dayName').textContent = weekday;
-
-    updateClockColor();
-}
-
-setInterval(updateClock,1000);
-updateClock();
-</script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-// ----------------- Slideshow Ảnh Ngẫu nhiên -----------------
-let images=[], currentImage=0;
-function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
-function changeImage(){if(images.length>0){document.getElementById("slide").src=images[currentImage];currentImage=(currentImage+1)%images.length;}}
-fetch("images.json").then(r=>r.json()).then(data=>{
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
+let images=[];
+let current=0;
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+}
+
+function changeImage(){
+  document.getElementById("slide").src = images[current];
+  current = (current+1)%images.length;
+}
+
+fetch("images.json")
+.then(res=>res.json())
+.then(data=>{
   shuffle(data);
-  images=data.slice(0,10);
+  images = data.slice(0,10);
   changeImage();
   setInterval(changeImage,5000);
 });
 
-// ----------------- Nhạc YouTube Ngẫu nhiên -----------------
-let musicList=[], currentTrack=0, player, userClicked=false;
-document.body.addEventListener("click",()=>{userClicked=true;if(player)player.playVideo();},{once:true});
-function getVideoId(url){let m=url.match(/v=([^&]+)/);return m?m[1]:null;}
+/* =========================
+   NHẠC NỀN YOUTUBE
+========================= */
+let musicList=[];
+let currentTrack=0;
+let player;
+let musicStarted=false;
+
+function getVideoId(url){
+  let match = url.match(/v=([^&]+)/);
+  return match ? match[1] : null;
+}
+
 function onYouTubeIframeAPIReady(){
-  fetch("music.json").then(r=>r.json()).then(data=>{
-    musicList=data; if(!musicList.length) return;
-    shuffle(musicList);
-    currentTrack=0;
-    let firstId=getVideoId(musicList[currentTrack]);
-    player=new YT.Player('player',{height:'0',width:'0',videoId:firstId,events:{
-      'onReady':(e)=>{if(userClicked)e.target.playVideo();},
-      'onStateChange':onPlayerStateChange
-    }});
+  fetch("music.json")
+  .then(res=>res.json())
+  .then(data=>{
+    shuffle(data);
+    musicList=data;
+    let firstId=getVideoId(musicList[0]);
+    player = new YT.Player('player',{
+      height:'0',
+      width:'0',
+      videoId:firstId,
+      events:{
+        'onStateChange': onPlayerStateChange
+      }
+    });
   });
 }
-function onPlayerStateChange(e){
-  if(e.data===YT.PlayerState.ENDED){
+
+function startMusic(){
+  if(player) player.playVideo();
+}
+
+function onPlayerStateChange(event){
+  if(event.data===YT.PlayerState.ENDED){
     setTimeout(()=>{
       currentTrack=(currentTrack+1)%musicList.length;
-      player.loadVideoById(getVideoId(musicList[currentTrack]));
+      let nextId=getVideoId(musicList[currentTrack]);
+      player.loadVideoById(nextId);
     },10000);
   }
 }
 
-// ----------------- Nút Control -----------------
-document.getElementById('btnTop').onclick=()=>{
-  window.scrollTo({top:0,behavior:'smooth'});
-  const rocket=document.createElement('div'); rocket.textContent='🚀';
-  rocket.className='rocketAnim';
-  const rect=event.target.getBoundingClientRect();
-  rocket.style.left=rect.left+'px'; rocket.style.top=rect.top+'px';
-  document.body.appendChild(rocket);
-  setTimeout(()=>rocket.remove(),1000);
-};
-document.getElementById('btnPausePlay').onclick=()=>{if(player){let s=player.getPlayerState(); s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();}};
-const trackControls=document.getElementById('trackControls');
-document.getElementById('btnTrack').onclick=()=>trackControls.style.display=trackControls.style.display==='flex'?'none':'flex';
-document.getElementById('nextTrack').onclick=(e)=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(e.clientX,e.clientY);}};
-document.getElementById('prevTrack').onclick=(e)=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(e.clientX,e.clientY);}};
-const volumeControls=document.getElementById('volumeControls');
-document.getElementById('btnVolume').onclick=()=>volumeControls.style.display=volumeControls.style.display==='flex'?'none':'flex';
-document.getElementById('volumeSlider').oninput=(e)=>{if(player)player.setVolume(e.target.value);};
-document.getElementById('btnReloadMusic').onclick=()=>{
-  if(player && musicList.length){shuffle(musicList); currentTrack=0; player.loadVideoById(getVideoId(musicList[0])); player.playVideo();}
-};
+document.body.addEventListener("click",()=>{
+  if(player && !musicStarted){
+    player.playVideo();
+    musicStarted=true;
+  }
+},{once:true});
 
-// ---------- Hiệu ứng star ----------
-function starEffect(x,y){
-  const star=document.createElement('div'); star.textContent='🌟';
-  star.className='starAnim';
-  star.style.left=x+'px'; star.style.top=y+'px';
-  document.body.appendChild(star);
-  setTimeout(()=>star.remove(),800);
+/* =========================
+   NÚT CONTROL
+========================= */
+// Rocket: quay về đầu trang
+document.getElementById('btnRocket').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+
+// Cloud1: pause/play
+document.getElementById('btnCloud1').addEventListener('click',()=>{
+  if(player){
+    const state = player.getPlayerState();
+    if(state===YT.PlayerState.PLAYING) player.pauseVideo();
+    else player.playVideo();
+  }
+});
+
+// Cloud2: hiện 2 nút next/prev
+document.getElementById('btnCloud2').addEventListener('click',()=>{
+  let next = document.createElement('div');
+  next.textContent="⭐▶";
+  next.style.position="fixed"; next.style.bottom="90px"; next.style.left="50px"; next.style.fontSize="24px"; next.style.cursor="pointer"; next.style.zIndex="999";
+  next.onclick=()=>{ currentTrack=(currentTrack+1)%musicList.length; player.loadVideoById(getVideoId(musicList[currentTrack])); };
+  document.body.appendChild(next);
+
+  let prev = document.createElement('div');
+  prev.textContent="⭐◀";
+  prev.style.position="fixed"; prev.style.bottom="90px"; prev.style.left="90px"; prev.style.fontSize="24px"; prev.style.cursor="pointer"; prev.style.zIndex="999";
+  prev.onclick=()=>{ currentTrack=(currentTrack-1+musicList.length)%musicList.length; player.loadVideoById(getVideoId(musicList[currentTrack])); };
+  document.body.appendChild(prev);
+});
+
+// Cloud3: hiện volume slider
+document.getElementById('btnCloud3').addEventListener('click',()=>{
+  let slider = document.createElement('input');
+  slider.type="range";
+  slider.min="0"; slider.max="100"; slider.value="100";
+  slider.style.position="fixed"; slider.style.bottom="130px"; slider.style.left="50px"; slider.style.zIndex="999";
+  slider.oninput=()=>{ if(player) player.setVolume(parseInt(slider.value)); };
+  document.body.appendChild(slider);
+});
+
+// Cloud4: phát nhạc sau load
+document.getElementById('btnCloud4').addEventListener('click',()=>{
+  if(player && !musicStarted){
+    shuffle(musicList);
+    currentTrack=0;
+    player.loadVideoById(getVideoId(musicList[currentTrack]));
+    player.playVideo();
+    musicStarted=true;
+  }
+});
+
+/* =========================
+   ĐỒNG HỒ GÓC DƯỚI
+========================= */
+function getContrastingColor(rgb){
+  const luminance = 0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2];
+  return luminance>186?'#000':'#fff';
 }
 
-// ---------- Đồng hồ vertical ----------
+function updateClockColor(){
+  const bgColor = window.getComputedStyle(document.body).backgroundColor;
+  const rgb = bgColor.match(/\d+/g).map(Number);
+  const textColor = getContrastingColor(rgb);
+  document.querySelectorAll('#clockContainer div').forEach(el=>el.style.color=textColor);
+}
+
 function updateClock(){
-  let now=new Date();
-  let hh=("0"+now.getHours()).slice(-2), mm=("0"+now.getMinutes()).slice(-2), ss=("0"+now.getSeconds()).slice(-2);
+  const now = new Date();
+  const hh = ("0"+now.getHours()).slice(-2),
+        mm = ("0"+now.getMinutes()).slice(-2),
+        ss = ("0"+now.getSeconds()).slice(-2);
+  const yy = now.getFullYear().toString(),
+        month = ("0"+(now.getMonth()+1)).slice(-2),
+        day = ("0"+now.getDate()).slice(-2);
+  const weekday = now.toLocaleDateString('en-US',{weekday:'long'});
+
   document.querySelector('.hh').textContent=hh;
   document.querySelector('.mm').textContent=mm;
   document.querySelector('.ss').textContent=ss;
-
-  let yy=now.getFullYear().toString(), month=("0"+(now.getMonth()+1)).slice(-2), day=("0"+now.getDate()).slice(-2);
   document.querySelector('.year1').textContent=yy.slice(0,2);
   document.querySelector('.year2').textContent=yy.slice(2);
   document.querySelector('.month').textContent=month;
   document.querySelector('.day').textContent=day;
-  document.querySelector('.dayName').textContent=now.toLocaleDateString('en-US',{weekday:'long'});
+  document.querySelector('.dayName').textContent=weekday;
+
+  updateClockColor();
 }
+
 setInterval(updateClock,1000);
 updateClock();
 </script>
