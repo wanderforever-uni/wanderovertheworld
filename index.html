@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <title>wander</title>
@@ -28,7 +27,6 @@ img {
 }
 </style>
 </head>
-
 <body>
 
 <h1>wander</h1>
@@ -36,7 +34,6 @@ img {
 
 <!-- youtube player ẩn -->
 <div id="player" style="display:none;"></div>
-
 <div class="bottom"></div>
 
 <!-- YouTube API -->
@@ -71,28 +68,27 @@ fetch("images.json")
   setInterval(changeImage, 5000);
 });
 
-
 /* =========================
    NHẠC NỀN YOUTUBE
 ========================= */
 let musicList = [];
 let currentTrack = 0;
 let player;
-let userClicked = false;
+let userClicked = false; // lưu trạng thái click user
 
-// lấy video ID từ URL YouTube
-function getVideoId(url){
-  let match = url.match(/v=([^&]+)/);
-  return match ? match[1] : null;
-}
-
-// Click lần đầu → bật nhạc
+// click user → lưu trạng thái, nếu player sẵn sàng thì phát ngay
 document.body.addEventListener("click", () => {
     userClicked = true;
     if(player){
         player.playVideo();
     }
 }, {once:true});
+
+// hàm lấy video ID từ URL YouTube
+function getVideoId(url){
+  let match = url.match(/v=([^&]+)/);
+  return match ? match[1] : null;
+}
 
 // YouTube API ready
 function onYouTubeIframeAPIReady(){
@@ -101,14 +97,16 @@ function onYouTubeIframeAPIReady(){
   .then(data => {
     musicList = data;
     if(musicList.length === 0) return;
+
     let firstId = getVideoId(musicList[0]);
+
     player = new YT.Player('player', {
       height: '0',
       width: '0',
       videoId: firstId,
       events: {
         'onReady': (event) => {
-            // Nếu user đã click trước → play ngay
+            // nếu user đã click trước → play nhạc ngay
             if(userClicked){
                 event.target.playVideo();
             }
