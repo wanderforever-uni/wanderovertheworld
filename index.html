@@ -9,52 +9,53 @@
         h1 { font-family:'Satisfy', cursive; font-size:70px; margin:40px 0; color: #000; }
         img { width:100%; height:auto; display:block; }
         
-        /* 1. CHỈ ĐỒNG HỒ MỚI ĐỔI MÀU THEO NỀN */
+        /* 1. ĐỒNG HỒ: Dùng mix-blend-mode để tự đổi màu theo nền */
         #casioPanel { 
             position:fixed; left:30px; top:50%; transform:translateY(-50%); 
             display:flex; gap:20px; font-family:'Share Tech Mono', monospace; 
-            z-index: 9999;
-            mix-blend-mode: difference; /* Hiệu ứng đổi màu chỉ ở đây */
-            color: #fff;
+            z-index: 999;
+            mix-blend-mode: difference;
+            color: #fff; 
         }
         .clock-box { display:flex; flex-direction:column; line-height:1.1; font-size:28px; }
         .day-vertical { font-size:14px; writing-mode:vertical-rl; margin-top:5px; text-transform: uppercase; }
 
-        /* 2. BỘ NÚT ĐIỀU KHIỂN: GIỮ MÀU GỐC, KHÔNG ĐỔI MÀU */
+        /* 2. BỘ ĐIỀU KHIỂN: KHÔNG dùng mix-blend-mode để giữ màu gốc của Emoji */
         #controlPanel { 
             position:fixed; right:30px; bottom:40px; 
             display:flex; flex-direction:column-reverse; align-items:center; gap:15px; 
-            z-index: 9999;
-            /* KHÔNG có mix-blend-mode ở đây */
+            z-index: 1000;
         }
-        .btn { font-size:32px; cursor:pointer; transition:0.3s; user-select:none; position: relative; }
+        .btn { font-size:32px; cursor:pointer; transition:0.3s; user-select:none; }
         
         .sub-menu { display:none; flex-direction:column; gap:15px; margin-bottom: 10px; }
         .star-btn { position: relative; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        
-        /* Chữ n/p trong ngôi sao - Giữ màu đen để dễ nhìn trên nền sao vàng */
-        .star-label { 
-            position: absolute; font-size: 10px; font-family: 'Share Tech Mono', monospace; 
-            font-weight: bold; margin-top: 2px; pointer-events: none; color: #000; 
-        }
+        .star-label { position: absolute; font-size: 10px; font-family: 'Share Tech Mono', monospace; font-weight: bold; color: #000; pointer-events: none; }
 
-        #volumeSlider { 
-            writing-mode: bt-lr; appearance: slider-vertical; 
-            width:8px; height:80px; display:none; margin-bottom: 10px; 
-        }
+        #volumeSlider { writing-mode: bt-lr; appearance: slider-vertical; width:8px; height:80px; display:none; margin-bottom: 10px; }
 
         #player { position: absolute; top: -9999px; left: -9999px; }
 
-        /* Lớp phủ tàng hình bắt tương tác đầu tiên sau khi Reload */
-        #interactionOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10001; background: rgba(0,0,0,0);
+        /* LỚP PHỦ TÀNG HÌNH ĐỂ KÍCH HOẠT NHẠC SAU KHI RELOAD */
+        #gatekeeper {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(255,255,255,0.01); /* Gần như tàng hình */
+            z-index: 99999; /* Nằm trên cùng */
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
         }
+        #gatekeeper span { 
+            font-family: 'Satisfy', cursive; font-size: 20px; color: #888; 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 0% {opacity: 0.3;} 50% {opacity: 1;} 100% {opacity: 0.3;} }
     </style>
 </head>
 <body>
 
-    <div id="interactionOverlay"></div>
+    <div id="gatekeeper">
+        <span>click to wander...</span>
+    </div>
 
     <h1>wander</h1>
     <img id="slide">
@@ -64,15 +65,15 @@
         <div class="clock-box">
             <span id="hh">00</span><span id="mm">00</span><span id="ss" style="font-size:18px; opacity:0.8;">00</span>
         </div>
-        <div class="clock-box">
+        <div id="dateBox" class="clock-box">
             <span id="y1">20</span><span id="y2">26</span><span id="month">01</span><span id="day">01</span>
             <div id="weekday" class="day-vertical">MONDAY</div>
         </div>
     </div>
 
     <div id="controlPanel">
-        <div class="btn" id="rocketBtn" title="Back to Top">🚀</div>
-        <div class="btn" id="playPauseBtn" title="Play/Pause">☁️</div>
+        <div class="btn" id="rocketBtn">🚀</div>
+        <div class="btn" id="playPauseBtn">☁️</div>
         <div class="btn" id="navBtn">
             <div class="sub-menu" id="navSub">
                 <div class="star-btn" id="nextBtn">⭐<span class="star-label">n</span></div>
@@ -104,11 +105,8 @@
         }
 
         function onYouTubeIframeAPIReady() {
-            fetch("music.json")
-            .then(res => res.json())
-            .then(data => {
-                shuffle(data);
-                musicList = data;
+            fetch("music.json").then(res => res.json()).then(data => {
+                shuffle(data); musicList = data;
                 player = new YT.Player('player', {
                     height: '0', width: '0',
                     videoId: getVideoId(musicList[0]),
@@ -120,6 +118,16 @@
                 });
             });
         }
+
+        // KÍCH HOẠT NHẠC VÀ XÓA LỚP PHỦ
+        document.getElementById("gatekeeper").onclick = function() {
+            if (playerReady && player) {
+                player.unMute();
+                player.setVolume(50);
+                player.playVideo();
+                this.style.display = "none"; // Xóa bỏ lớp phủ để dùng được các nút bên dưới
+            }
+        };
 
         function nextTrack() {
             currentTrack = (currentTrack + 1) % musicList.length;
@@ -133,49 +141,27 @@
             player.unMute();
         }
 
-        // KÍCH HOẠT NHẠC KHI CLICK BẤT KỲ ĐÂU (GIẢI PHÁP CHO RELOAD)
-        document.getElementById("interactionOverlay").onclick = function() {
-            if (playerReady && player) {
-                player.unMute();
-                player.playVideo();
-                this.style.display = "none"; 
-                console.log("Music Started after Interaction");
-            }
-        };
-
-        // BUTTONS LOGIC
-        document.getElementById("rocketBtn").onclick = (e) => {
-            e.stopPropagation();
-            window.scrollTo({top:0, behavior:'smooth'});
-        };
-        
-        document.getElementById("playPauseBtn").onclick = (e) => {
-            e.stopPropagation();
+        // ĐIỀU KHIỂN
+        document.getElementById("rocketBtn").onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+        document.getElementById("playPauseBtn").onclick = () => {
             if(!playerReady) return;
             player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo();
         };
-
-        document.getElementById("navBtn").onclick = (e) => {
-            e.stopPropagation();
+        document.getElementById("navBtn").onclick = () => {
             const s = document.getElementById("navSub");
             s.style.display = s.style.display === "flex" ? "none" : "flex";
         };
-
         document.getElementById("nextBtn").onclick = (e) => { e.stopPropagation(); nextTrack(); };
         document.getElementById("prevBtn").onclick = (e) => { e.stopPropagation(); prevTrack(); };
-
-        document.getElementById("volBtn").onclick = (e) => {
-            e.stopPropagation();
+        document.getElementById("volBtn").onclick = () => {
             const v = document.getElementById("volumeSlider");
             v.style.display = v.style.display === "block" ? "none" : "block";
         };
-
-        document.getElementById("volumeSlider").oninput = function(e) {
-            e.stopPropagation();
+        document.getElementById("volumeSlider").oninput = function() {
             if(playerReady) player.setVolume(this.value);
         };
 
-        // CASIO CLOCK LOGIC
+        // CLOCK & SLIDESHOW
         function updateClock() {
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
@@ -187,10 +173,15 @@
             document.getElementById("y2").innerText = y.slice(2);
             document.getElementById("month").innerText = pad(now.getMonth()+1);
             document.getElementById("day").innerText = pad(now.getDate());
-            const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
-            document.getElementById("weekday").innerText = days[now.getDay()];
+            document.getElementById("weekday").innerText = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][now.getDay()];
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // SL
+        fetch("images.json").then(r=>r.json()).then(d=>{
+            shuffle(d); let i=0; document.getElementById("slide").src=d[0];
+            setInterval(()=>{ i=(i+1)%d.length; document.getElementById("slide").src=d[i]; }, 5000);
+        });
+    </script>
+</body>
+</html>
 
