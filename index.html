@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 <title>wander</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
@@ -11,10 +12,8 @@
 body{
 margin:0;
 text-align:center;
-overflow:hidden;
 }
 
-/* title */
 h1{
 font-family:'Satisfy',cursive;
 font-size:70px;
@@ -23,57 +22,9 @@ margin-top:40px;
 margin-bottom:40px;
 }
 
-/* image */
 img{
 width:100%;
 height:auto;
-}
-
-/* overlay */
-#overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:black;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:999;
-cursor:pointer;
-}
-
-/* button */
-#launchBtn{
-width:220px;
-height:220px;
-border-radius:50%;
-border:2px solid white;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:20px;
-cursor:pointer;
-transition:0.4s;
-}
-
-#launchBtn:hover{
-transform:scale(1.1);
-}
-
-/* rocket */
-.rocket{
-position:fixed;
-bottom:-100px;
-font-size:40px;
-animation:fly 2s linear forwards;
-}
-
-@keyframes fly{
-0%{transform:translateY(0);}
-100%{transform:translateY(-120vh);}
 }
 
 .bottom{
@@ -86,15 +37,11 @@ height:120px;
 
 <body>
 
-<!-- overlay -->
-<div id="overlay">
-  <div id="launchBtn">launch to explore</div>
-</div>
-
 <h1>wander</h1>
 
 <img id="slide">
 
+<!-- youtube player ẩn -->
 <div id="player" style="display:none;"></div>
 
 <div class="bottom"></div>
@@ -103,11 +50,14 @@ height:120px;
 
 <script>
 
-/* ================= SLIDESHOW ================= */
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
 
 let images = [];
 let current = 0;
 
+/* random thứ tự */
 function shuffle(array){
 for(let i=array.length-1;i>0;i--){
 const j=Math.floor(Math.random()*(i+1));
@@ -115,31 +65,48 @@ const j=Math.floor(Math.random()*(i+1));
 }
 }
 
+/* đổi ảnh */
 function changeImage(){
+
 document.getElementById("slide").src = images[current];
+
 current = (current + 1) % images.length;
+
 }
 
+/* đọc file images.json */
+
 fetch("images.json")
-.then(res=>res.json())
+.then(response=>response.json())
 .then(data=>{
+
 shuffle(data);
+
 images = data.slice(0,10);
+
 changeImage();
+
 setInterval(changeImage,5000);
+
 });
 
 
-/* ================= MUSIC ================= */
+/* =========================
+   NHẠC NỀN YOUTUBE
+========================= */
 
 let musicList = [];
 let currentTrack = 0;
-let player = null;
+let player;
+
+/* lấy video ID */
 
 function getVideoId(url){
 let match = url.match(/v=([^&]+)/);
 return match ? match[1] : null;
 }
+
+/* youtube api ready */
 
 function onYouTubeIframeAPIReady(){
 
@@ -148,6 +115,7 @@ fetch("music.json")
 .then(data=>{
 
 shuffle(data);
+
 musicList = data;
 
 let firstId = getVideoId(musicList[0]);
@@ -156,11 +124,8 @@ player = new YT.Player('player',{
 height:'0',
 width:'0',
 videoId:firstId,
-playerVars:{
-'autoplay':1,
-'mute':1
-},
 events:{
+'onReady':startMusic,
 'onStateChange':onPlayerStateChange
 }
 });
@@ -169,65 +134,39 @@ events:{
 
 }
 
-function startMusic(){
-if(player){
-player.mute();
-player.playVideo();
+/* bắt đầu phát */
 
-setTimeout(()=>{
-player.unMute();
-},1000);
+function startMusic(){
+player.playVideo();
 }
-}
+
+/* khi nhạc kết thúc */
 
 function onPlayerStateChange(event){
+
 if(event.data === YT.PlayerState.ENDED){
+
 setTimeout(()=>{
+
 currentTrack = (currentTrack+1)%musicList.length;
+
 let nextId = getVideoId(musicList[currentTrack]);
+
 player.loadVideoById(nextId);
+
 },10000);
-}
-}
 
-
-/* ================= LAUNCH EFFECT ================= */
-
-window.onload = function(){
-
-const btn = document.getElementById("launchBtn");
-
-btn.onclick = function(){
-
-/* ẩn overlay */
-document.getElementById("overlay").style.display = "none";
-
-/* rocket effect */
-for(let i=0;i<10;i++){
-
-let rocket = document.createElement("div");
-rocket.className = "rocket";
-rocket.innerHTML = "🚀";
-
-rocket.style.left = Math.random()*100 + "vw";
-rocket.style.animationDuration = (1.5 + Math.random()*1.5) + "s";
-
-document.body.appendChild(rocket);
-
-setTimeout(()=>rocket.remove(),2000);
 }
 
-/* phát nhạc */
-let wait = setInterval(()=>{
+}
+
+/* fix autoplay */
+
+document.body.addEventListener("click",()=>{
 if(player){
-startMusic();
-clearInterval(wait);
+player.playVideo();
 }
-},300);
-
-};
-
-};
+},{once:true});
 
 </script>
 
