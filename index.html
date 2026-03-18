@@ -1,122 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>wander</title>
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            background-color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+<meta charset="UTF-8">
+<title>wander</title>
+<link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; text-align: center; background-color: #fff; }
+  h1 { font-family: 'Satisfy', cursive; font-size: 70px; font-weight: normal; margin: 40px 0; }
+  img#slide { width: 100%; height: auto; display: block; }
 
-        h1 {
-            font-family: 'Satisfy', cursive;
-            font-size: clamp(45px, 12vw, 75px);
-            font-weight: normal;
-            margin: 45px 0;
-            color: #222;
-        }
+  /* Cụm điều khiển tổng góc dưới bên phải */
+  #status-bar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    z-index: 9999;
+    /* Dùng đổ bóng để chữ trắng luôn nổi bật trên mọi nền ảnh */
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5);
+  }
 
-        /* Trình chiếu ảnh */
-        #slide {
-            width: 100%;
-            height: auto;
-            display: block;
-            transition: opacity 1.2s ease-in-out;
-            background-color: #eee; /* Nền tạm khi chưa load ảnh */
-        }
+  /* Nhóm Emoji xếp dọc */
+  .emoji-controls {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    align-items: center;
+  }
+  .emoji-btn { font-size: 24px; cursor: pointer; user-select: none; }
+  
+  #vol-input { 
+    display: none; 
+    background: rgba(0,0,0,0.6); 
+    padding: 10px; 
+    border-radius: 20px; 
+    margin-bottom: 5px;
+  }
 
-        /* GÓC ĐIỀU KHIỂN & ĐỒNG HỒ (DƯỚI PHẢI) */
-        #widgetArea {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            display: flex;
-            align-items: flex-end;
-            gap: 15px;
-            z-index: 9999;
-            color: #fff;
-            /* Đảm bảo chữ luôn nổi bật trên mọi màu ảnh */
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.3);
-        }
-
-        /* Cụm nút Emoji */
-        .btn-stack {
-            display: flex;
-            flex-direction: column-reverse; /* Xếp từ dưới lên */
-            gap: 15px;
-            align-items: center;
-        }
-
-        .emoji-icon {
-            font-size: 26px;
-            cursor: pointer;
-            user-select: none;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .emoji-icon:hover { transform: scale(1.25); }
-
-        /* Panel Âm lượng */
-        #volPanel {
-            display: none;
-            background: rgba(0,0,0,0.7);
-            padding: 12px 8px;
-            border-radius: 20px;
-            margin-bottom: 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        /* Đồng hồ Digital */
-        #digitalClock {
-            display: flex;
-            gap: 6px;
-            font-family: 'Share Tech Mono', monospace;
-            line-height: 1;
-        }
-        .col { display: flex; flex-direction: column; align-items: center; }
-        .date-part { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
-        .time-part { font-size: 32px; font-weight: bold; letter-spacing: 1px; }
-        .day-label { writing-mode: vertical-rl; font-size: 11px; text-transform: uppercase; margin-left: 2px; }
-
-        input[type=range] { cursor: pointer; accent-color: #fff; }
-    </style>
+  /* Đồng hồ */
+  #clock-box { display: flex; gap: 6px; font-family: 'Share Tech Mono', monospace; line-height: 1; }
+  .c-col { display: flex; flex-direction: column; align-items: center; }
+  .c-date { font-size: 12px; }
+  .c-time { font-size: 28px; font-weight: bold; }
+  .c-day { writing-mode: vertical-rl; font-size: 10px; text-transform: uppercase; }
+</style>
 </head>
 <body>
 
 <h1>wander</h1>
+<img id="slide">
 
-<img id="slide" src="" alt="loading context...">
+<div id="player" style="display:none;"></div>
 
-<div id="player"></div>
-
-<div id="widgetArea">
-    <div class="btn-stack">
-        <div class="emoji-icon" title="Go to top" onclick="window.scrollTo({top:0, behavior:'smooth'})">🔝</div>
-        <div class="emoji-icon" id="playToggle" title="Play/Pause">☁️</div>
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-            <div id="volPanel">
-                <input type="range" id="volControl" min="0" max="100" value="100" style="width: 70px;">
-            </div>
-            <div class="emoji-icon" id="volToggle" title="Volume">☁️</div>
-        </div>
+<div id="status-bar">
+  <div class="emoji-controls">
+    <div class="emoji-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">🔝</div>
+    <div class="emoji-btn" id="play-btn">☁️</div>
+    <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
+        <div id="vol-input"><input type="range" id="volume-slider" min="0" max="100" value="100" style="width:70px;"></div>
+        <div class="emoji-btn" id="vol-btn">☁️</div>
     </div>
+  </div>
 
-    <div id="digitalClock">
-        <div class="col date-part">
-            <span id="y_hi">--</span><span id="y_lo">--</span>
-            <span id="mo">--</span><span id="da">--</span>
-        </div>
-        <div class="col time-part">
-            <span id="hr">00</span><span id="mn">00</span><span id="sc">00</span>
-        </div>
-        <div class="day-label" id="dayName">---</div>
+  <div id="clock-box">
+    <div class="c-col c-date">
+      <span id="y1"></span><span id="y2"></span>
+      <span id="mo"></span><span id="da"></span>
     </div>
+    <div class="c-col c-time">
+      <span id="hh">00</span><span id="mm">00</span><span id="ss">00</span>
+    </div>
+    <div class="c-day" id="dname">---</div>
+  </div>
 </div>
 
-<script src="
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+/* SLIDESHOW GỐC CỦA BẠN */
+let images = [];
+let current = 0;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+fetch("images.json").then(r=>r.json()).then(data=>{
+  shuffle(data);
+  images = data.slice(0,10);
+  if(images.length>0){
+    document.getElementById("slide").src = images[0];
+    setInterval(()=>{
+      current = (current+1)%images.length;
+      document.getElementById("slide").src = images[current];
+    }, 5000);
+  }
+});
+
+/* NHẠC YOUTUBE GỐC CỦA BẠN */
+let player, musicList=[], started=false;
+function getVideoId(url){ let m=url.match(/v=([^&]+)/); return m?m[1]:null; }
+
+function onYouTubeIframeAPIReady(){
+  fetch("music.json").then(r=>r.json()).then(data=>{
+    shuffle(data);
+    musicList = data;
+    if(musicList.length>0){
+      player = new YT.Player('player',{
+        height:'0', width:'0', videoId: getVideoId(musicList[0]),
+        events: {'onStateChange': (e)=>{ if(e.data===YT.PlayerState.ENDED){
+          let next = Math.floor(Math.random()*musicList.length);
+          player.loadVideoById(getVideoId(musicList[next]));
+        }}}
+      });
+    }
+  });
+}
+
+// Click bất kỳ đâu để bật nhạc lần đầu
+document.body.addEventListener("click", ()=>{
+  if(player && !started){ player.playVideo(); started=true; }
+}, {once:true});
+
+/* ĐIỀU KHIỂN */
+document.getElementById('play-btn').onclick = (e)=>{
+  e.stopPropagation();
+  if(!player) return;
+  player.getPlayerState()===1 ? player.pauseVideo() : player.playVideo();
+};
+
+document.getElementById('vol-btn').onclick = (e)=>{
+  e.stopPropagation();
+  let v = document.getElementById('vol-input');
+  v.style.display = (v.style.display==='block')?'none':'block';
+};
+
+document.getElementById('volume-slider').oninput = (e)=>{
+  player.setVolume(e.target.value);
+};
+
+/* ĐỒNG HỒ */
+function update(){
+  const n = new Date();
+  const y = String(n.getFullYear());
+  document.getElementById('y1').innerText = y.slice(0,2);
+  document.getElementById('y2').innerText = y.slice(2);
+  document.getElementById('mo').innerText = String(n.getMonth()+1).padStart(2,'0');
+  document.getElementById('da').innerText = String(n.getDate()).padStart(2,'0');
+  document.getElementById('hh').innerText = String(n.getHours()).padStart(2,'0');
+  document.getElementById('mm').innerText = String(now=n.getMinutes()).padStart(2,'0');
+  document.getElementById('ss').innerText = String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('dname').innerText = n.toLocaleDateString('en-US',{weekday:'short'});
+}
+setInterval(update, 1000); update();
+</script>
+</body>
+</html>
