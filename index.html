@@ -2,146 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wander</title>
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --casio-font: 'Share Tech Mono', monospace;
-        }
+        body { margin:0; text-align:center; background:#fff; font-family:sans-serif; }
+        h1 { font-family:'Satisfy', cursive; font-size:70px; margin:40px 0; }
+        img { width:100%; height:auto; display:block; }
+        
+        /* Panel Settings */
+        #controlPanel { position:fixed; right:30px; bottom:40px; display:flex; flex-direction:column-reverse; align-items:center; gap:15px; z-index:9999; }
+        .btn { font-size:32px; cursor:pointer; transition:0.3s; user-select:none; }
+        .sub-menu { display:none; flex-direction:column; gap:10px; font-size:24px; }
+        #volumeSlider { writing-mode: bt-lr; appearance: slider-vertical; width:8px; height:80px; display:none; }
 
-        body {
-            margin: 0;
-            text-align: center;
-            background: #fff;
-            font-family: sans-serif;
-        }
-
-        h1 {
-            font-family: 'Satisfy', cursive;
-            font-size: 70px;
-            font-weight: normal;
-            margin: 40px 0;
-        }
-
-        img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .spacer { height: 1000px; } /* Tạo khoảng trống để test việc cuộn trang */
-
-        /* =========================
-           FLOATING CONTROL PANEL (RIGHT)
-        ========================= */
-        #controlPanel {
-            position: fixed;
-            right: 30px;
-            bottom: 40px;
-            display: flex;
-            flex-direction: column-reverse; /* Rocket ở dưới cùng */
-            align-items: center;
-            gap: 15px;
-            z-index: 9999;
-        }
-
-        .btn {
-            font-size: 32px;
-            cursor: pointer;
-            transition: 0.3s;
-            user-select: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .btn:hover { transform: scale(1.2); }
-
-        /* Sub-controls (Stars & Volume) */
-        .sub-menu {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 5px;
-            font-size: 24px;
-        }
-
-        #volumeSlider {
-            writing-mode: bt-lr; /* Vertical slider */
-            appearance: slider-vertical;
-            width: 8px;
-            height: 80px;
-            display: none;
-        }
-
-        /* =========================
-           CASIO CLOCK PANEL (LEFT)
-        ========================= */
-        #casioPanel {
-            position: fixed;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 20px;
-            font-family: var(--casio-font);
-            color: #333;
-            z-index: 9999;
-            text-transform: uppercase;
-        }
-
-        .clock-box {
-            display: flex;
-            flex-direction: column;
-            line-height: 1;
-            font-size: 28px;
-        }
-
-        .day-vertical {
-            font-size: 14px;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            margin-top: 5px;
-        }
-
+        #casioPanel { position:fixed; left:30px; top:50%; transform:translateY(-50%); display:flex; gap:20px; font-family:'Share Tech Mono', monospace; z-index:9999; }
+        .clock-box { display:flex; flex-direction:column; line-height:1.1; font-size:28px; }
+        .day-vertical { font-size:14px; writing-mode:vertical-rl; margin-top:5px; }
         #player { position: absolute; top: -9999px; }
     </style>
 </head>
 <body>
 
     <h1>wander</h1>
-    <img id="slide" alt="slideshow">
+    <img id="slide">
     <div id="player"></div>
-    <div class="spacer"></div> <div id="casioPanel">
-        <div class="clock-box" id="timeBox">
-            <span id="hh">00</span>
-            <span id="mm">00</span>
-            <span id="ss" style="font-size: 20px; color: #888;">00</span>
+
+    <div id="casioPanel">
+        <div class="clock-box">
+            <span id="hh">00</span><span id="mm">00</span><span id="ss" style="font-size:18px; opacity:0.6;">00</span>
         </div>
-        <div class="clock-box" id="dateBox">
-            <span id="y1">20</span>
-            <span id="y2">26</span>
-            <span id="month">01</span>
-            <span id="day">01</span>
+        <div class="clock-box">
+            <span id="y1">20</span><span id="y2">26</span><span id="month">01</span><span id="day">01</span>
             <div id="weekday" class="day-vertical">MONDAY</div>
         </div>
     </div>
 
     <div id="controlPanel">
-        <div class="btn" id="rocketBtn" title="Back to top">🚀</div>
-
-        <div class="btn" id="playPauseBtn" title="Play/Pause">☁️</div>
-
-        <div class="btn" id="navBtn" title="Next/Prev">
-            <div class="sub-menu" id="navSub">
-                <span id="prevBtn">⭐</span>
-                <span id="nextBtn">⭐</span>
-            </div>
+        <div class="btn" id="rocketBtn">🚀</div>
+        <div class="btn" id="playPauseBtn">☁️</div>
+        <div class="btn" id="navBtn">
+            <div class="sub-menu" id="navSub"><span id="prevBtn">⭐</span><span id="nextBtn">⭐</span></div>
             ☁️
         </div>
-
-        <div class="btn" id="volBtn" title="Volume">
+        <div class="btn" id="volBtn">
             <input type="range" id="volumeSlider" min="0" max="100" value="50">
             ☁️
         </div>
@@ -149,10 +52,7 @@
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        /* =========================
-           SLIDESHOW & DATA
-        ========================= */
-        let images = [], musicList = [], currentTrack = 0, player, playerReady = false;
+        let musicList = [], currentTrack = 0, player, playerReady = false;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -161,105 +61,109 @@
             }
         }
 
-        fetch("images.json").then(res => res.json()).then(data => {
-            shuffle(data); images = data;
-            document.getElementById("slide").src = images[0];
-            setInterval(() => {
-                currentTrack = (currentTrack + 1) % images.length;
-                document.getElementById("slide").src = images[currentTrack];
-            }, 5000);
-        });
-
-        /* =========================
-           YOUTUBE LOGIC
-        ========================= */
         function getVideoId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
+            const reg = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(reg);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
+        // 1. Khởi tạo Player
         function onYouTubeIframeAPIReady() {
-            fetch("music.json").then(res => res.json()).then(data => {
-                shuffle(data); musicList = data;
+            fetch("music.json")
+            .then(res => res.json())
+            .then(data => {
+                shuffle(data);
+                musicList = data;
                 player = new YT.Player('player', {
                     height: '0', width: '0',
                     videoId: getVideoId(musicList[0]),
-                    playerVars: { 'autoplay': 1, 'mute': 1 },
-                    events: { 'onReady': () => { playerReady = true; } }
+                    playerVars: { 'autoplay': 1, 'mute': 1, 'enablejsapi': 1 },
+                    events: {
+                        'onReady': (e) => { 
+                            playerReady = true; 
+                            e.target.playVideo(); // Chạy ngầm ngay khi sẵn sàng
+                            console.log("YouTube Ready");
+                        },
+                        'onStateChange': (e) => {
+                            if(e.data === YT.PlayerState.ENDED) nextTrack();
+                        }
+                    }
                 });
-            });
+            }).catch(e => console.error("Lỗi fetch nhạc:", e));
         }
 
-        /* =========================
-           CONTROL INTERACTIONS
-        ========================= */
-        // Rocket: Scroll to top
-        document.getElementById("rocketBtn").onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
-
-        // Tầng 1: Play/Pause
-        document.getElementById("playPauseBtn").onclick = () => {
-            if (!playerReady) return;
-            const state = player.getPlayerState();
-            state === 1 ? player.pauseVideo() : player.playVideo();
-        };
-
-        // Tầng 2: Show/Hide Stars
-        document.getElementById("navBtn").onclick = (e) => {
-            const sub = document.getElementById("navSub");
-            sub.style.display = sub.style.display === "flex" ? "none" : "flex";
-            e.stopPropagation();
-        };
-
-        document.getElementById("nextBtn").onclick = () => {
+        function nextTrack() {
             currentTrack = (currentTrack + 1) % musicList.length;
             player.loadVideoById(getVideoId(musicList[currentTrack]));
-        };
+        }
 
-        document.getElementById("prevBtn").onclick = () => {
+        function prevTrack() {
             currentTrack = (currentTrack - 1 + musicList.length) % musicList.length;
             player.loadVideoById(getVideoId(musicList[currentTrack]));
-        };
+        }
 
-        // Tầng 3: Volume Slider
-        document.getElementById("volBtn").onclick = (e) => {
-            const slider = document.getElementById("volumeSlider");
-            slider.style.display = slider.style.display === "block" ? "none" : "block";
+        // 2. Xử lý CLICK TO PLAY (Khắc phục lỗi reset trang)
+        document.addEventListener("click", function initAudio() {
+            if (playerReady && player) {
+                player.unMute();
+                player.setVolume(50);
+                player.playVideo();
+                console.log("Audio Activated");
+                // Sau khi kích hoạt thành công, gỡ bỏ sự kiện này để không bị reset volume mỗi lần click
+                document.removeEventListener("click", initAudio);
+            }
+        });
+
+        // 3. Các nút điều khiển
+        document.getElementById("rocketBtn").onclick = () => window.scrollTo({top:0, behavior:'smooth'});
+        
+        document.getElementById("playPauseBtn").onclick = (e) => {
             e.stopPropagation();
+            if(!playerReady) return;
+            player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo();
         };
 
-        document.getElementById("volumeSlider").oninput = function() {
+        document.getElementById("navBtn").onclick = (e) => {
+            e.stopPropagation();
+            const s = document.getElementById("navSub");
+            s.style.display = s.style.display === "flex" ? "none" : "flex";
+        };
+
+        document.getElementById("nextBtn").onclick = (e) => { e.stopPropagation(); nextTrack(); };
+        document.getElementById("prevBtn").onclick = (e) => { e.stopPropagation(); prevTrack(); };
+
+        document.getElementById("volBtn").onclick = (e) => {
+            e.stopPropagation();
+            const v = document.getElementById("volumeSlider");
+            v.style.display = v.style.display === "block" ? "none" : "block";
+        };
+
+        document.getElementById("volumeSlider").oninput = function(e) {
             if(playerReady) player.setVolume(this.value);
         };
 
-        // Fix Autoplay on first click
-        document.body.addEventListener("click", () => {
-            if (playerReady) { player.unMute(); player.playVideo(); }
-        }, { once: true });
-
-        /* =========================
-           CASIO DIGITAL CLOCK
-        ========================= */
+        // 4. Clock Logic
         function updateClock() {
             const now = new Date();
-            
-            // Time
-            document.getElementById("hh").textContent = String(now.getHours()).padStart(2, '0');
-            document.getElementById("mm").textContent = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById("ss").textContent = String(now.getSeconds()).padStart(2, '0');
-
-            // Date
-            const year = String(now.getFullYear());
-            document.getElementById("y1").textContent = year.slice(0, 2);
-            document.getElementById("y2").textContent = year.slice(2);
-            document.getElementById("month").textContent = String(now.getMonth() + 1).padStart(2, '0');
-            document.getElementById("day").textContent = String(now.getDate()).padStart(2, '0');
-            
-            const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
-            document.getElementById("weekday").textContent = days[now.getDay()];
+            const pad = (n) => String(n).padStart(2, '0');
+            document.getElementById("hh").innerText = pad(now.getHours());
+            document.getElementById("mm").innerText = pad(now.getMinutes());
+            document.getElementById("ss").innerText = pad(now.getSeconds());
+            const y = String(now.getFullYear());
+            document.getElementById("y1").innerText = y.slice(0,2);
+            document.getElementById("y2").innerText = y.slice(2);
+            document.getElementById("month").innerText = pad(now.getMonth()+1);
+            document.getElementById("day").innerText = pad(now.getDate());
+            const days = ["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"];
+            document.getElementById("weekday").innerText = days[now.getDay()];
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(updateClock, 1000); updateClock();
+
+        // 5. Slideshow
+        fetch("images.json").then(r=>r.json()).then(d=>{
+            let i=0; document.getElementById("slide").src=d[0];
+            setInterval(()=>{ i=(i+1)%d.length; document.getElementById("slide").src=d[i]; }, 5000);
+        });
     </script>
 </body>
 </html>
