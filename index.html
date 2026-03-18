@@ -137,7 +137,14 @@ events:{
 /* bắt đầu phát */
 
 function startMusic(){
-player.playVideo();
+
+player.mute();          // bắt buộc để autoplay
+player.playVideo();     // chạy luôn
+
+setTimeout(()=>{
+player.unMute();        // bật lại âm thanh sau 1s
+},1000);
+
 }
 
 /* khi nhạc kết thúc */
