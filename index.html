@@ -1,270 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>wander</title>
-<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-<style>
-body{
-  margin:0;
-  text-align:center;
-  background-color:#fff; /* màu nền mặc định */
-}
+    <meta charset="UTF-8">
+    <title>时刻 - wander</title>
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            text-align: center;
+            background-color: #fff;
+            overflow-x: hidden;
+        }
 
-/* tiêu đề */
-h1{
-  font-family:'Satisfy',cursive;
-  font-size:70px;
-  font-weight:normal;
-  margin-top:40px;
-  margin-bottom:40px;
-}
+        h1 {
+            font-family: 'Satisfy', cursive;
+            font-size: 70px;
+            font-weight: normal;
+            margin: 40px 0;
+        }
 
-/* slideshow ảnh */
-img#slide{
-  width:100%;
-  height:auto;
-}
+        img#slide {
+            width: 100%;
+            height: auto;
+            transition: opacity 1s ease-in-out;
+        }
 
-/* nút emoji nổi */
-.emoji-btn{
-  position:fixed;
-  bottom:10px;
-  left:10px;
-  font-size:24px;
-  cursor:pointer;
-  z-index:999;
-  user-select:none;
-}
+        /* VÙNG ĐIỀU KHIỂN GÓC PHẢI */
+        #mainControls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            z-index: 999;
+            mix-blend-mode: difference; 
+            color: white; 
+        }
 
-/* 2 cột đồng hồ góc dưới */
-#clockContainer{
-  position:fixed;
-  bottom:10px;
-  right:10px;
-  display:flex;
-  gap:5px;
-  font-family:'Digital 7', monospace;
-  font-size:12px;
-  z-index:999;
-}
+        .emoji-group {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 12px;
+            align-items: center;
+        }
 
-#clockContainer .vertical{
-  display:flex;
-  flex-direction:column;
-  gap:1px;
-  align-items:center;
-}
+        .emoji-btn {
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s;
+            position: relative;
+        }
 
-#clockContainer .dayName{
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  font-size:10px;
-}
-</style>
+        .emoji-btn:hover { transform: scale(1.3); }
+
+        .sub-panel {
+            display: none;
+            position: absolute;
+            right: 40px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        /* ĐỒNG HỒ */
+        #clockContainer {
+            display: flex;
+            gap: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            line-height: 1;
+        }
+
+        .vertical { display: flex; flex-direction: column; align-items: center; }
+        .dateBox { font-size: 12px; justify-content: center; }
+        .clock { font-size: 24px; font-weight: bold; }
+        .dayName { writing-mode: vertical-rl; font-size: 10px; text-transform: uppercase; }
+    </style>
 </head>
 <body>
 
 <h1>wander</h1>
 <img id="slide">
 
-<!-- youtube player ẩn -->
 <div id="player" style="display:none"></div>
 
-<!-- nút emoji -->
-<div class="emoji-btn" id="btnRocket">🚀</div>
-<div class="emoji-btn" id="btnCloud1" style="bottom:50px;">☁️</div>
-<div class="emoji-btn" id="btnCloud2" style="bottom:90px;">☁️</div>
-<div class="emoji-btn" id="btnCloud3" style="bottom:130px;">☁️</div>
-<div class="emoji-btn" id="btnCloud4" style="bottom:170px;">☁️</div>
+<div id="mainControls">
+    <div class="emoji-group">
+        <div class="emoji-btn" id="btnRocket" title="Lên đầu trang">🔝</div>
+        <div class="emoji-btn" id="btnCloud1" title="Play/Pause">☁️</div>
+        <div class="emoji-btn" id="btnCloud3" title="Âm lượng">
+            ☁️
+            <div id="panelVolume" class="sub-panel" style="bottom:0;">
+                <input type="range" id="volSlider" min="0" max="100" value="100">
+            </div>
+        </div>
+    </div>
 
-<!-- đồng hồ góc dưới -->
-<div id="clockContainer">
-  <div class="vertical dateBox">
-    <div class="year1">--</div>
-    <div class="year2">--</div>
-    <div class="month">--</div>
-    <div class="day">--</div>
-    <div class="dayName">---</div>
-  </div>
-  <div class="vertical clock">
-    <div class="hh">--</div>
-    <div class="mm">--</div>
-    <div class="ss">--</div>
-  </div>
+    <div id="clockContainer">
+        <div class="vertical dateBox">
+            <div class="year1">--</div>
+            <div class="year2">--</div>
+            <div class="month">--</div>
+            <div class="day">--</div>
+            <div class="dayName">---</div>
+        </div>
+        <div class="vertical clock">
+            <div class="hh">--</div>
+            <div class="mm">--</div>
+            <div class="ss">--</div>
+        </div>
+    </div>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-/* =========================
-   SLIDESHOW ẢNH
-========================= */
-let images=[];
-let current=0;
+/* --- HỆ THỐNG ẢNH --- */
+let images = [];
+let currentImg = 0;
 
-function shuffle(array){
-  for(let i=array.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [array[i],array[j]]=[array[j],array[i]];
-  }
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
 
-function changeImage(){
-  document.getElementById("slide").src = images[current];
-  current = (current+1)%images.length;
+function changeImage() {
+    if (images.length === 0) return;
+    const slide = document.getElementById("slide");
+    slide.style.opacity = 0;
+    setTimeout(() => {
+        slide.src = images[currentImg];
+        slide.style.opacity = 1;
+        currentImg = (currentImg + 1) % images.length;
+    }, 1000);
 }
 
 fetch("images.json")
-.then(res=>res.json())
-.then(data=>{
-  shuffle(data);
-  images = data.slice(0,10);
-  changeImage();
-  setInterval(changeImage,5000);
-});
-
-/* =========================
-   NHẠC NỀN YOUTUBE
-========================= */
-let musicList=[];
-let currentTrack=0;
-let player;
-let musicStarted=false;
-
-function getVideoId(url){
-  let match = url.match(/v=([^&]+)/);
-  return match ? match[1] : null;
-}
-
-function onYouTubeIframeAPIReady(){
-  fetch("music.json")
-  .then(res=>res.json())
-  .then(data=>{
-    shuffle(data);
-    musicList=data;
-    let firstId=getVideoId(musicList[0]);
-    player = new YT.Player('player',{
-      height:'0',
-      width:'0',
-      videoId:firstId,
-      events:{
-        'onStateChange': onPlayerStateChange
-      }
+    .then(res => res.json())
+    .then(data => {
+        shuffle(data);
+        images = data.slice(0, 10);
+        changeImage();
+        setInterval(changeImage, 7000);
     });
-  });
+
+/* --- HỆ THỐNG NHẠC --- */
+let musicList = [];
+let player;
+let musicStarted = false;
+
+function getVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
 }
 
-function startMusic(){
-  if(player) player.playVideo();
+function onYouTubeIframeAPIReady() {
+    fetch("music.json")
+        .then(res => res.json())
+        .then(data => {
+            shuffle(data);
+            musicList = data;
+            if (musicList.length === 0) return;
+            player = new YT.Player('player', {
+                height: '0', width: '0',
+                videoId: getVideoId(musicList[0]),
+                events: { 'onStateChange': onPlayerStateChange }
+            });
+        });
 }
 
-function onPlayerStateChange(event){
-  if(event.data===YT.PlayerState.ENDED){
-    setTimeout(()=>{
-      currentTrack=(currentTrack+1)%musicList.length;
-      let nextId=getVideoId(musicList[currentTrack]);
-      player.loadVideoById(nextId);
-    },10000);
-  }
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        // Tự động chuyển bài sau 5s khi kết thúc
+        let nextIndex = Math.floor(Math.random() * musicList.length);
+        player.loadVideoById(getVideoId(musicList[nextIndex]));
+    }
 }
 
-document.body.addEventListener("click",()=>{
-  if(player && !musicStarted){
-    player.playVideo();
-    musicStarted=true;
-  }
-},{once:true});
+/* --- ĐIỀU KHIỂN --- */
+document.body.onclick = () => {
+    if (player && !musicStarted) {
+        player.playVideo();
+        musicStarted = true;
+    }
+};
 
-/* =========================
-   NÚT CONTROL
-========================= */
-// Rocket: quay về đầu trang
-document.getElementById('btnRocket').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+document.getElementById('btnRocket').onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
 
-// Cloud1: pause/play
-document.getElementById('btnCloud1').addEventListener('click',()=>{
-  if(player){
+document.getElementById('btnCloud1').onclick = (e) => {
+    e.stopPropagation();
+    if(!player) return;
     const state = player.getPlayerState();
-    if(state===YT.PlayerState.PLAYING) player.pauseVideo();
-    else player.playVideo();
-  }
-});
+    state === 1 ? player.pauseVideo() : player.playVideo();
+};
 
-// Cloud2: hiện 2 nút next/prev
-document.getElementById('btnCloud2').addEventListener('click',()=>{
-  let next = document.createElement('div');
-  next.textContent="⭐▶";
-  next.style.position="fixed"; next.style.bottom="90px"; next.style.left="50px"; next.style.fontSize="24px"; next.style.cursor="pointer"; next.style.zIndex="999";
-  next.onclick=()=>{ currentTrack=(currentTrack+1)%musicList.length; player.loadVideoById(getVideoId(musicList[currentTrack])); };
-  document.body.appendChild(next);
+document.getElementById('btnCloud3').onclick = (e) => {
+    e.stopPropagation();
+    const v = document.getElementById('panelVolume');
+    v.style.display = (v.style.display === 'block') ? 'none' : 'block';
+};
 
-  let prev = document.createElement('div');
-  prev.textContent="⭐◀";
-  prev.style.position="fixed"; prev.style.bottom="90px"; prev.style.left="90px"; prev.style.fontSize="24px"; prev.style.cursor="pointer"; prev.style.zIndex="999";
-  prev.onclick=()=>{ currentTrack=(currentTrack-1+musicList.length)%musicList.length; player.loadVideoById(getVideoId(musicList[currentTrack])); };
-  document.body.appendChild(prev);
-});
+document.getElementById('volSlider').oninput = (e) => {
+    player.setVolume(e.target.value);
+};
 
-// Cloud3: hiện volume slider
-document.getElementById('btnCloud3').addEventListener('click',()=>{
-  let slider = document.createElement('input');
-  slider.type="range";
-  slider.min="0"; slider.max="100"; slider.value="100";
-  slider.style.position="fixed"; slider.style.bottom="130px"; slider.style.left="50px"; slider.style.zIndex="999";
-  slider.oninput=()=>{ if(player) player.setVolume(parseInt(slider.value)); };
-  document.body.appendChild(slider);
-});
-
-// Cloud4: phát nhạc sau load
-document.getElementById('btnCloud4').addEventListener('click',()=>{
-  if(player && !musicStarted){
-    shuffle(musicList);
-    currentTrack=0;
-    player.loadVideoById(getVideoId(musicList[currentTrack]));
-    player.playVideo();
-    musicStarted=true;
-  }
-});
-
-/* =========================
-   ĐỒNG HỒ GÓC DƯỚI
-========================= */
-function getContrastingColor(rgb){
-  const luminance = 0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2];
-  return luminance>186?'#000':'#fff';
-}
-
-function updateClockColor(){
-  const bgColor = window.getComputedStyle(document.body).backgroundColor;
-  const rgb = bgColor.match(/\d+/g).map(Number);
-  const textColor = getContrastingColor(rgb);
-  document.querySelectorAll('#clockContainer div').forEach(el=>el.style.color=textColor);
-}
-
-function updateClock(){
-  const now = new Date();
-  const hh = ("0"+now.getHours()).slice(-2),
-        mm = ("0"+now.getMinutes()).slice(-2),
-        ss = ("0"+now.getSeconds()).slice(-2);
-  const yy = now.getFullYear().toString(),
-        month = ("0"+(now.getMonth()+1)).slice(-2),
-        day = ("0"+now.getDate()).slice(-2);
-  const weekday = now.toLocaleDateString('en-US',{weekday:'long'});
-
-  document.querySelector('.hh').textContent=hh;
-  document.querySelector('.mm').textContent=mm;
-  document.querySelector('.ss').textContent=ss;
-  document.querySelector('.year1').textContent=yy.slice(0,2);
-  document.querySelector('.year2').textContent=yy.slice(2);
-  document.querySelector('.month').textContent=month;
-  document.querySelector('.day').textContent=day;
-  document.querySelector('.dayName').textContent=weekday;
-
-  updateClockColor();
-}
-
-setInterval(updateClock,1000);
-updateClock();
-</script>
-</body>
-</html>
+/* --- ĐỒNG HỒ --- */
+function updateClock() {
+    const now = new Date();
+    document.querySelector('.hh').innerText = String(now.getHours()).padStart(2, '0');
+    document.querySelector('.mm').innerText = String(now.getMinutes()).padStart(2, '0');
+    document.querySelector('.ss').innerText = String(now.getSeconds()).padStart(2, '0');
+    const yy = String(now.getFullYear());
+    document.querySelector('.year1').innerText = yy.slice(0,2);
+    document.querySelector('.year2').innerText = yy.slice(2);
+    document.querySelector
