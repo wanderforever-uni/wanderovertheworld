@@ -1,157 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-<meta charset="UTF-8">
+
 <title>wander</title>
-<link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+
 <style>
-  body { margin: 0; text-align: center; background-color: #fff; }
-  h1 { font-family: 'Satisfy', cursive; font-size: 70px; font-weight: normal; margin: 40px 0; }
-  img#slide { width: 100%; height: auto; display: block; }
 
-  /* Cụm điều khiển tổng góc dưới bên phải */
-  #status-bar {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    align-items: flex-end;
-    gap: 15px;
-    z-index: 9999;
-    /* Dùng đổ bóng để chữ trắng luôn nổi bật trên mọi nền ảnh */
-    color: white;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5);
-  }
+body{
+margin:0;
+text-align:center;
+}
 
-  /* Nhóm Emoji xếp dọc */
-  .emoji-controls {
-    display: flex;
-    flex-direction: column-reverse;
-    gap: 12px;
-    align-items: center;
-  }
-  .emoji-btn { font-size: 24px; cursor: pointer; user-select: none; }
-  
-  #vol-input { 
-    display: none; 
-    background: rgba(0,0,0,0.6); 
-    padding: 10px; 
-    border-radius: 20px; 
-    margin-bottom: 5px;
-  }
+h1{
+font-family:'Satisfy',cursive;
+font-size:70px;
+font-weight:normal;
+margin-top:40px;
+margin-bottom:40px;
+}
 
-  /* Đồng hồ */
-  #clock-box { display: flex; gap: 6px; font-family: 'Share Tech Mono', monospace; line-height: 1; }
-  .c-col { display: flex; flex-direction: column; align-items: center; }
-  .c-date { font-size: 12px; }
-  .c-time { font-size: 28px; font-weight: bold; }
-  .c-day { writing-mode: vertical-rl; font-size: 10px; text-transform: uppercase; }
+img{
+width:100%;
+height:auto;
+}
+
+.bottom{
+height:120px;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <h1>wander</h1>
+
 <img id="slide">
 
+<!-- youtube player ẩn -->
 <div id="player" style="display:none;"></div>
 
-<div id="status-bar">
-  <div class="emoji-controls">
-    <div class="emoji-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">🔝</div>
-    <div class="emoji-btn" id="play-btn">☁️</div>
-    <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
-        <div id="vol-input"><input type="range" id="volume-slider" min="0" max="100" value="100" style="width:70px;"></div>
-        <div class="emoji-btn" id="vol-btn">☁️</div>
-    </div>
-  </div>
-
-  <div id="clock-box">
-    <div class="c-col c-date">
-      <span id="y1"></span><span id="y2"></span>
-      <span id="mo"></span><span id="da"></span>
-    </div>
-    <div class="c-col c-time">
-      <span id="hh">00</span><span id="mm">00</span><span id="ss">00</span>
-    </div>
-    <div class="c-day" id="dname">---</div>
-  </div>
-</div>
+<div class="bottom"></div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-/* SLIDESHOW GỐC CỦA BẠN */
+
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
+
 let images = [];
 let current = 0;
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
 
-fetch("images.json").then(r=>r.json()).then(data=>{
-  shuffle(data);
-  images = data.slice(0,10);
-  if(images.length>0){
-    document.getElementById("slide").src = images[0];
-    setInterval(()=>{
-      current = (current+1)%images.length;
-      document.getElementById("slide").src = images[current];
-    }, 5000);
-  }
+/* random thứ tự */
+function shuffle(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+}
+
+/* đổi ảnh */
+function changeImage(){
+
+document.getElementById("slide").src = images[current];
+
+current = (current + 1) % images.length;
+
+}
+
+/* đọc file images.json */
+
+fetch("images.json")
+.then(response=>response.json())
+.then(data=>{
+
+shuffle(data);
+
+images = data.slice(0,10);
+
+changeImage();
+
+setInterval(changeImage,5000);
+
 });
 
-/* NHẠC YOUTUBE GỐC CỦA BẠN */
-let player, musicList=[], started=false;
-function getVideoId(url){ let m=url.match(/v=([^&]+)/); return m?m[1]:null; }
+
+/* =========================
+   NHẠC NỀN YOUTUBE
+========================= */
+
+let musicList = [];
+let currentTrack = 0;
+let player;
+
+/* lấy video ID */
+
+function getVideoId(url){
+let match = url.match(/v=([^&]+)/);
+return match ? match[1] : null;
+}
+
+/* youtube api ready */
 
 function onYouTubeIframeAPIReady(){
-  fetch("music.json").then(r=>r.json()).then(data=>{
-    shuffle(data);
-    musicList = data;
-    if(musicList.length>0){
-      player = new YT.Player('player',{
-        height:'0', width:'0', videoId: getVideoId(musicList[0]),
-        events: {'onStateChange': (e)=>{ if(e.data===YT.PlayerState.ENDED){
-          let next = Math.floor(Math.random()*musicList.length);
-          player.loadVideoById(getVideoId(musicList[next]));
-        }}}
-      });
-    }
-  });
+
+fetch("music.json")
+.then(res=>res.json())
+.then(data=>{
+
+shuffle(data);
+
+musicList = data;
+
+let firstId = getVideoId(musicList[0]);
+
+player = new YT.Player('player',{
+height:'0',
+width:'0',
+videoId:firstId,
+events:{
+'onReady':startMusic,
+'onStateChange':onPlayerStateChange
+}
+});
+
+});
+
 }
 
-// Click bất kỳ đâu để bật nhạc lần đầu
-document.body.addEventListener("click", ()=>{
-  if(player && !started){ player.playVideo(); started=true; }
-}, {once:true});
+/* bắt đầu phát */
 
-/* ĐIỀU KHIỂN */
-document.getElementById('play-btn').onclick = (e)=>{
-  e.stopPropagation();
-  if(!player) return;
-  player.getPlayerState()===1 ? player.pauseVideo() : player.playVideo();
-};
-
-document.getElementById('vol-btn').onclick = (e)=>{
-  e.stopPropagation();
-  let v = document.getElementById('vol-input');
-  v.style.display = (v.style.display==='block')?'none':'block';
-};
-
-document.getElementById('volume-slider').oninput = (e)=>{
-  player.setVolume(e.target.value);
-};
-
-/* ĐỒNG HỒ */
-function update(){
-  const n = new Date();
-  const y = String(n.getFullYear());
-  document.getElementById('y1').innerText = y.slice(0,2);
-  document.getElementById('y2').innerText = y.slice(2);
-  document.getElementById('mo').innerText = String(n.getMonth()+1).padStart(2,'0');
-  document.getElementById('da').innerText = String(n.getDate()).padStart(2,'0');
-  document.getElementById('hh').innerText = String(n.getHours()).padStart(2,'0');
-  document.getElementById('mm').innerText = String(now=n.getMinutes()).padStart(2,'0');
-  document.getElementById('ss').innerText = String(n.getSeconds()).padStart(2,'0');
-  document.getElementById('dname').innerText = n.toLocaleDateString('en-US',{weekday:'short'});
+function startMusic(){
+player.playVideo();
 }
-setInterval(update, 1000); update();
+
+/* khi nhạc kết thúc */
+
+function onPlayerStateChange(event){
+
+if(event.data === YT.PlayerState.ENDED){
+
+setTimeout(()=>{
+
+currentTrack = (currentTrack+1)%musicList.length;
+
+let nextId = getVideoId(musicList[currentTrack]);
+
+player.loadVideoById(nextId);
+
+},10000);
+
+}
+
+}
+
+/* fix autoplay */
+
+document.body.addEventListener("click",()=>{
+if(player){
+player.playVideo();
+}
+},{once:true});
+
 </script>
+
 </body>
+
 </html>
+
