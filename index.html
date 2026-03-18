@@ -2,7 +2,6 @@
 <html>
 
 <head>
-
 <title>wander</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
@@ -15,7 +14,7 @@ text-align:center;
 overflow:hidden;
 }
 
-/* tiêu đề */
+/* title */
 h1{
 font-family:'Satisfy',cursive;
 font-size:70px;
@@ -24,13 +23,13 @@ margin-top:40px;
 margin-bottom:40px;
 }
 
-/* ảnh */
+/* image */
 img{
 width:100%;
 height:auto;
 }
 
-/* overlay mở đầu */
+/* overlay */
 #overlay{
 position:fixed;
 top:0;
@@ -42,12 +41,13 @@ display:flex;
 justify-content:center;
 align-items:center;
 z-index:999;
+cursor:pointer;
 }
 
-/* vòng tròn */
+/* button */
 #launchBtn{
-width:200px;
-height:200px;
+width:220px;
+height:220px;
 border-radius:50%;
 border:2px solid white;
 color:white;
@@ -56,7 +56,7 @@ justify-content:center;
 align-items:center;
 font-size:20px;
 cursor:pointer;
-transition:0.5s;
+transition:0.4s;
 }
 
 #launchBtn:hover{
@@ -88,7 +88,7 @@ height:120px;
 
 <!-- overlay -->
 <div id="overlay">
-<div id="launchBtn">launch to explore</div>
+  <div id="launchBtn">launch to explore</div>
 </div>
 
 <h1>wander</h1>
@@ -103,14 +103,11 @@ height:120px;
 
 <script>
 
-/* =========================
-   SLIDESHOW ẢNH
-========================= */
+/* ================= SLIDESHOW ================= */
 
 let images = [];
 let current = 0;
 
-/* random thứ tự */
 function shuffle(array){
 for(let i=array.length-1;i>0;i--){
 const j=Math.floor(Math.random()*(i+1));
@@ -118,48 +115,31 @@ const j=Math.floor(Math.random()*(i+1));
 }
 }
 
-/* đổi ảnh */
 function changeImage(){
-
 document.getElementById("slide").src = images[current];
-
 current = (current + 1) % images.length;
-
 }
 
-/* đọc file images.json */
-
 fetch("images.json")
-.then(response=>response.json())
+.then(res=>res.json())
 .then(data=>{
-
 shuffle(data);
-
 images = data.slice(0,10);
-
 changeImage();
-
 setInterval(changeImage,5000);
-
 });
 
 
-/* =========================
-   NHẠC NỀN YOUTUBE
-========================= */
+/* ================= MUSIC ================= */
 
 let musicList = [];
 let currentTrack = 0;
-let player;
-
-/* lấy video ID */
+let player = null;
 
 function getVideoId(url){
 let match = url.match(/v=([^&]+)/);
 return match ? match[1] : null;
 }
-
-/* youtube api ready */
 
 function onYouTubeIframeAPIReady(){
 
@@ -168,7 +148,6 @@ fetch("music.json")
 .then(data=>{
 
 shuffle(data);
-
 musicList = data;
 
 let firstId = getVideoId(musicList[0]);
@@ -177,8 +156,11 @@ player = new YT.Player('player',{
 height:'0',
 width:'0',
 videoId:firstId,
+playerVars:{
+'autoplay':1,
+'mute':1
+},
 events:{
-'onReady':startMusic,
 'onStateChange':onPlayerStateChange
 }
 });
@@ -187,58 +169,66 @@ events:{
 
 }
 
-/* bắt đầu phát */
-
 function startMusic(){
-
-player.mute();          // bắt buộc để autoplay
-player.playVideo();     // chạy luôn
-
-setTimeout(()=>{
-player.unMute();        // bật lại âm thanh sau 1s
-},1000);
-
-}
-
-/* khi nhạc kết thúc */
-
-function onPlayerStateChange(event){
-
-if(event.data === YT.PlayerState.ENDED){
-
-setTimeout(()=>{
-
-currentTrack = (currentTrack+1)%musicList.length;
-
-let nextId = getVideoId(musicList[currentTrack]);
-
-player.loadVideoById(nextId);
-
-},10000);
-
-}
-
-}
-
-/* fix autoplay */
-
-document.body.addEventListener("click",()=>{
-if(player){
-player.playVideo();
-}
-},{once:true});
-
-   window.addEventListener("load",()=>{
-
-setTimeout(()=>{
 if(player){
 player.mute();
 player.playVideo();
-}
-},2000);
 
-});
-   
+setTimeout(()=>{
+player.unMute();
+},1000);
+}
+}
+
+function onPlayerStateChange(event){
+if(event.data === YT.PlayerState.ENDED){
+setTimeout(()=>{
+currentTrack = (currentTrack+1)%musicList.length;
+let nextId = getVideoId(musicList[currentTrack]);
+player.loadVideoById(nextId);
+},10000);
+}
+}
+
+
+/* ================= LAUNCH EFFECT ================= */
+
+window.onload = function(){
+
+const btn = document.getElementById("launchBtn");
+
+btn.onclick = function(){
+
+/* ẩn overlay */
+document.getElementById("overlay").style.display = "none";
+
+/* rocket effect */
+for(let i=0;i<10;i++){
+
+let rocket = document.createElement("div");
+rocket.className = "rocket";
+rocket.innerHTML = "🚀";
+
+rocket.style.left = Math.random()*100 + "vw";
+rocket.style.animationDuration = (1.5 + Math.random()*1.5) + "s";
+
+document.body.appendChild(rocket);
+
+setTimeout(()=>rocket.remove(),2000);
+}
+
+/* phát nhạc */
+let wait = setInterval(()=>{
+if(player){
+startMusic();
+clearInterval(wait);
+}
+},300);
+
+};
+
+};
+
 </script>
 
 </body>
