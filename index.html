@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
 <meta charset="UTF-8">
@@ -78,13 +78,23 @@ fetch("images.json")
 let musicList = [];
 let currentTrack = 0;
 let player;
-let musicStarted = false; // kiểm soát click
+let userClicked = false;
 
+// lấy video ID từ URL YouTube
 function getVideoId(url){
   let match = url.match(/v=([^&]+)/);
   return match ? match[1] : null;
 }
 
+// Click lần đầu → bật nhạc
+document.body.addEventListener("click", () => {
+    userClicked = true;
+    if(player){
+        player.playVideo();
+    }
+}, {once:true});
+
+// YouTube API ready
 function onYouTubeIframeAPIReady(){
   fetch("music.json")
   .then(res => res.json())
@@ -97,12 +107,19 @@ function onYouTubeIframeAPIReady(){
       width: '0',
       videoId: firstId,
       events: {
+        'onReady': (event) => {
+            // Nếu user đã click trước → play ngay
+            if(userClicked){
+                event.target.playVideo();
+            }
+        },
         'onStateChange': onPlayerStateChange
       }
     });
   });
 }
 
+// khi nhạc kết thúc → phát bài tiếp theo sau 10 giây
 function onPlayerStateChange(event){
   if(event.data === YT.PlayerState.ENDED){
     setTimeout(() => {
@@ -112,14 +129,6 @@ function onPlayerStateChange(event){
     }, 10000);
   }
 }
-
-// Click lần đầu → bật nhạc
-document.body.addEventListener("click", () => {
-  if(player && !musicStarted){
-    player.playVideo();
-    musicStarted = true;
-  }
-}, {once:true});
 </script>
 
 </body>
