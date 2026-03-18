@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wander</title>
-    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* =========================
-           GLOBAL STYLES
-        ========================= */
+        :root {
+            --casio-font: 'Share Tech Mono', monospace;
+        }
+
         body {
             margin: 0;
             text-align: center;
             background: #fff;
             font-family: sans-serif;
-            overflow-x: hidden;
         }
 
         h1 {
@@ -30,36 +30,129 @@
             display: block;
         }
 
-        .bottom {
-            height: 120px;
+        .spacer { height: 1000px; } /* Tạo khoảng trống để test việc cuộn trang */
+
+        /* =========================
+           FLOATING CONTROL PANEL (RIGHT)
+        ========================= */
+        #controlPanel {
+            position: fixed;
+            right: 30px;
+            bottom: 40px;
+            display: flex;
+            flex-direction: column-reverse; /* Rocket ở dưới cùng */
+            align-items: center;
+            gap: 15px;
+            z-index: 9999;
         }
 
-        /* Hide the YouTube player container */
-        #player {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
+        .btn {
+            font-size: 32px;
+            cursor: pointer;
+            transition: 0.3s;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
+
+        .btn:hover { transform: scale(1.2); }
+
+        /* Sub-controls (Stars & Volume) */
+        .sub-menu {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        #volumeSlider {
+            writing-mode: bt-lr; /* Vertical slider */
+            appearance: slider-vertical;
+            width: 8px;
+            height: 80px;
+            display: none;
+        }
+
+        /* =========================
+           CASIO CLOCK PANEL (LEFT)
+        ========================= */
+        #casioPanel {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 20px;
+            font-family: var(--casio-font);
+            color: #333;
+            z-index: 9999;
+            text-transform: uppercase;
+        }
+
+        .clock-box {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+            font-size: 28px;
+        }
+
+        .day-vertical {
+            font-size: 14px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            margin-top: 5px;
+        }
+
+        #player { position: absolute; top: -9999px; }
     </style>
 </head>
 <body>
 
     <h1>wander</h1>
-
     <img id="slide" alt="slideshow">
-
     <div id="player"></div>
+    <div class="spacer"></div> <div id="casioPanel">
+        <div class="clock-box" id="timeBox">
+            <span id="hh">00</span>
+            <span id="mm">00</span>
+            <span id="ss" style="font-size: 20px; color: #888;">00</span>
+        </div>
+        <div class="clock-box" id="dateBox">
+            <span id="y1">20</span>
+            <span id="y2">26</span>
+            <span id="month">01</span>
+            <span id="day">01</span>
+            <div id="weekday" class="day-vertical">MONDAY</div>
+        </div>
+    </div>
 
-    <div class="bottom"></div>
+    <div id="controlPanel">
+        <div class="btn" id="rocketBtn" title="Back to top">🚀</div>
+
+        <div class="btn" id="playPauseBtn" title="Play/Pause">☁️</div>
+
+        <div class="btn" id="navBtn" title="Next/Prev">
+            <div class="sub-menu" id="navSub">
+                <span id="prevBtn">⭐</span>
+                <span id="nextBtn">⭐</span>
+            </div>
+            ☁️
+        </div>
+
+        <div class="btn" id="volBtn" title="Volume">
+            <input type="range" id="volumeSlider" min="0" max="100" value="50">
+            ☁️
+        </div>
+    </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
         /* =========================
-           SLIDESHOW LOGIC
+           SLIDESHOW & DATA
         ========================= */
-        let images = [];
-        let current = 0;
+        let images = [], musicList = [], currentTrack = 0, player, playerReady = false;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -68,32 +161,18 @@
             }
         }
 
-        function changeImage() {
-            if (images.length > 0) {
-                document.getElementById("slide").src = images[current];
-                current = (current + 1) % images.length;
-            }
-        }
-
-        fetch("images.json")
-            .then(res => res.json())
-            .then(data => {
-                shuffle(data);
-                images = data.slice(0, 10);
-                changeImage();
-                setInterval(changeImage, 5000);
-            })
-            .catch(err => console.error("Error loading images.json:", err));
+        fetch("images.json").then(res => res.json()).then(data => {
+            shuffle(data); images = data;
+            document.getElementById("slide").src = images[0];
+            setInterval(() => {
+                currentTrack = (currentTrack + 1) % images.length;
+                document.getElementById("slide").src = images[currentTrack];
+            }, 5000);
+        });
 
         /* =========================
-           YOUTUBE MUSIC LOGIC
+           YOUTUBE LOGIC
         ========================= */
-        let musicList = [];
-        let currentTrack = 0;
-        let player;
-        let playerReady = false;
-
-        // Optimized Regex for your specific music.json links
         function getVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
@@ -101,61 +180,86 @@
         }
 
         function onYouTubeIframeAPIReady() {
-            fetch("music.json")
-                .then(res => res.json())
-                .then(data => {
-                    shuffle(data);
-                    musicList = data;
-                    const firstId = getVideoId(musicList[0]);
-
-                    player = new YT.Player('player', {
-                        height: '0',
-                        width: '0',
-                        videoId: firstId,
-                        playerVars: {
-                            'autoplay': 1,
-                            'controls': 0,
-                            'mute': 1 // Start muted to bypass browser autoplay restrictions
-                        },
-                        events: {
-                            'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
-                        }
-                    });
-                })
-                .catch(err => console.error("Error loading music.json:", err));
-        }
-
-        function onPlayerReady(event) {
-            playerReady = true;
-            event.target.playVideo();
-            console.log("Music loaded and playing in background (muted).");
-        }
-
-        function onPlayerStateChange(event) {
-            // When a song ends, wait 3 seconds then play next
-            if (event.data === YT.PlayerState.ENDED) {
-                setTimeout(() => {
-                    currentTrack = (currentTrack + 1) % musicList.length;
-                    const nextId = getVideoId(musicList[currentTrack]);
-                    player.loadVideoById(nextId);
-                }, 3000);
-            }
+            fetch("music.json").then(res => res.json()).then(data => {
+                shuffle(data); musicList = data;
+                player = new YT.Player('player', {
+                    height: '0', width: '0',
+                    videoId: getVideoId(musicList[0]),
+                    playerVars: { 'autoplay': 1, 'mute': 1 },
+                    events: { 'onReady': () => { playerReady = true; } }
+                });
+            });
         }
 
         /* =========================
-           AUTOPLAY FIX: UNMUTE ON CLICK
+           CONTROL INTERACTIONS
         ========================= */
-        // Browser requires a user gesture to enable audio
+        // Rocket: Scroll to top
+        document.getElementById("rocketBtn").onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+
+        // Tầng 1: Play/Pause
+        document.getElementById("playPauseBtn").onclick = () => {
+            if (!playerReady) return;
+            const state = player.getPlayerState();
+            state === 1 ? player.pauseVideo() : player.playVideo();
+        };
+
+        // Tầng 2: Show/Hide Stars
+        document.getElementById("navBtn").onclick = (e) => {
+            const sub = document.getElementById("navSub");
+            sub.style.display = sub.style.display === "flex" ? "none" : "flex";
+            e.stopPropagation();
+        };
+
+        document.getElementById("nextBtn").onclick = () => {
+            currentTrack = (currentTrack + 1) % musicList.length;
+            player.loadVideoById(getVideoId(musicList[currentTrack]));
+        };
+
+        document.getElementById("prevBtn").onclick = () => {
+            currentTrack = (currentTrack - 1 + musicList.length) % musicList.length;
+            player.loadVideoById(getVideoId(musicList[currentTrack]));
+        };
+
+        // Tầng 3: Volume Slider
+        document.getElementById("volBtn").onclick = (e) => {
+            const slider = document.getElementById("volumeSlider");
+            slider.style.display = slider.style.display === "block" ? "none" : "block";
+            e.stopPropagation();
+        };
+
+        document.getElementById("volumeSlider").oninput = function() {
+            if(playerReady) player.setVolume(this.value);
+        };
+
+        // Fix Autoplay on first click
         document.body.addEventListener("click", () => {
-            if (playerReady && player) {
-                player.unMute();
-                player.setVolume(50);
-                player.playVideo();
-                console.log("Audio enabled by user interaction.");
-            }
+            if (playerReady) { player.unMute(); player.playVideo(); }
         }, { once: true });
 
+        /* =========================
+           CASIO DIGITAL CLOCK
+        ========================= */
+        function updateClock() {
+            const now = new Date();
+            
+            // Time
+            document.getElementById("hh").textContent = String(now.getHours()).padStart(2, '0');
+            document.getElementById("mm").textContent = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById("ss").textContent = String(now.getSeconds()).padStart(2, '0');
+
+            // Date
+            const year = String(now.getFullYear());
+            document.getElementById("y1").textContent = year.slice(0, 2);
+            document.getElementById("y2").textContent = year.slice(2);
+            document.getElementById("month").textContent = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById("day").textContent = String(now.getDate()).padStart(2, '0');
+            
+            const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+            document.getElementById("weekday").textContent = days[now.getDay()];
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
