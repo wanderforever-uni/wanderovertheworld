@@ -173,8 +173,7 @@ player.playVideo();
 <!-- BỘ NÚT CUỐN THEO MÀN HÌNH -->
 <div id="control-panel">
     <!-- Tầng 2: Cloud Volume -->
-    <div class="control-btn" id="volume-btn" title="Adjust Volume">
-        ☁️
+    <div class="control-btn" id="volume-btn" title="Adjust Volume">☁️
         <input type="range" id="volume-slider" min="0" max="100" value="100">
     </div>
     <!-- Tầng 1: Cloud Play/Pause -->
@@ -189,81 +188,63 @@ player.playVideo();
     right: 20px;
     bottom: 20px;
     display: flex;
-    flex-direction: column-reverse; /* rocket dưới cùng */
+    flex-direction: column; /* rocket dưới cùng */
     gap: 15px;
     z-index: 9999;
 }
 
 .control-btn {
-    background: rgba(255,255,255,0.8);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
+    font-size: 32px;
     cursor: pointer;
-    position: relative;
-    transition: background 0.3s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.control-btn:hover {
-    background: rgba(255,255,255,1);
-}
-
-/* Thanh volume ẩn */
 #volume-slider {
     position: absolute;
-    bottom: 60px;
+    bottom: 50px;
+    left: -25px;
     width: 100px;
     display: none;
 }
 </style>
 
 <script>
-// --------------------
-// Lấy player YouTube từ code hiện có
-// --------------------
-let player; // từ YouTube API
+let isPlaying = true;
 
-// --------------------
-// Rocket: scroll lên đầu trang
-// --------------------
-document.getElementById("rocket-btn").addEventListener("click", ()=>{
-    window.scrollTo({top:0, behavior:'smooth'});
+const rocketBtn = document.getElementById("rocket-btn");
+const playpauseBtn = document.getElementById("playpause-btn");
+const volumeBtn = document.getElementById("volume-btn");
+const volumeSlider = document.getElementById("volume-slider");
+
+// --- Rocket scroll lên đầu trang ---
+rocketBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// --------------------
-// Play/Pause nhạc
-// --------------------
-let isPlaying = true;
-document.getElementById("playpause-btn").addEventListener("click", ()=>{
+// --- Play/Pause nhạc ---
+playpauseBtn.addEventListener("click", () => {
     if(player){
         if(isPlaying){
             player.pauseVideo();
             isPlaying = false;
-        }else{
+        } else {
             player.playVideo();
             isPlaying = true;
         }
     }
 });
 
-// --------------------
-// Hiện/ẩn thanh volume
-// --------------------
-const volumeBtn = document.getElementById("volume-btn");
-const volumeSlider = document.getElementById("volume-slider");
-
-volumeBtn.addEventListener("click", ()=>{
+// --- Hiện/ẩn thanh volume ---
+volumeBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // tránh click lan ra bên ngoài
     volumeSlider.style.display = (volumeSlider.style.display === "none") ? "block" : "none";
 });
 
-// --------------------
-// Điều chỉnh volume
-// --------------------
-volumeSlider.addEventListener("input", ()=>{
+// --- Điều chỉnh volume ---
+volumeSlider.addEventListener("input", () => {
     if(player){
         player.setVolume(volumeSlider.value); // 0-100
     }
