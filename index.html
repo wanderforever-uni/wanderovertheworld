@@ -1,194 +1,41 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
 <title>wander</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 
 <style>
-
 body{
-margin:0;
-text-align:center;
+    margin:0;
+    text-align:center;
+    background:#fff;
 }
 
 h1{
-font-family:'Satisfy',cursive;
-font-size:70px;
-font-weight:normal;
-margin-top:40px;
-margin-bottom:40px;
+    font-family:'Satisfy',cursive;
+    font-size:70px;
+    font-weight:normal;
+    margin-top:40px;
+    margin-bottom:40px;
+    color:#000;
 }
 
 img{
-width:100%;
-height:auto;
+    width:100%;
+    height:auto;
 }
 
 .bottom{
-height:120px;
+    height:120px;
 }
 
-</style>
-
-</head>
-
-<body>
-
-<h1>wander</h1>
-
-<img id="slide">
-
-<!-- youtube player ẩn -->
-<div id="player" style="display:none;"></div>
-
-<div class="bottom"></div>
-
-<script src="https://www.youtube.com/iframe_api"></script>
-
-<script>
-
-/* =========================
-   SLIDESHOW ẢNH
-========================= */
-
-let images = [];
-let current = 0;
-
-/* random thứ tự */
-function shuffle(array){
-for(let i=array.length-1;i>0;i--){
-const j=Math.floor(Math.random()*(i+1));
-[array[i],array[j]]=[array[j],array[i]];
-}
-}
-
-/* đổi ảnh */
-function changeImage(){
-
-document.getElementById("slide").src = images[current];
-
-current = (current + 1) % images.length;
-
-}
-
-/* đọc file images.json */
-
-fetch("images.json")
-.then(response=>response.json())
-.then(data=>{
-
-shuffle(data);
-
-images = data.slice(0,10);
-
-changeImage();
-
-setInterval(changeImage,5000);
-
-});
-
-
-/* =========================
-   NHẠC NỀN YOUTUBE
-========================= */
-
-let musicList = [];
-let currentTrack = 0;
-let player;
-
-/* lấy video ID */
-
-function getVideoId(url){
-let match = url.match(/v=([^&]+)/);
-return match ? match[1] : null;
-}
-
-/* youtube api ready */
-
-function onYouTubeIframeAPIReady(){
-
-fetch("music.json")
-.then(res=>res.json())
-.then(data=>{
-
-shuffle(data);
-
-musicList = data;
-
-let firstId = getVideoId(musicList[0]);
-
-player = new YT.Player('player',{
-height:'0',
-width:'0',
-videoId:firstId,
-events:{
-'onReady':startMusic,
-'onStateChange':onPlayerStateChange
-}
-});
-
-});
-
-}
-
-/* bắt đầu phát */
-
-function startMusic(){
-player.playVideo();
-}
-
-/* khi nhạc kết thúc */
-
-function onPlayerStateChange(event){
-
-if(event.data === YT.PlayerState.ENDED){
-
-setTimeout(()=>{
-
-currentTrack = (currentTrack+1)%musicList.length;
-
-let nextId = getVideoId(musicList[currentTrack]);
-
-player.loadVideoById(nextId);
-
-},10000);
-
-}
-
-}
-
-/* fix autoplay */
-
-document.body.addEventListener("click",()=>{
-if(player){
-player.playVideo();
-}
-},{once:true});
-
-</script>
-
-<!-- BỘ NÚT CUỐN THEO MÀN HÌNH -->
-<div id="control-panel">
-    <!-- Tầng 2: Cloud Volume -->
-    <div class="control-btn" id="volume-btn" title="Adjust Volume">☁️
-        <input type="range" id="volume-slider" min="0" max="100" value="100">
-    </div>
-    <!-- Tầng 1: Cloud Play/Pause -->
-    <div class="control-btn" id="playpause-btn" title="Play/Pause Music">☁️</div>
-    <!-- Dưới cùng: Rocket -->
-    <div class="control-btn" id="rocket-btn" title="Go to Top">🚀</div>
-</div>
-
-<style>
+/* --- BỘ NÚT CUỐN THEO MÀN HÌNH --- */
 #control-panel {
     position: fixed;
     right: 20px;
     bottom: 20px;
     display: flex;
-    flex-direction: column; /* rocket dưới cùng */
+    flex-direction: column-reverse; /* rocket dưới cùng */
     gap: 15px;
     z-index: 9999;
 }
@@ -202,16 +49,123 @@ player.playVideo();
     justify-content: center;
 }
 
+/* Thanh volume ẩn */
 #volume-slider {
     position: absolute;
-    bottom: 50px;
+    bottom: 60px;
     left: -25px;
     width: 100px;
     display: none;
 }
 </style>
+</head>
+<body>
+
+<h1>wander</h1>
+<img id="slide">
+
+<!-- youtube player ẩn -->
+<div id="player" style="display:none;"></div>
+
+<div class="bottom"></div>
+
+<!-- BỘ NÚT CUỐN THEO MÀN HÌNH -->
+<div id="control-panel">
+    <!-- Tầng 2: Cloud Volume -->
+    <div class="control-btn" id="volume-btn" title="Adjust Volume">☁️
+        <input type="range" id="volume-slider" min="0" max="100" value="100">
+    </div>
+    <!-- Tầng 1: Cloud Play/Pause -->
+    <div class="control-btn" id="playpause-btn" title="Play/Pause Music">☁️</div>
+    <!-- Dưới cùng: Rocket -->
+    <div class="control-btn" id="rocket-btn" title="Go to Top">🚀</div>
+</div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
+// =========================
+// SLIDESHOW ẢNH
+// =========================
+let images = [];
+let current = 0;
+
+function shuffle(array){
+    for(let i=array.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
+    }
+}
+
+function changeImage(){
+    document.getElementById("slide").src = images[current];
+    current = (current + 1) % images.length;
+}
+
+fetch("images.json")
+.then(response=>response.json())
+.then(data=>{
+    shuffle(data);
+    images = data.slice(0,10);
+    changeImage();
+    setInterval(changeImage,5000);
+});
+
+// =========================
+// NHẠC NỀN YOUTUBE
+// =========================
+let musicList = [];
+let currentTrack = 0;
+let player;
+
+function getVideoId(url){
+    let match = url.match(/v=([^&]+)/);
+    return match ? match[1] : null;
+}
+
+function onYouTubeIframeAPIReady(){
+    fetch("music.json")
+    .then(res=>res.json())
+    .then(data=>{
+        shuffle(data);
+        musicList = data;
+        let firstId = getVideoId(musicList[0]);
+        player = new YT.Player('player',{
+            height:'0',
+            width:'0',
+            videoId:firstId,
+            events:{
+                'onReady':startMusic,
+                'onStateChange':onPlayerStateChange
+            }
+        });
+    });
+}
+
+function startMusic(){
+    player.playVideo();
+}
+
+function onPlayerStateChange(event){
+    if(event.data === YT.PlayerState.ENDED){
+        setTimeout(()=>{
+            currentTrack = (currentTrack+1)%musicList.length;
+            let nextId = getVideoId(musicList[currentTrack]);
+            player.loadVideoById(nextId);
+        },10000);
+    }
+}
+
+// fix autoplay
+document.body.addEventListener("click",()=>{
+    if(player){
+        player.playVideo();
+    }
+},{once:true});
+
+// =========================
+// BỘ NÚT CUỐN THEO MÀN HÌNH
+// =========================
 let isPlaying = true;
 
 const rocketBtn = document.getElementById("rocket-btn");
@@ -219,14 +173,14 @@ const playpauseBtn = document.getElementById("playpause-btn");
 const volumeBtn = document.getElementById("volume-btn");
 const volumeSlider = document.getElementById("volume-slider");
 
-// --- Rocket scroll lên đầu trang ---
+// Rocket scroll lên đầu trang
 rocketBtn.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// --- Play/Pause nhạc ---
+// Play/Pause nhạc
 playpauseBtn.addEventListener("click", () => {
-    if(player){
+    if(player && player.getPlayerState){
         if(isPlaying){
             player.pauseVideo();
             isPlaying = false;
@@ -237,22 +191,19 @@ playpauseBtn.addEventListener("click", () => {
     }
 });
 
-// --- Hiện/ẩn thanh volume ---
+// Hiện/ẩn thanh volume
 volumeBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); // tránh click lan ra bên ngoài
+    e.stopPropagation();
     volumeSlider.style.display = (volumeSlider.style.display === "none") ? "block" : "none";
 });
 
-// --- Điều chỉnh volume ---
+// Điều chỉnh volume
 volumeSlider.addEventListener("input", () => {
-    if(player){
+    if(player && player.setVolume){
         player.setVolume(volumeSlider.value); // 0-100
     }
 });
 </script>
-
 </body>
-
 </html>
-
 
