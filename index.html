@@ -170,6 +170,156 @@ player.playVideo();
 
 </script>
 
+<!-- =========================
+     ĐỒNG HỒ VÀ NÚT FLOATING NGUYÊN VẸN
+========================= -->
+<style>
+/* Floating buttons */
+#floatingControls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.floatingBtn {
+  user-select: none;
+  background: transparent;
+  border: none;
+  font-size: 28px;
+}
+
+/* Volume slider */
+#volumeSlider {
+  width: 100px;
+  transform: rotate(-90deg);
+  margin-bottom: 10px;
+  display: none;
+}
+
+/* Digital clock */
+.digitalBox {
+  font-family: 'Digital-7', monospace;
+  background: transparent;
+  border: none;
+  text-align: center;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+/* Weekday rotated 90deg */
+#weekday {
+  transform: rotate(-90deg);
+  font-size: 18px;
+  margin-top: 5px;
+  display: block;
+}
+</style>
+
+<!-- Volume slider -->
+<input type="range" id="volumeSlider" min="0" max="100" value="50">
+
+<!-- Floating icons -->
+<div id="floatingControls">
+  <button class="floatingBtn" id="cloudPause">☁️</button>
+  <button class="floatingBtn" id="cloudVolume">☁️</button>
+</div>
+
+<!-- Clock and Date -->
+<div style="position: fixed; bottom: 20px; right: 90px; text-align:center; z-index:9999;">
+  <!-- Time hh/mm/ss -->
+  <input id="timeBox" class="digitalBox" readonly>
+  <!-- Date yy1/yy2/mm/dd -->
+  <div id="dateBox" class="digitalBox"></div>
+  <!-- Weekday -->
+  <span id="weekday"></span>
+</div>
+
+<script>
+// ========= PAUSE/PLAY NHẠC ============
+let isPaused = false;
+document.getElementById("cloudPause").addEventListener("click", () => {
+  if(!player) return;
+  if(isPaused){
+    player.playVideo();
+    isPaused = false;
+  } else {
+    player.pauseVideo();
+    isPaused = true;
+  }
+});
+
+// ========= HIỆN/ẨN VOLUME ============
+const volumeBtn = document.getElementById("cloudVolume");
+const volumeSlider = document.getElementById("volumeSlider");
+
+volumeBtn.addEventListener("click", () => {
+  volumeSlider.style.display = (volumeSlider.style.display==="none")?"block":"none";
+});
+
+// ========= SLIDER ĐIỀU CHỈNH VOLUME ============
+volumeSlider.addEventListener("input", () => {
+  if(player) {
+    player.setVolume(volumeSlider.value);
+  }
+});
+
+// ========= DIGITAL CLOCK VỚI MÀU TỰ ĐỘNG ============
+const timeBox = document.getElementById("timeBox");
+const dateBox = document.getElementById("dateBox");
+const weekdayBox = document.getElementById("weekday");
+
+// Hàm tính màu tương phản dựa trên độ sáng YIQ
+function getContrastColor(rgbColor){
+    const match = rgbColor.match(/\d+/g);
+    if(!match) return 'white';
+    let r = parseInt(match[0]);
+    let g = parseInt(match[1]);
+    let b = parseInt(match[2]);
+    let yiq = (r*299 + g*587 + b*114)/1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
+
+function updateClock(){
+  const now = new Date();
+  
+  // --- Time hh/mm/ss ---
+  let hh = String(now.getHours()).padStart(2,'0');
+  let mm = String(now.getMinutes()).padStart(2,'0');
+  let ss = String(now.getSeconds()).padStart(2,'0');
+  timeBox.value = `${hh}\n${mm}\n${ss}`;
+
+  // --- Date yy1/yy2/mm/dd ---
+  let year = String(now.getFullYear());
+  let yy1 = year.slice(0,2);
+  let yy2 = year.slice(2,4);
+  let month = String(now.getMonth()+1).padStart(2,'0');
+  let day = String(now.getDate()).padStart(2,'0');
+  dateBox.innerHTML = `${yy1}<br>${yy2}<br>${month}<br>${day}`;
+
+  // --- Weekday ---
+  let weekday = now.toLocaleDateString('en-US',{weekday:'long'});
+  weekdayBox.textContent = weekday.toUpperCase();
+
+  // --- Tự động lấy màu nền body và đặt màu chữ ---
+  const bgColor = window.getComputedStyle(document.body).backgroundColor;
+  const color = getContrastColor(bgColor);
+  timeBox.style.color = color;
+  dateBox.style.color = color;
+  weekdayBox.style.color = color;
+}
+
+// Cập nhật mỗi giây
+setInterval(updateClock,1000);
+updateClock();
+</script>
+
 </body>
 
 </html>
