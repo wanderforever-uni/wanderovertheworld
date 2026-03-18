@@ -13,21 +13,9 @@ body {
   background: #111;
   color: #fff;
 }
-
-h1 {
-  font-family: 'Satisfy', cursive;
-  font-size: 70px;
-  margin:40px 0;
-}
-
-img#slide {
-  width:100%;
-  height:auto;
-}
-
-.bottom {
-  height:120px;
-}
+h1 { font-family: 'Satisfy', cursive; font-size: 70px; margin:40px 0; }
+img#slide { width:100%; height:auto; }
+.bottom { height:120px; }
 
 /* ----------------- Nút nổi ----------------- */
 #controlPanel {
@@ -40,30 +28,29 @@ img#slide {
   gap:10px;
   z-index:999;
 }
-
 .controlBtn {
   width:50px;
   height:50px;
-  background:#222;
+  background:#0a84ff;
   color:#fff;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:24px;
+  font-size:32px;
   cursor:pointer;
+  box-shadow: 0 0 8px #0a84ff;
+  z-index:999;
   transition: transform 0.2s, background 0.2s;
 }
-.controlBtn:hover { transform: scale(1.2); background:#444; }
-
+.controlBtn:hover { transform: scale(1.2); background:#0c6ef5; }
 .subControls {
   display:none;
   flex-direction: column;
   gap:5px;
   margin-bottom:5px;
 }
-
-input[type=range] { width:80px; }
+input[type=range]{ width:80px; }
 
 /* ----------------- Đồng hồ ----------------- */
 #clockContainer {
@@ -78,7 +65,6 @@ input[type=range] { width:80px; }
   color: #0f0;
   z-index: 999;
 }
-
 .clock, .dateBox {
   background: transparent;
   color:#0f0;
@@ -94,39 +80,28 @@ input[type=range] { width:80px; }
 }
 
 /* ----------------- Hiệu ứng bay ----------------- */
-@keyframes rocketFly {
-  0% { transform: translateY(0); opacity:1; }
-  100% { transform: translateY(-400px) rotate(20deg); opacity:0; }
-}
-@keyframes starFly {
-  0% { transform: translateY(0); opacity:1; }
-  100% { transform: translateY(-150px) rotate(360deg); opacity:0; }
-}
+@keyframes rocketFly { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(-400px) rotate(20deg); opacity:0; } }
+@keyframes starFly { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(-150px) rotate(360deg); opacity:0; } }
 .rocketAnim { position: fixed; font-size:30px; z-index:1000; animation: rocketFly 1s ease-out forwards; }
 .starAnim { position: fixed; font-size:24px; z-index:1000; animation: starFly 0.8s ease-out forwards; }
-
 </style>
 </head>
 <body>
 
 <h1>wander</h1>
 <img id="slide">
-
 <div id="player" style="display:none;"></div>
 <div class="bottom"></div>
 
 <!-- Control Panel -->
 <div id="controlPanel">
-  <!-- Tầng 4: Phát nhạc sau reload -->
   <div class="controlBtn" id="btnReloadMusic">☁️</div>
-  <!-- Tầng 3: Volume -->
   <div>
     <div class="controlBtn" id="btnVolume">☁️</div>
     <div class="subControls" id="volumeControls">
       <input type="range" min="0" max="100" value="50" id="volumeSlider">
     </div>
   </div>
-  <!-- Tầng 2: Next/Prev -->
   <div>
     <div class="controlBtn" id="btnTrack">☁️</div>
     <div class="subControls" id="trackControls">
@@ -134,9 +109,7 @@ input[type=range] { width:80px; }
       <div class="controlBtn" id="nextTrack">🌟</div>
     </div>
   </div>
-  <!-- Tầng 1: Pause/Play -->
   <div class="controlBtn" id="btnPausePlay">☁️</div>
-  <!-- Tầng 0: Rocket -->
   <div class="controlBtn" id="btnTop">🚀</div>
 </div>
 
@@ -144,8 +117,7 @@ input[type=range] { width:80px; }
 <div id="clockContainer">
   <div class="clock" id="clock">--:--:--</div>
   <div class="dateBox" id="dateBox">
-    <span class="year1">--</span>
-    <span class="year2">--</span>-
+    <span class="year1">--</span><span class="year2">--</span>-
     <span class="month">--</span>-
     <span class="day">--</span>
     <div class="dayName">---</div>
@@ -155,13 +127,13 @@ input[type=range] { width:80px; }
 <!-- YouTube API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-/* ----------------- Slideshow ----------------- */
-let images = [], currentImage=0;
+// ----------------- Slideshow -----------------
+let images=[], currentImage=0;
 function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
 function changeImage(){if(images.length>0){document.getElementById("slide").src=images[currentImage];currentImage=(currentImage+1)%images.length;}}
 fetch("images.json").then(r=>r.json()).then(data=>{shuffle(data);images=data.slice(0,10);changeImage();setInterval(changeImage,5000);});
 
-/* ----------------- Nhạc YouTube ----------------- */
+// ----------------- Nhạc YouTube -----------------
 let musicList=[], currentTrack=0, player, userClicked=false;
 document.body.addEventListener("click",()=>{userClicked=true;if(player)player.playVideo();},{once:true});
 function getVideoId(url){let m=url.match(/v=([^&]+)/);return m?m[1]:null;}
@@ -177,7 +149,7 @@ function onYouTubeIframeAPIReady(){
 }
 function onPlayerStateChange(e){if(e.data===YT.PlayerState.ENDED){setTimeout(()=>{currentTrack=(currentTrack+1)%musicList.length;let nextId=getVideoId(musicList[currentTrack]);player.loadVideoById(nextId);},10000);}}
 
-/* ----------------- Nút Control ----------------- */
+// ----------------- Nút Control -----------------
 const btnTop=document.getElementById('btnTop');
 btnTop.onclick=()=>{
   window.scrollTo({top:0,behavior:'smooth'});
@@ -196,8 +168,8 @@ const btnTrack=document.getElementById('btnTrack');
 const trackControls=document.getElementById('trackControls');
 btnTrack.onclick=()=>trackControls.style.display=trackControls.style.display==='flex'?'none':'flex';
 
-document.getElementById('nextTrack').onclick=()=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(event.clientX,event.clientY); }};
-document.getElementById('prevTrack').onclick=()=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(event.clientX,event.clientY); }};
+document.getElementById('nextTrack').onclick=(e)=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(e.clientX,e.clientY);}};
+document.getElementById('prevTrack').onclick=(e)=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(e.clientX,e.clientY);}};
 
 const btnVolume=document.getElementById('btnVolume');
 const volumeControls=document.getElementById('volumeControls');
@@ -206,14 +178,10 @@ document.getElementById('volumeSlider').oninput=(e)=>{if(player)player.setVolume
 
 const btnReloadMusic=document.getElementById('btnReloadMusic');
 btnReloadMusic.onclick=()=>{
-  if(player && musicList.length){
-    shuffle(musicList); currentTrack=0;
-    player.loadVideoById(getVideoId(musicList[0]));
-    player.playVideo();
-  }
+  if(player && musicList.length){shuffle(musicList); currentTrack=0; player.loadVideoById(getVideoId(musicList[0])); player.playVideo();}
 };
 
-/* ----------------- Hiệu ứng ngôi sao ----------------- */
+// ----------------- Hiệu ứng ngôi sao -----------------
 function starEffect(x,y){
   const star=document.createElement('div'); star.textContent='🌟';
   star.className='starAnim';
@@ -222,12 +190,11 @@ function starEffect(x,y){
   setTimeout(()=>star.remove(),800);
 }
 
-/* ----------------- Đồng hồ ----------------- */
+// ----------------- Đồng hồ -----------------
 function updateClock(){
   let now=new Date();
   let hh=("0"+now.getHours()).slice(-2), mm=("0"+now.getMinutes()).slice(-2), ss=("0"+now.getSeconds()).slice(-2);
   document.getElementById('clock').textContent=`${hh}:${mm}:${ss}`;
-
   let yy=now.getFullYear().toString();
   let month=("0"+(now.getMonth()+1)).slice(-2);
   let day=("0"+now.getDate()).slice(-2);
