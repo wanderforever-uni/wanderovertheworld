@@ -88,38 +88,36 @@ input[type=range]{ width:80px; }
 </div>
 
 <!-- Đồng hồ vertical -->
-<div id="clockContainer" style="position:fixed; top:10px; left:10px; display:flex; gap:5px; font-family:'Digital 7', monospace; font-size:14px; z-index:999;">
-  <!-- Cột ngày/tháng/năm + thứ -->
-  <div style="display:flex; gap:2px; align-items:center;">
-    <div class="verticalNumbers dateBox">
-      <div><span class="year1">--</span></div>
-      <div><span class="year2">--</span></div>
-      <div><span class="month">--</span><span class="day">--</span></div>
-    </div>
-    <div class="dayName" style="writing-mode: vertical-rl; text-orientation: upright; font-size:12px; margin-left:2px;">---</div>
-  </div>
-  <!-- Cột giờ/phút/giây -->
+<div id="clockContainer" style="position:fixed; top:10px; left:10px; display:flex; gap:10px; font-family:'Digital 7', monospace; font-size:14px; z-index:999;">
+  <!-- Khung 1: thời gian hh/mm/ss -->
   <div class="verticalNumbers clock">
     <div><span class="hh">--</span></div>
     <div><span class="mm">--</span></div>
     <div><span class="ss">--</span></div>
   </div>
+
+  <!-- Khung 2: ngày tháng yy/yy/mm/dd + thứ -->
+  <div style="display:flex; gap:5px; align-items:center;">
+    <div class="verticalNumbers dateBox">
+      <div><span class="year1">--</span></div>
+      <div><span class="year2">--</span></div>
+      <div><span class="month">--</span><span class="day">--</span></div>
+    </div>
+    <div class="dayName" style="writing-mode: vertical-rl; text-orientation: mixed; font-size:12px;">---</div>
+  </div>
 </div>
 
 <script>
-// Chọn màu chữ tương phản với background
+// Chọn màu chữ tương phản với nền
 function updateClockColor(){
-  // Lấy màu background body
   const bgColor = window.getComputedStyle(document.body).backgroundColor; // rgb(r,g,b)
   const rgb = bgColor.match(/\d+/g).map(Number);
-  // Tính độ sáng (luminance)
   const luminance = 0.299*rgb[0] + 0.587*rgb[1] + 0.114*rgb[2];
-  // Nếu sáng → chữ đen, nếu tối → chữ trắng
   const textColor = luminance > 186 ? '#000' : '#fff';
   document.querySelectorAll('#clockContainer span, #clockContainer .dayName').forEach(el=>el.style.color=textColor);
 }
 
-// Cập nhật giờ & ngày
+// Cập nhật thời gian & ngày
 function updateClock(){
   const now = new Date();
   const hh = ("0"+now.getHours()).slice(-2),
@@ -130,13 +128,18 @@ function updateClock(){
         day = ("0"+now.getDate()).slice(-2);
   const weekday = now.toLocaleDateString('en-US',{weekday:'long'});
 
+  // Thời gian
   document.querySelector('.hh').textContent = hh;
   document.querySelector('.mm').textContent = mm;
   document.querySelector('.ss').textContent = ss;
+
+  // Ngày
   document.querySelector('.year1').textContent = yy.slice(0,2);
   document.querySelector('.year2').textContent = yy.slice(2);
   document.querySelector('.month').textContent = month;
   document.querySelector('.day').textContent = day;
+
+  // Thứ
   document.querySelector('.dayName').textContent = weekday;
 
   updateClockColor();
