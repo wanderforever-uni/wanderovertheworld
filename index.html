@@ -1,29 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <title>wander</title>
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Digital+7&display=swap" rel="stylesheet">
 <style>
 body {
-  margin: 0;
-  text-align: center;
+  margin:0;
+  text-align:center;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
 }
 
 h1 {
   font-family: 'Satisfy', cursive;
   font-size: 70px;
-  font-weight: normal;
-  margin: 40px 0;
+  margin:40px 0;
 }
 
-img {
-  width: 100%;
-  height: auto;
+img#slide {
+  width:100%;
+  height:auto;
 }
 
 .bottom {
-  height: 120px;
+  height:120px;
+}
+
+/* ----------------- Nút nổi ----------------- */
+#controlPanel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  gap:10px;
+  z-index:999;
+}
+
+.controlBtn {
+  width:50px;
+  height:50px;
+  background:#222;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  cursor:pointer;
+}
+
+.subControls {
+  display:none;
+  flex-direction: column;
+  gap:5px;
+  margin-bottom:5px;
+}
+
+input[type=range] {
+  width:80px;
+}
+
+/* ----------------- Đồng hồ ----------------- */
+#clockContainer {
+  position: fixed;
+  right: 100px;
+  bottom: 20px;
+  display:flex;
+  flex-direction: column;
+  align-items:flex-start;
+  gap:10px;
+  font-family: 'Digital 7', monospace;
+  color: #0f0;
+  z-index: 999;
+}
+
+.clock, .dateBox {
+  background: transparent;
+  color:#0f0;
+  border:none;
+  font-size: 24px;
+  text-align:left;
+  line-height:1.2em;
+}
+.dateBox .dayName {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size:18px;
 }
 </style>
 </head>
@@ -32,102 +99,139 @@ img {
 <h1>wander</h1>
 <img id="slide">
 
-<!-- youtube player ẩn -->
 <div id="player" style="display:none;"></div>
+
 <div class="bottom"></div>
+
+<!-- Control Panel -->
+<div id="controlPanel">
+  <!-- Tầng 4: Phát nhạc sau reload -->
+  <div class="controlBtn" id="btnReloadMusic">☁️</div>
+  <!-- Tầng 3: Volume -->
+  <div>
+    <div class="controlBtn" id="btnVolume">☁️</div>
+    <div class="subControls" id="volumeControls">
+      <input type="range" min="0" max="100" value="50" id="volumeSlider">
+    </div>
+  </div>
+  <!-- Tầng 2: Next/Prev -->
+  <div>
+    <div class="controlBtn" id="btnTrack">☁️</div>
+    <div class="subControls" id="trackControls">
+      <div class="controlBtn" id="prevTrack">🌟</div>
+      <div class="controlBtn" id="nextTrack">🌟</div>
+    </div>
+  </div>
+  <!-- Tầng 1: Pause/Play -->
+  <div class="controlBtn" id="btnPausePlay">☁️</div>
+  <!-- Tầng 0: Rocket -->
+  <div class="controlBtn" id="btnTop">🚀</div>
+</div>
+
+<!-- Đồng hồ -->
+<div id="clockContainer">
+  <div class="clock" id="clock">--:--:--</div>
+  <div class="dateBox" id="dateBox">
+    <span class="year1">--</span>
+    <span class="year2">--</span>-
+    <span class="month">--</span>-
+    <span class="day">--</span>
+    <div class="dayName">---</div>
+  </div>
+</div>
 
 <!-- YouTube API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-/* =========================
-   SLIDESHOW ẢNH
-========================= */
+/* ----------------- Slideshow ----------------- */
 let images = [];
 let currentImage = 0;
+function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
+function changeImage(){if(images.length>0){document.getElementById("slide").src = images[currentImage]; currentImage=(currentImage+1)%images.length;}}
+fetch("images.json").then(r=>r.json()).then(data=>{shuffle(data); images=data.slice(0,10); changeImage(); setInterval(changeImage,5000);});
 
-function shuffle(array){
-  for(let i=array.length-1; i>0; i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
+/* ----------------- Nhạc YouTube ----------------- */
+let musicList=[], currentTrack=0, player, userClicked=false;
 
-function changeImage(){
-  if(images.length > 0){
-    document.getElementById("slide").src = images[currentImage];
-    currentImage = (currentImage + 1) % images.length;
-  }
-}
+// Click body → ghi nhớ
+document.body.addEventListener("click",()=>{userClicked=true;if(player){player.playVideo();}}, {once:true});
 
-fetch("images.json")
-.then(res => res.json())
-.then(data => {
-  shuffle(data);
-  images = data.slice(0, 10);
-  changeImage();
-  setInterval(changeImage, 5000);
-});
+function getVideoId(url){let m=url.match(/v=([^&]+)/); return m?m[1]:null;}
 
-/* =========================
-   NHẠC NỀN YOUTUBE
-========================= */
-let musicList = [];
-let currentTrack = 0;
-let player;
-let userClicked = false; // lưu trạng thái click user
-
-// click user → lưu trạng thái, nếu player sẵn sàng thì phát ngay
-document.body.addEventListener("click", () => {
-    userClicked = true;
-    if(player){
-        player.playVideo();
-    }
-}, {once:true});
-
-// hàm lấy video ID từ URL YouTube
-function getVideoId(url){
-  let match = url.match(/v=([^&]+)/);
-  return match ? match[1] : null;
-}
-
-// YouTube API ready
 function onYouTubeIframeAPIReady(){
-  fetch("music.json")
-  .then(res => res.json())
-  .then(data => {
-    musicList = data;
-    if(musicList.length === 0) return;
-
-    let firstId = getVideoId(musicList[0]);
-
-    player = new YT.Player('player', {
-      height: '0',
-      width: '0',
-      videoId: firstId,
-      events: {
-        'onReady': (event) => {
-            // nếu user đã click trước → play nhạc ngay
-            if(userClicked){
-                event.target.playVideo();
-            }
-        },
-        'onStateChange': onPlayerStateChange
-      }
-    });
+  fetch("music.json").then(r=>r.json()).then(data=>{
+    musicList=data;
+    if(!musicList.length) return;
+    let firstId=getVideoId(musicList[0]);
+    player=new YT.Player('player',{height:'0', width:'0', videoId:firstId, events:{
+      'onReady': (e)=>{if(userClicked) e.target.playVideo();},
+      'onStateChange': onPlayerStateChange
+    }});
   });
 }
 
-// khi nhạc kết thúc → phát bài tiếp theo sau 10 giây
-function onPlayerStateChange(event){
-  if(event.data === YT.PlayerState.ENDED){
-    setTimeout(() => {
-      currentTrack = (currentTrack + 1) % musicList.length;
-      let nextId = getVideoId(musicList[currentTrack]);
+function onPlayerStateChange(e){
+  if(e.data===YT.PlayerState.ENDED){
+    setTimeout(()=>{
+      currentTrack=(currentTrack+1)%musicList.length;
+      let nextId=getVideoId(musicList[currentTrack]);
       player.loadVideoById(nextId);
-    }, 10000);
+    },10000);
   }
 }
-</script>
 
+/* ----------------- Nút Control ----------------- */
+const btnTop=document.getElementById('btnTop');
+btnTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+const btnPausePlay=document.getElementById('btnPausePlay');
+btnPausePlay.onclick=()=>{if(player){let state=player.getPlayerState(); state===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();}};
+
+const btnTrack=document.getElementById('btnTrack');
+const trackControls=document.getElementById('trackControls');
+btnTrack.onclick=()=>trackControls.style.display=trackControls.style.display==='flex'?'none':'flex';
+
+document.getElementById('nextTrack').onclick=()=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack]));}};
+document.getElementById('prevTrack').onclick=()=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack]));}};
+
+const btnVolume=document.getElementById('btnVolume');
+const volumeControls=document.getElementById('volumeControls');
+btnVolume.onclick=()=>volumeControls.style.display=volumeControls.style.display==='flex'?'none':'flex';
+
+document.getElementById('volumeSlider').oninput=(e)=>{if(player) player.setVolume(e.target.value);};
+
+// Tầng 4: phát nhạc sau reload
+const btnReloadMusic=document.getElementById('btnReloadMusic');
+btnReloadMusic.onclick=()=>{
+  if(player && musicList.length){
+    shuffle(musicList);
+    currentTrack=0;
+    player.loadVideoById(getVideoId(musicList[0]));
+    player.playVideo();
+  }
+};
+
+/* ----------------- Đồng hồ ----------------- */
+function updateClock(){
+  let now=new Date();
+  let hh=("0"+now.getHours()).slice(-2), mm=("0"+now.getMinutes()).slice(-2), ss=("0"+now.getSeconds()).slice(-2);
+  document.getElementById('clock').textContent=`${hh}:${mm}:${ss}`;
+
+  let yy=now.getFullYear().toString();
+  let month=("0"+(now.getMonth()+1)).slice(-2);
+  let day=("0"+now.getDate()).slice(-2);
+  let dayName=now.toLocaleDateString('en-US',{weekday:'long'});
+  document.querySelector('.year1').textContent=yy.slice(0,2);
+  document.querySelector('.year2').textContent=yy.slice(2);
+  document.querySelector('.month').textContent=month;
+  document.querySelector('.day').textContent=day;
+  document.querySelector('.dayName').textContent=dayName;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+/* ----------------- Shuffle function ----------------- */
+function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
+</script>
 </body>
 </html>
