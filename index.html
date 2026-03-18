@@ -52,7 +52,9 @@ img#slide {
   justify-content:center;
   font-size:24px;
   cursor:pointer;
+  transition: transform 0.2s, background 0.2s;
 }
+.controlBtn:hover { transform: scale(1.2); background:#444; }
 
 .subControls {
   display:none;
@@ -61,9 +63,7 @@ img#slide {
   margin-bottom:5px;
 }
 
-input[type=range] {
-  width:80px;
-}
+input[type=range] { width:80px; }
 
 /* ----------------- Đồng hồ ----------------- */
 #clockContainer {
@@ -92,6 +92,19 @@ input[type=range] {
   text-orientation: upright;
   font-size:18px;
 }
+
+/* ----------------- Hiệu ứng bay ----------------- */
+@keyframes rocketFly {
+  0% { transform: translateY(0); opacity:1; }
+  100% { transform: translateY(-400px) rotate(20deg); opacity:0; }
+}
+@keyframes starFly {
+  0% { transform: translateY(0); opacity:1; }
+  100% { transform: translateY(-150px) rotate(360deg); opacity:0; }
+}
+.rocketAnim { position: fixed; font-size:30px; z-index:1000; animation: rocketFly 1s ease-out forwards; }
+.starAnim { position: fixed; font-size:24px; z-index:1000; animation: starFly 0.8s ease-out forwards; }
+
 </style>
 </head>
 <body>
@@ -100,7 +113,6 @@ input[type=range] {
 <img id="slide">
 
 <div id="player" style="display:none;"></div>
-
 <div class="bottom"></div>
 
 <!-- Control Panel -->
@@ -144,72 +156,71 @@ input[type=range] {
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 /* ----------------- Slideshow ----------------- */
-let images = [];
-let currentImage = 0;
+let images = [], currentImage=0;
 function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
-function changeImage(){if(images.length>0){document.getElementById("slide").src = images[currentImage]; currentImage=(currentImage+1)%images.length;}}
-fetch("images.json").then(r=>r.json()).then(data=>{shuffle(data); images=data.slice(0,10); changeImage(); setInterval(changeImage,5000);});
+function changeImage(){if(images.length>0){document.getElementById("slide").src=images[currentImage];currentImage=(currentImage+1)%images.length;}}
+fetch("images.json").then(r=>r.json()).then(data=>{shuffle(data);images=data.slice(0,10);changeImage();setInterval(changeImage,5000);});
 
 /* ----------------- Nhạc YouTube ----------------- */
 let musicList=[], currentTrack=0, player, userClicked=false;
-
-// Click body → ghi nhớ
-document.body.addEventListener("click",()=>{userClicked=true;if(player){player.playVideo();}}, {once:true});
-
-function getVideoId(url){let m=url.match(/v=([^&]+)/); return m?m[1]:null;}
-
+document.body.addEventListener("click",()=>{userClicked=true;if(player)player.playVideo();},{once:true});
+function getVideoId(url){let m=url.match(/v=([^&]+)/);return m?m[1]:null;}
 function onYouTubeIframeAPIReady(){
   fetch("music.json").then(r=>r.json()).then(data=>{
-    musicList=data;
-    if(!musicList.length) return;
+    musicList=data;if(!musicList.length)return;
     let firstId=getVideoId(musicList[0]);
-    player=new YT.Player('player',{height:'0', width:'0', videoId:firstId, events:{
-      'onReady': (e)=>{if(userClicked) e.target.playVideo();},
-      'onStateChange': onPlayerStateChange
+    player=new YT.Player('player',{height:'0',width:'0',videoId:firstId,events:{
+      'onReady':(e)=>{if(userClicked)e.target.playVideo();},
+      'onStateChange':onPlayerStateChange
     }});
   });
 }
-
-function onPlayerStateChange(e){
-  if(e.data===YT.PlayerState.ENDED){
-    setTimeout(()=>{
-      currentTrack=(currentTrack+1)%musicList.length;
-      let nextId=getVideoId(musicList[currentTrack]);
-      player.loadVideoById(nextId);
-    },10000);
-  }
-}
+function onPlayerStateChange(e){if(e.data===YT.PlayerState.ENDED){setTimeout(()=>{currentTrack=(currentTrack+1)%musicList.length;let nextId=getVideoId(musicList[currentTrack]);player.loadVideoById(nextId);},10000);}}
 
 /* ----------------- Nút Control ----------------- */
 const btnTop=document.getElementById('btnTop');
-btnTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+btnTop.onclick=()=>{
+  window.scrollTo({top:0,behavior:'smooth'});
+  const rocket=document.createElement('div'); rocket.textContent='🚀';
+  rocket.className='rocketAnim';
+  const rect=btnTop.getBoundingClientRect();
+  rocket.style.left=rect.left+'px'; rocket.style.top=rect.top+'px';
+  document.body.appendChild(rocket);
+  setTimeout(()=>rocket.remove(),1000);
+};
 
 const btnPausePlay=document.getElementById('btnPausePlay');
-btnPausePlay.onclick=()=>{if(player){let state=player.getPlayerState(); state===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();}};
+btnPausePlay.onclick=()=>{if(player){let s=player.getPlayerState();s===YT.PlayerState.PLAYING?player.pauseVideo():player.playVideo();}};
 
 const btnTrack=document.getElementById('btnTrack');
 const trackControls=document.getElementById('trackControls');
 btnTrack.onclick=()=>trackControls.style.display=trackControls.style.display==='flex'?'none':'flex';
 
-document.getElementById('nextTrack').onclick=()=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack]));}};
-document.getElementById('prevTrack').onclick=()=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack]));}};
+document.getElementById('nextTrack').onclick=()=>{if(player){currentTrack=(currentTrack+1)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(event.clientX,event.clientY); }};
+document.getElementById('prevTrack').onclick=()=>{if(player){currentTrack=(currentTrack-1+musicList.length)%musicList.length;player.loadVideoById(getVideoId(musicList[currentTrack])); starEffect(event.clientX,event.clientY); }};
 
 const btnVolume=document.getElementById('btnVolume');
 const volumeControls=document.getElementById('volumeControls');
 btnVolume.onclick=()=>volumeControls.style.display=volumeControls.style.display==='flex'?'none':'flex';
+document.getElementById('volumeSlider').oninput=(e)=>{if(player)player.setVolume(e.target.value);};
 
-document.getElementById('volumeSlider').oninput=(e)=>{if(player) player.setVolume(e.target.value);};
-
-// Tầng 4: phát nhạc sau reload
 const btnReloadMusic=document.getElementById('btnReloadMusic');
 btnReloadMusic.onclick=()=>{
   if(player && musicList.length){
-    shuffle(musicList);
-    currentTrack=0;
+    shuffle(musicList); currentTrack=0;
     player.loadVideoById(getVideoId(musicList[0]));
     player.playVideo();
   }
 };
+
+/* ----------------- Hiệu ứng ngôi sao ----------------- */
+function starEffect(x,y){
+  const star=document.createElement('div'); star.textContent='🌟';
+  star.className='starAnim';
+  star.style.left=x+'px'; star.style.top=y+'px';
+  document.body.appendChild(star);
+  setTimeout(()=>star.remove(),800);
+}
 
 /* ----------------- Đồng hồ ----------------- */
 function updateClock(){
@@ -229,9 +240,6 @@ function updateClock(){
 }
 setInterval(updateClock,1000);
 updateClock();
-
-/* ----------------- Shuffle function ----------------- */
-function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]]}}
 </script>
 </body>
 </html>
