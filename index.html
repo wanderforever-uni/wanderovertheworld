@@ -41,14 +41,23 @@ height:120px;
 
 <img id="slide">
 
+<!-- youtube player ẩn -->
+<div id="player" style="display:none;"></div>
+
 <div class="bottom"></div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
+
+/* =========================
+   SLIDESHOW ẢNH
+========================= */
 
 let images = [];
 let current = 0;
 
-/* random thứ tự ảnh */
+/* random thứ tự */
 function shuffle(array){
 for(let i=array.length-1;i>0;i--){
 const j=Math.floor(Math.random()*(i+1));
@@ -71,14 +80,93 @@ fetch("images.json")
 .then(response=>response.json())
 .then(data=>{
 
-shuffle(data);        // random ảnh
-images = data.slice(0,10);   // lấy 10 ảnh
+shuffle(data);
+
+images = data.slice(0,10);
 
 changeImage();
 
 setInterval(changeImage,5000);
 
 });
+
+
+/* =========================
+   NHẠC NỀN YOUTUBE
+========================= */
+
+let musicList = [];
+let currentTrack = 0;
+let player;
+
+/* lấy video ID */
+
+function getVideoId(url){
+let match = url.match(/v=([^&]+)/);
+return match ? match[1] : null;
+}
+
+/* youtube api ready */
+
+function onYouTubeIframeAPIReady(){
+
+fetch("music.json")
+.then(res=>res.json())
+.then(data=>{
+
+shuffle(data);
+
+musicList = data;
+
+let firstId = getVideoId(musicList[0]);
+
+player = new YT.Player('player',{
+height:'0',
+width:'0',
+videoId:firstId,
+events:{
+'onReady':startMusic,
+'onStateChange':onPlayerStateChange
+}
+});
+
+});
+
+}
+
+/* bắt đầu phát */
+
+function startMusic(){
+player.playVideo();
+}
+
+/* khi nhạc kết thúc */
+
+function onPlayerStateChange(event){
+
+if(event.data === YT.PlayerState.ENDED){
+
+setTimeout(()=>{
+
+currentTrack = (currentTrack+1)%musicList.length;
+
+let nextId = getVideoId(musicList[currentTrack]);
+
+player.loadVideoById(nextId);
+
+},10000);
+
+}
+
+}
+
+/* fix autoplay */
+
+document.body.addEventListener("click",()=>{
+if(player){
+player.playVideo();
+}
+},{once:true});
 
 </script>
 
