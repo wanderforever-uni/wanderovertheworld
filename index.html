@@ -175,6 +175,17 @@ player.playVideo();
 }
 },{once:true});
 
+   window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+if(player){
+player.mute();
+player.playVideo();
+}
+},2000);
+
+});
+   
 </script>
 
 </body>
