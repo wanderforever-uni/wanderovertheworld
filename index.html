@@ -5,56 +5,42 @@
     <title>wander</title>
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        body { margin:0; text-align:center; background:#fff; font-family:sans-serif; cursor: pointer; }
+        body { margin:0; text-align:center; background:#fff; font-family:sans-serif; }
         h1 { font-family:'Satisfy', cursive; font-size:70px; margin:40px 0; color: #000; }
         img { width:100%; height:auto; display:block; }
         
-        /* MIX-BLEND-MODE FOR CONTRAST */
+        /* Chỉ giữ tương phản cho đồng hồ và nhóm điều khiển */
         #controlPanel, #casioPanel {
             mix-blend-mode: difference;
             color: #fff;
             z-index: 9999;
         }
 
-        /* Control Panel */
         #controlPanel { position:fixed; right:30px; bottom:40px; display:flex; flex-direction:column-reverse; align-items:center; gap:15px; }
         .btn { font-size:32px; cursor:pointer; transition:0.3s; user-select:none; position: relative; }
         
-        /* Star Menu with Letters */
         .sub-menu { display:none; flex-direction:column; gap:15px; margin-bottom: 10px; }
-        .star-btn { 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 28px;
-        }
-        .star-label { 
-            position: absolute; 
-            font-size: 10px; 
-            font-family: 'Share Tech Mono', monospace;
-            font-weight: bold;
-            margin-top: 2px;
-            pointer-events: none;
-            color: #000;
-            filter: invert(1); 
-        }
+        .star-btn { position: relative; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+        .star-label { position: absolute; font-size: 10px; font-family: 'Share Tech Mono', monospace; font-weight: bold; margin-top: 2px; pointer-events: none; color: #000; filter: invert(1); }
 
-        #volumeSlider { 
-            writing-mode: bt-lr; appearance: slider-vertical; 
-            width:8px; height:80px; display:none; margin-bottom: 10px;
-            filter: invert(1);
-        }
+        #volumeSlider { writing-mode: bt-lr; appearance: slider-vertical; width:8px; height:80px; display:none; margin-bottom: 10px; filter: invert(1); }
 
-        /* Casio Panel */
         #casioPanel { position:fixed; left:30px; top:50%; transform:translateY(-50%); display:flex; gap:20px; font-family:'Share Tech Mono', monospace; }
         .clock-box { display:flex; flex-direction:column; line-height:1.1; font-size:28px; }
         .day-vertical { font-size:14px; writing-mode:vertical-rl; margin-top:5px; text-transform: uppercase; }
         
         #player { position: absolute; top: -9999px; left: -9999px; }
+
+        /* Lớp phủ để ép người dùng tương tác sau khi reload */
+        #clickAnywhere {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10000; cursor: pointer; background: rgba(0,0,0,0.01);
+        }
     </style>
 </head>
 <body>
+
+    <div id="clickAnywhere"></div>
 
     <h1>wander</h1>
     <img id="slide">
@@ -71,18 +57,18 @@
     </div>
 
     <div id="controlPanel">
-        <div class="btn" id="rocketBtn" title="Top">🚀</div>
-        <div class="btn" id="playPauseBtn" title="Play/Pause">☁️</div>
+        <div class="btn" id="rocketBtn">🚀</div>
+        <div class="btn" id="playPauseBtn">☁️</div>
         <div class="btn" id="navBtn">
             <div class="sub-menu" id="navSub">
                 <div class="star-btn" id="nextBtn">⭐<span class="star-label">n</span></div>
                 <div class="star-btn" id="prevBtn">⭐<span class="star-label">p</span></div>
             </div>
-            <span title="Music Menu">☁️</span>
+            <span>☁️</span>
         </div>
         <div class="btn" id="volBtn">
             <input type="range" id="volumeSlider" min="0" max="100" value="50">
-            <span title="Volume">☁️</span>
+            <span>☁️</span>
         </div>
     </div>
 
@@ -103,7 +89,6 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Khởi tạo YouTube Player
         function onYouTubeIframeAPIReady() {
             fetch("music.json")
             .then(res => res.json())
@@ -113,17 +98,11 @@
                 player = new YT.Player('player', {
                     height: '0', width: '0',
                     videoId: getVideoId(musicList[0]),
-                    playerVars: { 
-                        'autoplay': 1, 
-                        'mute': 1, // Bắt buộc mute để trình duyệt cho phép tự chạy khi load/reload
-                        'enablejsapi': 1,
-                        'loop': 0
-                    },
+                    playerVars: { 'autoplay': 1, 'mute': 1, 'enablejsapi': 1 },
                     events: {
                         'onReady': (e) => { 
                             playerReady = true; 
-                            e.target.playVideo(); 
-                            console.log("Player Ready (Muted)");
+                            e.target.playVideo();
                         },
                         'onStateChange': (e) => { 
                             if(e.data === YT.PlayerState.ENDED) nextTrack(); 
@@ -136,7 +115,7 @@
         function nextTrack() {
             currentTrack = (currentTrack + 1) % musicList.length;
             player.loadVideoById(getVideoId(musicList[currentTrack]));
-            player.unMute(); // Đảm bảo unMute khi chuyển bài
+            player.unMute();
         }
 
         function prevTrack() {
@@ -145,30 +124,28 @@
             player.unMute();
         }
 
-        // CLICK VÀO BẤT KỲ ĐÂU TRÊN TRANG ĐỂ KÍCH HOẠT ÂM THANH (Dùng cho cả khi Reload)
-        window.onclick = function() {
+        // GIẢI PHÁP MỚI: Bắt cú click đầu tiên sau khi load trang
+        document.getElementById("clickAnywhere").onclick = function() {
             if (playerReady && player) {
                 player.unMute();
                 player.playVideo();
-                console.log("Audio Activated via Global Click");
+                this.style.display = "none"; // Ẩn lớp phủ đi sau khi đã kích hoạt nhạc
+                console.log("Music Unmuted");
             }
         };
 
         // BUTTONS LOGIC
         document.getElementById("rocketBtn").onclick = (e) => {
-            e.stopPropagation();
             window.scrollTo({top:0, behavior:'smooth'});
         };
         
         document.getElementById("playPauseBtn").onclick = (e) => {
-            e.stopPropagation();
             if(!playerReady) return;
             const state = player.getPlayerState();
             state === 1 ? player.pauseVideo() : player.playVideo();
         };
 
         document.getElementById("navBtn").onclick = (e) => {
-            e.stopPropagation();
             const s = document.getElementById("navSub");
             s.style.display = s.style.display === "flex" ? "none" : "flex";
         };
@@ -177,17 +154,15 @@
         document.getElementById("prevBtn").onclick = (e) => { e.stopPropagation(); prevTrack(); };
 
         document.getElementById("volBtn").onclick = (e) => {
-            e.stopPropagation();
             const v = document.getElementById("volumeSlider");
             v.style.display = v.style.display === "block" ? "none" : "block";
         };
 
         document.getElementById("volumeSlider").oninput = function(e) {
-            e.stopPropagation();
             if(playerReady) player.setVolume(this.value);
         };
 
-        // CLOCK LOGIC
+        // CLOCK
         function updateClock() {
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
@@ -204,7 +179,7 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // SLIDESHOW LOGIC
+        // SLIDESHOW
         fetch("images.json").then(r=>r.json()).then(d=>{
             shuffle(d);
             let idx=0; document.getElementById("slide").src=d[0];
