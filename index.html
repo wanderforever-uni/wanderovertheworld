@@ -31,6 +31,53 @@ height:auto;
 height:120px;
 }
 
+   /* CONTROL PANEL */
+#controlPanel{
+position:fixed;
+right:20px;
+bottom:40px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:15px;
+z-index:999;
+}
+
+.btn{
+font-size:28px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.btn:hover{
+transform:scale(1.2);
+}
+
+#volumeSlider{
+display:none;
+writing-mode: bt-lr;
+height:100px;
+}
+
+/* TIME PANEL */
+#timePanel{
+position:fixed;
+left:20px;
+top:50%;
+transform:translateY(-50%);
+display:flex;
+gap:20px;
+font-family:'Courier New', monospace;
+font-size:20px;
+text-align:center;
+z-index:999;
+}
+
+#time, #date{
+display:flex;
+flex-direction:column;
+}
+   
 </style>
 
 </head>
@@ -168,8 +215,116 @@ player.playVideo();
 }
 },{once:true});
 
+   /* =========================
+   CONTROL FUNCTIONS
+========================= */
+
+// scroll to top
+function scrollToTop(){
+window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// toggle volume slider
+function toggleVolume(){
+let slider = document.getElementById("volumeSlider");
+
+slider.style.display = (slider.style.display === "block") ? "none" : "block";
+}
+
+// change volume
+document.getElementById("volumeSlider").addEventListener("input", function(){
+if(player){
+player.setVolume(this.value);
+}
+});
+
+// play / pause
+let isPlaying = true;
+
+function toggleMusic(){
+if(!player) return;
+
+if(isPlaying){
+player.pauseVideo();
+}else{
+player.playVideo();
+}
+isPlaying = !isPlaying;
+}
+
+/* =========================
+   TIME (NEW YORK)
+========================= */
+
+function updateTime(){
+
+let now = new Date();
+
+// convert to New York time
+let options = {
+timeZone: "America/New_York",
+hour12: false,
+hour: "2-digit",
+minute: "2-digit",
+second: "2-digit",
+year: "numeric",
+month: "2-digit",
+day: "2-digit",
+weekday: "long"
+};
+
+let parts = new Intl.DateTimeFormat("en-US", options).formatToParts(now);
+
+let map = {};
+parts.forEach(p=> map[p.type]=p.value);
+
+// TIME
+document.getElementById("time").innerHTML = `
+<div>${map.hour}</div>
+<div>${map.minute}</div>
+<div>${map.second}</div>
+`;
+
+// DATE
+let year = map.year;
+
+document.getElementById("date").innerHTML = `
+<div>${year.slice(0,2)}</div>
+<div>${year.slice(2)}</div>
+<div>${map.month}</div>
+<div>${map.day}</div>
+<div>${map.weekday}</div>
+`;
+
+}
+
+// update every second
+setInterval(updateTime,1000);
+updateTime();
+   
 </script>
 
+   <!-- FLOAT CONTROL -->
+<div id="controlPanel">
+
+  <!-- rocket -->
+  <div class="btn rocket" onclick="scrollToTop()">🚀</div>
+
+  <!-- cloud volume -->
+  <div class="btn cloud" onclick="toggleVolume()">☁️</div>
+  <input id="volumeSlider" type="range" min="0" max="100" value="50">
+
+  <!-- cloud play/pause -->
+  <div class="btn cloud" onclick="toggleMusic()">☁️</div>
+
+</div>
+
+<!-- TIME + DATE -->
+<div id="timePanel">
+  <div id="time"></div>
+  <div id="date"></div>
+</div>
+   
 </body>
 
 </html>
