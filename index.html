@@ -28,13 +28,13 @@ img {
     height:120px;
 }
 
-/* BỘ NÚT CUỐN THEO MÀN HÌNH */
+/* --- BỘ NÚT CUỐN THEO MÀN HÌNH --- */
 #control-panel {
     position: fixed;
     right: 20px;
     bottom: 20px;
     display: flex;
-    flex-direction: column-reverse; /* rocket dưới cùng */
+    flex-direction: column; /* thứ tự DOM = thứ tự hiển thị */
     gap: 15px;
     z-index: 9999;
 }
@@ -46,15 +46,20 @@ img {
     display:flex;
     align-items:center;
     justify-content:center;
+    position: relative; /* để volume slider định vị tuyệt đối */
 }
 
-/* Thanh volume ẩn */
+/* Volume slider dọc bên phải nút Cloud */
 #volume-slider {
-    position:absolute;
-    bottom:60px;
-    left:-25px;
-    width:100px;
-    display:none;
+    writing-mode: bt-lr; /* dọc từ dưới lên */
+    -webkit-appearance: slider-vertical;
+    width: 8px;
+    height: 80px;
+    position: absolute;
+    left: 40px; /* cách icon 40px sang phải */
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
 }
 </style>
 </head>
@@ -81,8 +86,11 @@ img {
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-// ========== SLIDESHOW ==========
+// =========================
+// SLIDESHOW ẢNH
+// =========================
 let images=[], current=0;
 
 function shuffle(arr){
@@ -108,7 +116,9 @@ fetch("images.json")
     setInterval(changeImage,5000);
 });
 
-// ========== NHẠC YOUTUBE ==========
+// =========================
+// NHẠC YOUTUBE
+// =========================
 let musicList=[], currentTrack=0, player;
 
 function getVideoId(url){
@@ -150,25 +160,27 @@ document.body.addEventListener("click",()=>{
     if(player) player.playVideo();
 },{once:true});
 
-// ========== BỘ NÚT ==========
+// =========================
+// BỘ NÚT CUỐN THEO MÀN HÌNH
+// =========================
 let isPlaying=true;
 const rocketBtn=document.getElementById("rocket-btn");
 const playpauseBtn=document.getElementById("playpause-btn");
 const volumeBtn=document.getElementById("volume-btn");
 const volumeSlider=document.getElementById("volume-slider");
 
-// Rocket scroll top
+// Rocket scroll lên đầu trang
 rocketBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:'smooth'}));
 
 // Play/Pause nhạc
 playpauseBtn.addEventListener("click",()=>{
     if(player && player.getPlayerState){
-        if(isPlaying){ player.pauseVideo(); isPlaying=false; }
-        else{ player.playVideo(); isPlaying=true; }
+        if(isPlaying){player.pauseVideo(); isPlaying=false;}
+        else{player.playVideo(); isPlaying=true;}
     }
 });
 
-// Hiện/ẩn volume
+// Hiện/ẩn volume slider
 volumeBtn.addEventListener("click",(e)=>{
     e.stopPropagation();
     volumeSlider.style.display=(volumeSlider.style.display==='none')?'block':'none';
