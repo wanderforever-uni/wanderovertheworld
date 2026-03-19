@@ -41,7 +41,13 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* CHÌA KHÓA Ở ĐÂY: Trộn màu với lớp nền dưới nó */
+}
+
+/* 2 KHUNG NẰM NGANG */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+    /* CHÌA KHÓA Ở ĐÂY: Hiệu ứng tương phản chỉ áp dụng cho nhóm thời gian */
     mix-blend-mode: difference; 
 }
 
@@ -51,7 +57,7 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* Màu trắng kết hợp với 'difference' sẽ tạo ra màu nghịch đảo của nền */
+    /* Màu gốc là trắng để đảo màu chuẩn xác khi gặp nền */
     color: #fff; 
 }
 
@@ -62,18 +68,13 @@ img {
     margin-top: 5px;
 }
 
-/* 2 KHUNG NẰM NGANG */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
-}
-
 /* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    color: #fff; /* Đảm bảo nút tên lửa cũng tương phản */
+    /* Đảm bảo icon Rocket không bị màu mặc định của body ảnh hưởng (nếu body tối) */
+    /* Và nó sẽ KHÔNG bị đảo màu vì nằm ngoài mix-blend-mode của #time-wrapper */
 }
 </style>
 </head>
@@ -96,7 +97,7 @@ img {
 
 <script>
 // =========================
-// SLIDESHOW
+// SLIDESHOW (Giữ nguyên)
 // =========================
 let images=[], current=0;
 
@@ -124,7 +125,7 @@ fetch("images.json")
 });
 
 // =========================
-// ROCKET
+// ROCKET (Giữ nguyên)
 // =========================
 const rocketBtn=document.getElementById("rocket-btn");
 
@@ -133,7 +134,7 @@ rocketBtn.addEventListener("click",()=>{
 });
 
 // =========================
-// TIME SYSTEM
+// TIME SYSTEM (Giữ nguyên logic chính)
 // =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
