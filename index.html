@@ -40,7 +40,8 @@ img {
     gap: 10px;
     z-index: 9999;
 
-    mix-blend-mode: difference; /* 🔥 ĐẶT LẠI Ở ĐÂY */
+    mix-blend-mode: difference;
+    isolation: isolate; /* 🔥 thêm dòng này để khóa chỉ đen/trắng */
     pointer-events: none;
 }
 
@@ -49,10 +50,9 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-
-    color: #fff; /* 🔥 giữ trắng để blend */
+    color: #fff; /* giữ trắng để blend */
 }
-
+    
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
