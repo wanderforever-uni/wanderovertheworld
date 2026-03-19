@@ -43,22 +43,26 @@ img {
     z-index: 9999;
 }
 
-/* KHUNG CHỨA THỜI GIAN */
+/* CHỈ áp dụng cho cụm thời gian */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* Áp dụng hiệu ứng hòa trộn tại đây */
+    /* Sử dụng 'difference' kết hợp với màu sắc 
+       sẽ tạo ra màu đối xứng (complementary) trên vòng tròn màu sắc 
+    */
     mix-blend-mode: difference;
 }
 
-/* CHỮ VÀ SỐ THỜI GIAN */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* QUAN TRỌNG: Phải là màu trắng để hiệu ứng Difference hoạt động (Đảo ngược màu nền) */
-    color: #fff; 
+    /* Để có màu tương phản (không chỉ đen trắng), 
+       ta dùng màu xám sáng hoặc màu sắc nhẹ. 
+       #fffffe (gần như trắng) sẽ đảo ngược chính xác màu nền phía sau.
+    */
+    color: #ffffff; 
 }
 
 .weekday {
@@ -67,12 +71,13 @@ img {
     margin-top: 5px;
 }
 
-/* ROCKET - GIỮ NGUYÊN MÀU GỐC */
+/* ROCKET - TUYỆT ĐỐI KHÔNG ĐỔI MÀU */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Không bị ảnh hưởng bởi mix-blend-mode vì nằm ngoài #time-wrapper */
+    /* Đảm bảo không bị dính mix-blend-mode của cha nếu có nhầm lẫn */
+    isolation: isolate; 
 }
 </style>
 </head>
@@ -89,11 +94,11 @@ img {
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
     </div>
-
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
+// Logic giữ nguyên như bản gốc của bạn để đảm bảo tính ổn định
 let images=[], current=0;
 
 function shuffle(arr){
