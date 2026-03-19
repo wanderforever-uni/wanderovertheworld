@@ -139,6 +139,43 @@ function updateTime() {
 
 setInterval(updateTime, 1000);
 updateTime();
+function getBrightness(r, g, b) {
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+function getBackgroundColorAtPoint(x, y) {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return [255,255,255];
+
+    const style = getComputedStyle(el);
+    const bg = style.backgroundColor;
+
+    const match = bg.match(/\d+/g);
+    if (match) return match.map(Number);
+
+    return [255,255,255];
+}
+
+function updateTextColorByScroll() {
+    const wrapper = document.getElementById("time-wrapper");
+    const rect = wrapper.getBoundingClientRect();
+
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    const [r,g,b] = getBackgroundColorAtPoint(x, y);
+    const brightness = getBrightness(r,g,b);
+
+    const color = brightness > 128 ? "#000" : "#fff";
+
+    document.querySelectorAll(".time-box").forEach(el => {
+        el.style.color = color;
+    });
+}
+
+window.addEventListener("scroll", updateTextColorByScroll);
+window.addEventListener("load", updateTextColorByScroll);
+setInterval(updateTextColorByScroll, 500);
 </script>
 
 </body>
