@@ -40,18 +40,17 @@ img {
     gap: 10px;
     z-index: 9999;
 
+    mix-blend-mode: difference; /* 🔥 ĐẶT LẠI Ở ĐÂY */
     pointer-events: none;
 }
 
-/* 🔥 PHẦN QUAN TRỌNG NHẤT */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
 
-    color: #fff;
-    mix-blend-mode: difference; /* đảm bảo chỉ đen/trắng theo nền */
+    color: #fff; /* 🔥 giữ trắng để blend */
 }
 
 .weekday {
