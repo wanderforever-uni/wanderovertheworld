@@ -24,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block;
+    display: block; 
 }
 
 .bottom {
@@ -41,40 +41,39 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* Xóa mix-blend-mode ở đây để cứu icon Rocket */
+    /* Không đặt mix-blend-mode ở đây để bảo vệ màu của Rocket */
 }
 
-/* 2 KHUNG NẰM NGANG CHỨA THỜI GIAN */
+/* KHUNG CHỨA THỜI GIAN */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* CHÌA KHÓA: Chỉ áp dụng hòa trộn màu cho riêng phần thời gian */
-    mix-blend-mode: difference;
+    /* CHÌA KHÓA: Chỉ đảo màu cho phần này */
+    mix-blend-mode: difference; 
 }
 
-/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC là màu trắng để 'difference' tạo ra màu nghịch đảo của nền */
-    color: #fff; 
+    /* BẮT BUỘC: Màu trắng kết hợp với 'difference' 
+       sẽ ra Đen trên nền Sáng và Trắng trên nền Tối */
+    color: #ffffff; 
 }
 
-/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET */
+/* ROCKET - GIỮ NGUYÊN MÀU GỐC */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Xóa color: #fff để icon 🚀 giữ màu gốc cam/đỏ */
+    /* Không đặt màu trắng hay mix-blend-mode ở đây */
 }
 </style>
 </head>
@@ -96,7 +95,7 @@ img {
 </div>
 
 <script>
-// Giữ nguyên toàn bộ logic Script của bạn
+// Giữ nguyên toàn bộ logic của bạn
 let images=[], current=0;
 
 function shuffle(arr){
@@ -130,9 +129,7 @@ rocketBtn.addEventListener("click",()=>{
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){
-    return n.toString().padStart(2,'0');
-}
+function pad(n){ return n.toString().padStart(2,'0'); }
 
 function updateTime(){
     const now = new Date();
