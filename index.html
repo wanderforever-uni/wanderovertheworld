@@ -10,7 +10,16 @@
 body {
     margin:0;
     text-align:center;
-    background:#fff;
+    background:#000;
+}
+
+/* BACKGROUND IMAGE */
+#bg {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
 }
 
 h1 {
@@ -18,19 +27,15 @@ h1 {
     font-size:70px;
     font-weight:normal;
     margin:40px 0;
-    color:#000;
-}
-
-img {
-    width:100%;
-    height:auto;
+    color:#fff;
+    mix-blend-mode: difference;
 }
 
 .bottom {
     height:120px;
 }
 
-/* --- CONTROL PANEL --- */
+/* CONTROL PANEL */
 #control-panel {
     position: fixed;
     right: 20px;
@@ -39,31 +44,29 @@ img {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    z-index: 9999;
 }
 
-/* TIME BOX */
+/* TIME */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
 .time-box {
     font-family: 'Digital-7', monospace;
-    text-align: center;
-    line-height: 1.1;
     font-size: 18px;
+    line-height: 1.1;
+    text-align: center;
 
-    color: white; /* base */
-    mix-blend-mode: difference; /* 🔥 magic */
+    color: white;
+    mix-blend-mode: difference; /* 🔥 REAL CONTRAST */
 }
 
 /* WEEKDAY XOAY */
 .weekday {
-    transform: rotate(90deg);
     display: inline-block;
+    transform: rotate(90deg);
     margin-top: 5px;
-}
-
-/* 2 KHUNG NẰM NGANG */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
 }
 
 /* ROCKET */
@@ -71,14 +74,17 @@ img {
     font-size:32px;
     cursor:pointer;
     user-select:none;
+    color:white;
+    mix-blend-mode: difference;
 }
 </style>
 </head>
 
 <body>
 
+<div id="bg"></div>
+
 <h1>wander</h1>
-<img id="slide">
 
 <div class="bottom"></div>
 
@@ -86,10 +92,7 @@ img {
 
     <!-- TIME -->
     <div id="time-wrapper">
-        <!-- DATE -->
         <div class="time-box" id="date-box"></div>
-
-        <!-- CLOCK -->
         <div class="time-box" id="clock-box"></div>
     </div>
 
@@ -99,7 +102,7 @@ img {
 
 <script>
 // =========================
-// SLIDESHOW
+// SLIDESHOW (BACKGROUND)
 // =========================
 let images=[], current=0;
 
@@ -112,7 +115,9 @@ function shuffle(arr){
 
 function changeImage(){
     if(images.length>0){
-        document.getElementById("slide").src = images[current];
+        const bg = document.getElementById("bg");
+        bg.style.backgroundImage = `url(${images[current]})`;
+
         current=(current+1)%images.length;
     }
 }
@@ -129,14 +134,13 @@ fetch("images.json")
 // =========================
 // ROCKET
 // =========================
-const rocketBtn=document.getElementById("rocket-btn");
-
-rocketBtn.addEventListener("click",()=>{
+document.getElementById("rocket-btn")
+.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
 
 // =========================
-// TIME SYSTEM
+// TIME
 // =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
@@ -149,6 +153,7 @@ function updateTime(){
     const now = new Date();
 
     let year = now.getFullYear().toString();
+
     let yy1 = year.slice(0,2);
     let yy2 = year.slice(2);
 
@@ -161,7 +166,6 @@ function updateTime(){
     let min = pad(now.getMinutes());
     let ss = pad(now.getSeconds());
 
-    // DATE (5 dòng)
     dateBox.innerHTML = `
         ${yy1}<br>
         ${yy2}<br>
@@ -170,72 +174,11 @@ function updateTime(){
         <span class="weekday">${weekday}</span>
     `;
 
-    // CLOCK (3 dòng)
     clockBox.innerHTML = `
         ${hh}<br>
         ${min}<br>
         ${ss}
     `;
-
-    updateContrast();
-}
-
-// =========================
-// AUTO CONTRAST
-// =========================
-function updateContrast(){
-    const img = document.getElementById("slide");
-    if(!img.complete || img.naturalWidth === 0) return;
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-
-    canvas.width = w;
-    canvas.height = h;
-
-    ctx.drawImage(img, 0, 0);
-
-    // 🎯 vùng phía sau clock (góc phải dưới)
-    const startX = Math.floor(w * 0.75);
-    const startY = Math.floor(h * 0.75);
-    const size = 10;
-
-    const data = ctx.getImageData(startX, startY, size, size).data;
-
-    let r=0, g=0, b=0, count=0;
-
-    for(let i=0;i<data.length;i+=4){
-        r+=data[i];
-        g+=data[i+1];
-        b+=data[i+2];
-        count++;
-    }
-
-    r/=count;
-    g/=count;
-    b/=count;
-
-    const luminance = (0.299*r + 0.587*g + 0.114*b);
-
-    let nr, ng, nb;
-
-    if(luminance > 140){
-        nr = r * 0.2;
-        ng = g * 0.2;
-        nb = b * 0.2;
-    } else {
-        nr = r + (255 - r) * 0.8;
-        ng = g + (255 - g) * 0.8;
-        nb = b + (255 - b) * 0.8;
-    }
-
-    const color = `rgb(${nr},${ng},${nb})`;
-
-    dateBox.style.color = color;
-    clockBox.style.color = color;
 }
 
 setInterval(updateTime,1000);
