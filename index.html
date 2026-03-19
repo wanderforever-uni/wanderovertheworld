@@ -89,19 +89,23 @@ img {
     color: #000;
 }
 
-/* container */
+/* container 2 khung */
 .air-container {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-/* group chính */
+/* mỗi khung */
+.air-frame {
+    min-height: 100px;
+}
+
+/* group bên trong khung 1 */
 .air-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    width: 100%;
-    max-width: 1100px;
 }
 
 /* item */
@@ -109,12 +113,12 @@ img {
     text-align: center;
 }
 
-/* ô trên cùng nằm giữa */
+/* ô trên cùng */
 .air-item.center {
     grid-column: 1 / span 2;
 }
 
-/* khung logo */
+/* logo */
 .logo-box {
     width: 100%;
     max-width: 500px;
@@ -158,36 +162,43 @@ img {
     <div class="air-container">
 
         <!-- KHUNG 1 -->
-        <div class="air-group">
+        <div class="air-frame">
 
-            <!-- Ô 1 -->
-            <div class="air-item center">
-                <div class="logo-box">
-                    <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
-                </div>
-                <div class="air-name">Qatar Airways</div>
-                <div class="air-country">Qatar</div>
-            </div>
+            <div class="air-group">
 
-            <!-- Ô 2 -->
-            <div class="air-item">
-                <div class="logo-box">
-                    <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
+                <!-- Ô 1 -->
+                <div class="air-item center">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Qatar Airways</div>
+                    <div class="air-country">Qatar</div>
                 </div>
-                <div class="air-name">Singapore Airlines</div>
-                <div class="air-country">Singapore</div>
-            </div>
 
-            <!-- Ô 3 -->
-            <div class="air-item">
-                <div class="logo-box">
-                    <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
+                <!-- Ô 2 -->
+                <div class="air-item">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Singapore Airlines</div>
+                    <div class="air-country">Singapore</div>
                 </div>
-                <div class="air-name">Cathay Pacific</div>
-                <div class="air-country">Hong Kong</div>
+
+                <!-- Ô 3 -->
+                <div class="air-item">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Cathay Pacific</div>
+                    <div class="air-country">Hong Kong</div>
+                </div>
+
             </div>
 
         </div>
+
+        <!-- KHUNG 2 (để trống hoặc dùng sau) -->
+        <div class="air-frame"></div>
 
     </div>
 
