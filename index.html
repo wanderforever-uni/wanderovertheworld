@@ -8,69 +8,70 @@
 
 <style>
 body {
-    margin:0;
-    text-align:center;
-    background:#fff;
+    margin: 0;
+    text-align: center;
+    background: #fff; /* Nền trắng của body */
 }
 
 h1 {
-    font-family:'Satisfy',cursive;
-    font-size:70px;
-    font-weight:normal;
-    margin:40px 0;
-    color:#000;
+    font-family: 'Satisfy', cursive;
+    font-size: 70px;
+    font-weight: normal;
+    margin: 40px 0;
+    color: #000;
 }
 
 img {
-    width:100%;
-    height:auto;
-    display: block; /* Tránh khoảng hở dưới ảnh */
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .bottom {
-    height:120px;
+    height: 120px;
 }
 
-/* --- CONTROL PANEL --- */
-#control-panel {
+/* --- TIME WRAPPER --- */
+/* Đặt trực tiếp hiệu ứng lên khung chứa thời gian */
+#time-wrapper {
     position: fixed;
     right: 20px;
-    bottom: 20px;
+    bottom: 65px; /* Đẩy lên trên tên lửa */
     display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 10px;
     z-index: 9999;
+    
+    /* ĐÂY LÀ PHẦN QUAN TRỌNG NHẤT */
+    mix-blend-mode: difference; 
+    pointer-events: none; /* Để không cản trở việc click */
 }
 
-/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    mix-blend-mode: difference;
-    color: #fff; 
+    color: #fff; /* Trắng + Difference sẽ ra Đen khi gặp nền trắng body */
 }
 
-/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* 2 KHUNG NẰM NGANG */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
-}
-
-/* ROCKET */
-.control-btn {
-    font-size:32px;
-    cursor:pointer;
-    user-select:none;
+/* --- ROCKET --- */
+#rocket-btn {
+    position: fixed;
+    right: 32px;
+    bottom: 20px;
+    font-size: 32px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10000;
+    
+    /* Tên lửa tách biệt hoàn toàn, không có mix-blend-mode */
+    /* Không đặt màu trắng để giữ màu 🚀 gốc */
 }
 </style>
 </head>
@@ -82,101 +83,65 @@ img {
 
 <div class="bottom"></div>
 
-<div id="control-panel">
-    <div id="time-wrapper">
-        <div class="time-box" id="date-box"></div>
-        <div class="time-box" id="clock-box"></div>
-    </div>
-
-    <div class="control-btn" id="rocket-btn">🚀</div>
+<div id="time-wrapper">
+    <div class="time-box" id="date-box"></div>
+    <div class="time-box" id="clock-box"></div>
 </div>
 
-<script>
-// =========================
-// SLIDESHOW
-// =========================
-let images=[], current=0;
+<div id="rocket-btn">🚀</div>
 
-function shuffle(arr){
-    for(let i=arr.length-1;i>0;i--){
-        let j=Math.floor(Math.random()*(i+1));
-        [arr[i],arr[j]]=[arr[j],arr[i]];
+<script>
+let images = [], current = 0;
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
 }
 
-function changeImage(){
-   if(images.length>0){
-       document.getElementById("slide").src = images[current];
-       current=(current+1)%images.length;
+function changeImage() {
+    if (images.length > 0) {
+        document.getElementById("slide").src = images[current];
+        current = (current + 1) % images.length;
     }
 }
 
 fetch("images.json")
-.then(r=>r.json())
-.then(data=>{
-    shuffle(data);
-    images=data.slice(0,10);
-    changeImage();
-    setInterval(changeImage,5000);
+    .then(r => r.json())
+    .then(data => {
+        shuffle(data);
+        images = data.slice(0, 10);
+        changeImage();
+        setInterval(changeImage, 5000);
+    });
+
+const rocketBtn = document.getElementById("rocket-btn");
+rocketBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-// =========================
-// ROCKET
-// =========================
-const rocketBtn=document.getElementById("rocket-btn");
-
-rocketBtn.addEventListener("click",()=>{
-    window.scrollTo({top:0,behavior:'smooth'});
-});
-
-// =========================
-// TIME SYSTEM
-// =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){
-    return n.toString().padStart(2,'0');
-}
+function pad(n) { return n.toString().padStart(2, '0'); }
 
-function updateTime(){
+function updateTime() {
     const now = new Date();
-
     let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2);
-    let yy2 = year.slice(2);
+    let yy1 = year.slice(0, 2), yy2 = year.slice(2);
+    let mm = pad(now.getMonth() + 1), dd = pad(now.getDate());
+    let weekday = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][now.getDay()];
+    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
-    let mm = pad(now.getMonth()+1);
-    let dd = pad(now.getDate());
-
-    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-
-    let hh = pad(now.getHours());
-    let min = pad(now.getMinutes());
-    let ss = pad(now.getSeconds());
-
-    dateBox.innerHTML = `
-        ${yy1}<br>
-        ${yy2}<br>
-        ${mm}<br>
-        ${dd}<br>
-        <span class="weekday">${weekday}</span>
-    `;
-
-    clockBox.innerHTML = `
-        ${hh}<br>
-        ${min}<br>
-        ${ss}
-    `;
-    
+    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
+    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
 }
 
-setInterval(updateTime,1000);
+setInterval(updateTime, 1000);
 updateTime();
-
 </script>
 
 </body>
 </html>
-
 
