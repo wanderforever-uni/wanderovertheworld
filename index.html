@@ -10,7 +10,7 @@
 body {
     margin: 0;
     text-align: center;
-    background: #fff; /* Nền trắng của body */
+    background: #fff;
 }
 
 h1 {
@@ -32,26 +32,26 @@ img {
 }
 
 /* --- TIME WRAPPER --- */
-/* Đặt trực tiếp hiệu ứng lên khung chứa thời gian */
 #time-wrapper {
     position: fixed;
     right: 20px;
-    bottom: 65px; /* Đẩy lên trên tên lửa */
+    bottom: 65px;
     display: flex;
     gap: 10px;
     z-index: 9999;
-    
-    /* ĐÂY LÀ PHẦN QUAN TRỌNG NHẤT */
-    mix-blend-mode: difference; 
-    pointer-events: none; /* Để không cản trở việc click */
+
+    pointer-events: none;
 }
 
+/* 🔥 PHẦN QUAN TRỌNG NHẤT */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    color: #fff; /* Trắng + Difference sẽ ra Đen khi gặp nền trắng body */
+
+    color: #fff;
+    mix-blend-mode: difference; /* đảm bảo chỉ đen/trắng theo nền */
 }
 
 .weekday {
@@ -69,9 +69,6 @@ img {
     cursor: pointer;
     user-select: none;
     z-index: 10000;
-    
-    /* Tên lửa tách biệt hoàn toàn, không có mix-blend-mode */
-    /* Không đặt màu trắng để giữ màu 🚀 gốc */
 }
 </style>
 </head>
