@@ -24,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block; /* Tránh khoảng hở dưới ảnh */
+    display: block;
 }
 
 .bottom {
@@ -47,8 +47,12 @@ img {
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* CHÌA KHÓA Ở ĐÂY: Hiệu ứng tương phản chỉ áp dụng cho nhóm thời gian */
-    mix-blend-mode: difference; 
+    /* Dùng filter thay vì mix-blend-mode để đảm bảo hiển thị rõ trên nền trắng/đen */
+    /* Nó sẽ đảo ngược màu của bất kỳ thứ gì nằm dưới nó */
+    backdrop-filter: invert(100%);
+    -webkit-backdrop-filter: invert(100%);
+    padding: 5px;
+    border-radius: 4px;
 }
 
 /* TIME BOX */
@@ -57,24 +61,21 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* Màu gốc là trắng để đảo màu chuẩn xác khi gặp nền */
-    color: #fff; 
+    /* Để màu đen khi dùng backdrop-filter invert sẽ ra màu trắng và ngược lại */
+    color: #000; 
 }
 
-/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET */
+/* ROCKET - KHÔNG ĐỔI MÀU */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Đảm bảo icon Rocket không bị màu mặc định của body ảnh hưởng (nếu body tối) */
-    /* Và nó sẽ KHÔNG bị đảo màu vì nằm ngoài mix-blend-mode của #time-wrapper */
 }
 </style>
 </head>
@@ -91,14 +92,11 @@ img {
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
     </div>
-
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
-// =========================
-// SLIDESHOW (Giữ nguyên)
-// =========================
+// Giữ nguyên logic slideshow và thời gian như cũ
 let images=[], current=0;
 
 function shuffle(arr){
@@ -124,61 +122,30 @@ fetch("images.json")
     setInterval(changeImage,5000);
 });
 
-// =========================
-// ROCKET (Giữ nguyên)
-// =========================
 const rocketBtn=document.getElementById("rocket-btn");
-
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
 
-// =========================
-// TIME SYSTEM (Giữ nguyên logic chính)
-// =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){
-    return n.toString().padStart(2,'0');
-}
+function pad(n){ return n.toString().padStart(2,'0'); }
 
 function updateTime(){
     const now = new Date();
-
     let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2);
-    let yy2 = year.slice(2);
-
-    let mm = pad(now.getMonth()+1);
-    let dd = pad(now.getDate());
-
+    let yy1 = year.slice(0,2), yy2 = year.slice(2);
+    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
     let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
-    let hh = pad(now.getHours());
-    let min = pad(now.getMinutes());
-    let ss = pad(now.getSeconds());
-
-    dateBox.innerHTML = `
-        ${yy1}<br>
-        ${yy2}<br>
-        ${mm}<br>
-        ${dd}<br>
-        <span class="weekday">${weekday}</span>
-    `;
-
-    clockBox.innerHTML = `
-        ${hh}<br>
-        ${min}<br>
-        ${ss}
-    `;
-    
-    // Đã xóa updateContrast() vì CSS đã tự xử lý thông minh hơn
+    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
+    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
 }
 
 setInterval(updateTime,1000);
 updateTime();
-
 </script>
 
 </body>
