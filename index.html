@@ -200,7 +200,7 @@ img {
        <!-- KHUNG 2 -->
 <div class="air-frame">
     <!-- Video container -->
-    <div id="video-container" style="width:720px; height:1280px; margin:0 auto 5px; position: relative; border: none;">
+    <div id="video-container" style="width:720px; height:1280px; margin:0 auto; position: relative; border: none;">
         <video id="air-video" width="720" height="1280" autoplay muted playsinline></video>
 
         <!-- Star controls -->
@@ -211,7 +211,7 @@ img {
         </div>
 
         <!-- Volume slider -->
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
+        <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto; display:block;">
     </div>
 </div>
 
@@ -417,14 +417,9 @@ volumeSlider.addEventListener("input", () => {
     videoEl.volume = parseFloat(volumeSlider.value);
 });
 
-let volumeVisible = false;
-volumeBtn.addEventListener("click", () => {
-    volumeVisible = !volumeVisible;
-    volumeSlider.style.display = volumeVisible ? "block" : "none";
-});
-
 </script>
 
 </body>
 </html>
+
 
