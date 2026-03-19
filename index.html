@@ -28,13 +28,13 @@ img {
     height:120px;
 }
 
-/* --- BỘ NÚT CUỐN THEO MÀN HÌNH --- */
+/* --- NÚT ROCKET --- */
 #control-panel {
     position: fixed;
     right: 20px;
     bottom: 20px;
     display: flex;
-    flex-direction: column; /* thứ tự DOM = thứ tự hiển thị */
+    flex-direction: column;
     gap: 15px;
     z-index: 9999;
 }
@@ -43,23 +43,6 @@ img {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position: relative; /* để volume slider định vị tuyệt đối */
-}
-
-/* Volume slider dọc bên phải nút Cloud */
-#volume-slider {
-    writing-mode: bt-lr; /* dọc từ dưới lên */
-    -webkit-appearance: slider-vertical;
-    width: 8px;
-    height: 80px;
-    position: absolute;
-    left: 40px; /* cách icon 40px sang phải */
-    top: 50%;
-    transform: translateY(-50%);
-    display: none;
 }
 </style>
 </head>
@@ -68,24 +51,12 @@ img {
 <h1>wander</h1>
 <img id="slide">
 
-<!-- youtube player ẩn -->
-<div id="player" style="display:none;"></div>
-
 <div class="bottom"></div>
 
-<!-- BỘ NÚT CUỐN THEO MÀN HÌNH -->
+<!-- CHỈ GIỮ ROCKET -->
 <div id="control-panel">
-    <!-- Cloud Volume -->
-    <div class="control-btn" id="volume-btn">☁️
-        <input type="range" id="volume-slider" min="0" max="100" value="100">
-    </div>
-    <!-- Cloud Play/Pause -->
-    <div class="control-btn" id="playpause-btn">☁️</div>
-    <!-- Rocket -->
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
-
-<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 // =========================
@@ -117,80 +88,15 @@ fetch("images.json")
 });
 
 // =========================
-// NHẠC YOUTUBE
+// ROCKET SCROLL
 // =========================
-let musicList=[], currentTrack=0, player;
-
-function getVideoId(url){
-    let m=url.match(/v=([^&]+)/);
-    return m? m[1]:null;
-}
-
-function onYouTubeIframeAPIReady(){
-    fetch("music.json")
-    .then(r=>r.json())
-    .then(data=>{
-        shuffle(data);
-        musicList=data;
-        let firstId=getVideoId(musicList[0]);
-        player=new YT.Player('player',{
-            height:'0',
-            width:'0',
-            videoId:firstId,
-            events:{
-                'onReady':()=>player.playVideo(),
-                'onStateChange':onPlayerStateChange
-            }
-        });
-    });
-}
-
-function onPlayerStateChange(event){
-    if(event.data===YT.PlayerState.ENDED){
-        setTimeout(()=>{
-            currentTrack=(currentTrack+1)%musicList.length;
-            let nextId=getVideoId(musicList[currentTrack]);
-            player.loadVideoById(nextId);
-        },10000);
-    }
-}
-
-// fix autoplay
-document.body.addEventListener("click",()=>{
-    if(player) player.playVideo();
-},{once:true});
-
-// =========================
-// BỘ NÚT CUỐN THEO MÀN HÌNH
-// =========================
-let isPlaying=true;
 const rocketBtn=document.getElementById("rocket-btn");
-const playpauseBtn=document.getElementById("playpause-btn");
-const volumeBtn=document.getElementById("volume-btn");
-const volumeSlider=document.getElementById("volume-slider");
 
-// Rocket scroll lên đầu trang
-rocketBtn.addEventListener("click",()=>window.scrollTo({top:0,behavior:'smooth'}));
-
-// Play/Pause nhạc
-playpauseBtn.addEventListener("click",()=>{
-    if(player && player.getPlayerState){
-        if(isPlaying){player.pauseVideo(); isPlaying=false;}
-        else{player.playVideo(); isPlaying=true;}
-    }
-});
-
-// Hiện/ẩn volume slider
-volumeBtn.addEventListener("click",(e)=>{
-    e.stopPropagation();
-    volumeSlider.style.display=(volumeSlider.style.display==='none')?'block':'none';
-});
-
-// Thay đổi volume
-volumeSlider.addEventListener("input",()=>{
-    if(player && player.setVolume) player.setVolume(volumeSlider.value);
+rocketBtn.addEventListener("click",()=>{
+    window.scrollTo({top:0,behavior:'smooth'});
 });
 </script>
+
 </body>
 </html>
 
