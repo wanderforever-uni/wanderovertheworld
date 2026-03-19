@@ -24,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block; 
+    display: block;
 }
 
 .bottom {
@@ -41,17 +41,15 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* Không đặt mix-blend-mode ở đây để cứu tên lửa */
+    /* Xóa mix-blend-mode ở đây để cứu icon Rocket */
 }
 
-/* 2 KHUNG NẰM NGANG */
+/* 2 KHUNG NẰM NGANG CHỨA THỜI GIAN */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* CHÌA KHÓA: Phải có mix-blend-mode ở đây */
+    /* CHÌA KHÓA: Chỉ áp dụng hòa trộn màu cho riêng phần thời gian */
     mix-blend-mode: difference;
-    /* Thêm dòng này để ép trình duyệt nhận diện lớp nền phía sau ảnh */
-    position: relative; 
 }
 
 /* TIME BOX */
@@ -60,8 +58,8 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC là màu trắng (#fff) để hiệu ứng tương phản hoạt động */
-    color: #ffffff; 
+    /* BẮT BUỘC là màu trắng để 'difference' tạo ra màu nghịch đảo của nền */
+    color: #fff; 
 }
 
 /* WEEKDAY XOAY */
@@ -76,7 +74,7 @@ img {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Xóa color: #fff ở đây để 🚀 hiện màu cam/đỏ gốc */
+    /* Xóa color: #fff để icon 🚀 giữ màu gốc cam/đỏ */
 }
 </style>
 </head>
@@ -98,7 +96,7 @@ img {
 </div>
 
 <script>
-// Giữ nguyên toàn bộ JavaScript như bản gốc của bạn
+// Giữ nguyên toàn bộ logic Script của bạn
 let images=[], current=0;
 
 function shuffle(arr){
@@ -132,7 +130,9 @@ rocketBtn.addEventListener("click",()=>{
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){ return n.toString().padStart(2,'0'); }
+function pad(n){
+    return n.toString().padStart(2,'0');
+}
 
 function updateTime(){
     const now = new Date();
