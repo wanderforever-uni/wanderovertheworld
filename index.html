@@ -24,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block; /* Tránh khoảng hở dưới ảnh */
+    display: block; 
 }
 
 .bottom {
@@ -41,8 +41,7 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* CHÌA KHÓA Ở ĐÂY: Trộn màu với lớp nền dưới nó */
-    mix-blend-mode: difference; 
+    /* Đã bỏ mix-blend-mode ở đây để không ảnh hưởng đến toàn bộ con trực tiếp */
 }
 
 /* TIME BOX */
@@ -51,7 +50,6 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* Màu trắng kết hợp với 'difference' sẽ tạo ra màu nghịch đảo của nền */
     color: #fff; 
 }
 
@@ -66,6 +64,8 @@ img {
 #time-wrapper {
     display: flex;
     gap: 10px;
+    /* CHÌA KHÓA: Chỉ áp dụng trộn màu cho riêng phần thời gian */
+    mix-blend-mode: difference; 
 }
 
 /* ROCKET */
@@ -73,7 +73,7 @@ img {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    color: #fff;
+    /* Đã bỏ color: #fff để icon 🚀 giữ màu gốc */
 }
 </style>
 </head>
@@ -95,9 +95,7 @@ img {
 </div>
 
 <script>
-// =========================
-// SLIDESHOW
-// =========================
+// Giữ nguyên toàn bộ phần Script bên dưới
 let images=[], current=0;
 
 function shuffle(arr){
@@ -108,9 +106,9 @@ function shuffle(arr){
 }
 
 function changeImage(){
-   if(images.length>0){
-       document.getElementById("slide").src = images[current];
-       current=(current+1)%images.length;
+  if(images.length>0){
+      document.getElementById("slide").src = images[current];
+      current=(current+1)%images.length;
     }
 }
 
@@ -123,18 +121,11 @@ fetch("images.json")
     setInterval(changeImage,5000);
 });
 
-// =========================
-// ROCKET
-// =========================
 const rocketBtn=document.getElementById("rocket-btn");
-
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
 
-// =========================
-// TIME SYSTEM
-// =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
@@ -144,39 +135,22 @@ function pad(n){
 
 function updateTime(){
     const now = new Date();
-
     let year = now.getFullYear().toString();
     let yy1 = year.slice(0,2);
     let yy2 = year.slice(2);
-
     let mm = pad(now.getMonth()+1);
     let dd = pad(now.getDate());
-
     let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-
     let hh = pad(now.getHours());
     let min = pad(now.getMinutes());
     let ss = pad(now.getSeconds());
 
-    dateBox.innerHTML = `
-        ${yy1}<br>
-        ${yy2}<br>
-        ${mm}<br>
-        ${dd}<br>
-        <span class="weekday">${weekday}</span>
-    `;
-
-    clockBox.innerHTML = `
-        ${hh}<br>
-        ${min}<br>
-        ${ss}
-    `;
-    
+    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
+    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
 }
 
 setInterval(updateTime,1000);
 updateTime();
-
 </script>
 
 </body>
