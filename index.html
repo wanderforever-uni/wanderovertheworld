@@ -41,38 +41,41 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
+    /* ĐÃ BỎ mix-blend-mode ở đây để cứu màu của tên lửa */
 }
 
-/* CHỈ ĐẢO MÀU CHỮ VÀ SỐ */
+/* 2 KHUNG NẰM NGANG - CHỈ ĐẢO MÀU PHẦN NÀY */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* exclusion kết hợp với màu trắng sẽ đảo màu chữ cực mạnh 
-       mà ít làm biến đổi màu ảnh nền nhất so với difference */
-    mix-blend-mode: exclusion;
+    /* CHÌA KHÓA: Hiệu ứng đảo màu chỉ tác động lên các con số */
+    mix-blend-mode: difference;
 }
 
+/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC dùng màu trắng tinh để chữ tự "phản ứng" với nền */
-    color: #ffffff; 
+    /* BẮT BUỘC dùng màu trắng tinh (#fff) kết hợp với 'difference'
+       để tạo ra màu nghịch đảo: Nền sáng -> Chữ đen, Nền tối -> Chữ trắng */
+    color: #fff; 
 }
 
+/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET - GIỮ NGUYÊN MÀU 🚀 */
+/* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Tách biệt hoàn toàn, không có mix-blend-mode */
+    /* ĐÃ BỎ color: #fff để icon 🚀 giữ màu cam/đỏ nguyên bản */
 }
 </style>
 </head>
@@ -89,11 +92,12 @@ img {
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
     </div>
+
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
-// Giữ nguyên logic slideshow và thời gian của bạn
+// Giữ nguyên toàn bộ logic JavaScript gốc
 let images=[], current=0;
 
 function shuffle(arr){
@@ -120,6 +124,7 @@ fetch("images.json")
 });
 
 const rocketBtn=document.getElementById("rocket-btn");
+
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
@@ -127,15 +132,21 @@ rocketBtn.addEventListener("click",()=>{
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){ return n.toString().padStart(2,'0'); }
+function pad(n){
+    return n.toString().padStart(2,'0');
+}
 
 function updateTime(){
     const now = new Date();
     let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2), yy2 = year.slice(2);
-    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
+    let yy1 = year.slice(0,2);
+    let yy2 = year.slice(2);
+    let mm = pad(now.getMonth()+1);
+    let dd = pad(now.getDate());
     let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
+    let hh = pad(now.getHours());
+    let min = pad(now.getMinutes());
+    let ss = pad(now.getSeconds());
 
     dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
     clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
