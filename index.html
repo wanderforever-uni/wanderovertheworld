@@ -299,20 +299,21 @@ window.addEventListener("scroll", updateTextColorByScroll);
 window.addEventListener("load", updateTextColorByScroll);
 setInterval(updateTextColorByScroll, 500);
 
-const slideImg = document.getElementById("slide");
 const rocket = document.getElementById("rocket-btn");
 const timeWrapper = document.getElementById("time-wrapper");
 
 function toggleUI() {
-    const rect = slideImg.getBoundingClientRect();
+    const scrollY = window.scrollY;
 
-    // nếu phần ảnh còn nằm trong viewport
-    const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+    // chiều cao vùng slideshow (ảnh + bottom)
+    const triggerHeight = document.getElementById("slide").offsetHeight;
 
-    if (isVisible) {
+    if (scrollY < triggerHeight) {
+        // đang ở vùng ảnh
         rocket.style.opacity = "0";
         timeWrapper.style.opacity = "0";
     } else {
+        // đã scroll xuống dưới
         rocket.style.opacity = "1";
         timeWrapper.style.opacity = "1";
     }
