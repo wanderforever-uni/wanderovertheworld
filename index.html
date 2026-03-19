@@ -11,6 +11,8 @@ body {
     margin:0;
     text-align:center;
     background:#fff;
+    /* Dòng này quan trọng để control-panel fixed chuẩn */
+    position: relative; 
 }
 
 h1 {
@@ -33,6 +35,7 @@ img {
 
 /* --- CONTROL PANEL --- */
 #control-panel {
+    /* Vị trí fixed để chữ luôn chực sẵn ở góc màn hình */
     position: fixed;
     right: 20px;
     bottom: 20px;
@@ -41,41 +44,41 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* ĐÃ BỎ mix-blend-mode ở đây để cứu màu của tên lửa */
+    /* isolation isolate: Cô lập mix-blend-mode bên trong, không làm ảnh 
+       hưởng ra ngoài, giúp 🚀 không bị đổi màu */
+    isolation: isolate; 
 }
 
-/* 2 KHUNG NẰM NGANG - CHỈ ĐẢO MÀU PHẦN NÀY */
+/* KHUNG CHỨA THỜI GIAN */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* CHÌA KHÓA: Hiệu ứng đảo màu chỉ tác động lên các con số */
+    /* CHÌA KHÓA Ở ĐÂY: Hiệu ứng đảo màu chỉ tác động lên text */
     mix-blend-mode: difference;
 }
 
-/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC dùng màu trắng tinh (#fff) kết hợp với 'difference'
-       để tạo ra màu nghịch đảo: Nền sáng -> Chữ đen, Nền tối -> Chữ trắng */
-    color: #fff; 
+    /* BẮT BUỘC: Màu trắng kết hợp với 'difference' 
+       -> Trên nền tối (lá cây) sẽ hiện Trắng, trên nền sáng (nền trắng của body) 
+       sẽ tự biến thành Đen */
+    color: #ffffff; 
 }
 
-/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET */
+/* ROCKET - TUYỆT ĐỐI KHÔNG ĐỔI MÀU */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* ĐÃ BỎ color: #fff để icon 🚀 giữ màu cam/đỏ nguyên bản */
 }
 </style>
 </head>
@@ -97,7 +100,7 @@ img {
 </div>
 
 <script>
-// Giữ nguyên toàn bộ logic JavaScript gốc
+// Giữ nguyên logic JavaScript của bạn
 let images=[], current=0;
 
 function shuffle(arr){
@@ -124,7 +127,6 @@ fetch("images.json")
 });
 
 const rocketBtn=document.getElementById("rocket-btn");
-
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
@@ -132,21 +134,15 @@ rocketBtn.addEventListener("click",()=>{
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){
-    return n.toString().padStart(2,'0');
-}
+function pad(n){ return n.toString().padStart(2,'0'); }
 
 function updateTime(){
     const now = new Date();
     let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2);
-    let yy2 = year.slice(2);
-    let mm = pad(now.getMonth()+1);
-    let dd = pad(now.getDate());
+    let yy1 = year.slice(0,2), yy2 = year.slice(2);
+    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
     let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-    let hh = pad(now.getHours());
-    let min = pad(now.getMinutes());
-    let ss = pad(now.getSeconds());
+    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
     dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
     clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
