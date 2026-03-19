@@ -40,8 +40,7 @@ img {
     gap: 10px;
     z-index: 9999;
 
-    mix-blend-mode: difference;
-    isolation: isolate; /* 🔥 thêm dòng này để khóa chỉ đen/trắng */
+    mix-blend-mode: exclusion; /* 🔥 đổi từ difference */
     pointer-events: none;
 }
 
@@ -50,7 +49,11 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    color: #fff; /* giữ trắng để blend */
+
+    color: #fff;
+
+    filter: contrast(1000%) grayscale(100%); 
+    /* 🔥 ép về chỉ đen/trắng tuyệt đối */
 }
     
 .weekday {
