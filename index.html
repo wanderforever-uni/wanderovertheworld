@@ -72,6 +72,75 @@ img {
     user-select: none;
     z-index: 10000;
 }
+
+/* --- AIR SECTION --- */
+#air-section {
+    max-width: calc(100% - 80px);
+    margin: 60px auto;
+    padding: 10px;
+}
+
+/* tiêu đề */
+.air-title {
+    font-family: 'Satisfy', cursive;
+    font-size: 50px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #000;
+}
+
+/* container */
+.air-container {
+    display: flex;
+    justify-content: center;
+}
+
+/* group chính */
+.air-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* item */
+.air-item {
+    text-align: center;
+}
+
+/* ô trên cùng nằm giữa */
+.air-item.center {
+    grid-column: 1 / span 2;
+}
+
+/* khung logo */
+.logo-box {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* text */
+.air-name {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.air-country {
+    font-size: 14px;
+    opacity: 0.7;
+}
 </style>
 </head>
 
@@ -81,6 +150,48 @@ img {
 <img id="slide">
 
 <div class="bottom"></div>
+
+<div id="air-section">
+
+    <h2 class="air-title">air</h2>
+
+    <div class="air-container">
+
+        <!-- KHUNG 1 -->
+        <div class="air-group">
+
+            <!-- Ô 1 -->
+            <div class="air-item center">
+                <div class="logo-box">
+                    <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
+                </div>
+                <div class="air-name">Qatar Airways</div>
+                <div class="air-country">Qatar</div>
+            </div>
+
+            <!-- Ô 2 -->
+            <div class="air-item">
+                <div class="logo-box">
+                    <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
+                </div>
+                <div class="air-name">Singapore Airlines</div>
+                <div class="air-country">Singapore</div>
+            </div>
+
+            <!-- Ô 3 -->
+            <div class="air-item">
+                <div class="logo-box">
+                    <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
+                </div>
+                <div class="air-name">Cathay Pacific</div>
+                <div class="air-country">Hong Kong</div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <div id="time-wrapper">
     <div class="time-box" id="date-box"></div>
