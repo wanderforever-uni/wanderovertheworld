@@ -41,15 +41,15 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* Không đặt mix-blend-mode ở đây để bảo vệ màu của Rocket */
 }
 
-/* KHUNG CHỨA THỜI GIAN */
+/* CHỈ ĐẢO MÀU CHỮ VÀ SỐ */
 #time-wrapper {
     display: flex;
     gap: 10px;
-    /* CHÌA KHÓA: Chỉ đảo màu cho phần này */
-    mix-blend-mode: difference; 
+    /* exclusion kết hợp với màu trắng sẽ đảo màu chữ cực mạnh 
+       mà ít làm biến đổi màu ảnh nền nhất so với difference */
+    mix-blend-mode: exclusion;
 }
 
 .time-box {
@@ -57,8 +57,7 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC: Màu trắng kết hợp với 'difference' 
-       sẽ ra Đen trên nền Sáng và Trắng trên nền Tối */
+    /* BẮT BUỘC dùng màu trắng tinh để chữ tự "phản ứng" với nền */
     color: #ffffff; 
 }
 
@@ -68,12 +67,12 @@ img {
     margin-top: 5px;
 }
 
-/* ROCKET - GIỮ NGUYÊN MÀU GỐC */
+/* ROCKET - GIỮ NGUYÊN MÀU 🚀 */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Không đặt màu trắng hay mix-blend-mode ở đây */
+    /* Tách biệt hoàn toàn, không có mix-blend-mode */
 }
 </style>
 </head>
@@ -90,12 +89,11 @@ img {
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
     </div>
-
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
-// Giữ nguyên toàn bộ logic của bạn
+// Giữ nguyên logic slideshow và thời gian của bạn
 let images=[], current=0;
 
 function shuffle(arr){
@@ -149,5 +147,4 @@ updateTime();
 
 </body>
 </html>
-
 
