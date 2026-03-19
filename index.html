@@ -24,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block;
+    display: block; /* Tránh khoảng hở dưới ảnh */
 }
 
 .bottom {
@@ -41,43 +41,39 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
+    /* CHÌA KHÓA Ở ĐÂY: Trộn màu với lớp nền dưới nó */
+    mix-blend-mode: difference; 
 }
 
-/* CHỈ áp dụng cho cụm thời gian */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
-    /* Sử dụng 'difference' kết hợp với màu sắc 
-       sẽ tạo ra màu đối xứng (complementary) trên vòng tròn màu sắc 
-    */
-    mix-blend-mode: difference;
-}
-
+/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* Để có màu tương phản (không chỉ đen trắng), 
-       ta dùng màu xám sáng hoặc màu sắc nhẹ. 
-       #fffffe (gần như trắng) sẽ đảo ngược chính xác màu nền phía sau.
-    */
-    color: #ffffff; 
+    /* Màu trắng kết hợp với 'difference' sẽ tạo ra màu nghịch đảo của nền */
+    color: #fff; 
 }
 
+/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET - TUYỆT ĐỐI KHÔNG ĐỔI MÀU */
+/* 2 KHUNG NẰM NGANG */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+/* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Đảm bảo không bị dính mix-blend-mode của cha nếu có nhầm lẫn */
-    isolation: isolate; 
+    color: #fff;
 }
 </style>
 </head>
@@ -94,11 +90,14 @@ img {
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
     </div>
+
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
-// Logic giữ nguyên như bản gốc của bạn để đảm bảo tính ổn định
+// =========================
+// SLIDESHOW
+// =========================
 let images=[], current=0;
 
 function shuffle(arr){
@@ -124,32 +123,63 @@ fetch("images.json")
     setInterval(changeImage,5000);
 });
 
+// =========================
+// ROCKET
+// =========================
 const rocketBtn=document.getElementById("rocket-btn");
+
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
 
+// =========================
+// TIME SYSTEM
+// =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){ return n.toString().padStart(2,'0'); }
+function pad(n){
+    return n.toString().padStart(2,'0');
+}
 
 function updateTime(){
     const now = new Date();
-    let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2), yy2 = year.slice(2);
-    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
-    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
-    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
-    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
+    let year = now.getFullYear().toString();
+    let yy1 = year.slice(0,2);
+    let yy2 = year.slice(2);
+
+    let mm = pad(now.getMonth()+1);
+    let dd = pad(now.getDate());
+
+    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+
+    let hh = pad(now.getHours());
+    let min = pad(now.getMinutes());
+    let ss = pad(now.getSeconds());
+
+    dateBox.innerHTML = `
+        ${yy1}<br>
+        ${yy2}<br>
+        ${mm}<br>
+        ${dd}<br>
+        <span class="weekday">${weekday}</span>
+    `;
+
+    clockBox.innerHTML = `
+        ${hh}<br>
+        ${min}<br>
+        ${ss}
+    `;
+    
 }
 
 setInterval(updateTime,1000);
 updateTime();
+
 </script>
 
 </body>
 </html>
+
 
