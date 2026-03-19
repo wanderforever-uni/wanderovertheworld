@@ -24,6 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
+    display: block; /* Tránh khoảng hở dưới ảnh */
 }
 
 .bottom {
@@ -40,6 +41,8 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
+    /* CHÌA KHÓA Ở ĐÂY: Trộn màu với lớp nền dưới nó */
+    mix-blend-mode: difference; 
 }
 
 /* TIME BOX */
@@ -48,6 +51,8 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
+    /* Màu trắng kết hợp với 'difference' sẽ tạo ra màu nghịch đảo của nền */
+    color: #fff; 
 }
 
 /* WEEKDAY XOAY */
@@ -68,6 +73,7 @@ img {
     font-size:32px;
     cursor:pointer;
     user-select:none;
+    color: #fff; /* Đảm bảo nút tên lửa cũng tương phản */
 }
 </style>
 </head>
@@ -80,17 +86,11 @@ img {
 <div class="bottom"></div>
 
 <div id="control-panel">
-
-    <!-- TIME -->
     <div id="time-wrapper">
-        <!-- DATE -->
         <div class="time-box" id="date-box"></div>
-
-        <!-- CLOCK -->
         <div class="time-box" id="clock-box"></div>
     </div>
 
-    <!-- ROCKET -->
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
@@ -108,9 +108,9 @@ function shuffle(arr){
 }
 
 function changeImage(){
-    if(images.length>0){
-        document.getElementById("slide").src = images[current];
-        current=(current+1)%images.length;
+   if(images.length>0){
+       document.getElementById("slide").src = images[current];
+       current=(current+1)%images.length;
     }
 }
 
@@ -158,7 +158,6 @@ function updateTime(){
     let min = pad(now.getMinutes());
     let ss = pad(now.getSeconds());
 
-    // DATE (5 dòng)
     dateBox.innerHTML = `
         ${yy1}<br>
         ${yy2}<br>
@@ -167,31 +166,13 @@ function updateTime(){
         <span class="weekday">${weekday}</span>
     `;
 
-    // CLOCK (3 dòng)
     clockBox.innerHTML = `
         ${hh}<br>
         ${min}<br>
         ${ss}
     `;
-
-    updateContrast();
-}
-
-// =========================
-// AUTO CONTRAST
-// =========================
-function updateContrast(){
-    const bg = window.getComputedStyle(document.body).backgroundColor;
-
-    const rgb = bg.match(/\d+/g);
-    if(!rgb) return;
-
-    const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114)/1000;
-
-    const color = brightness > 128 ? "#000" : "#fff";
-
-    dateBox.style.color = color;
-    clockBox.style.color = color;
+    
+    // Đã xóa updateContrast() vì CSS đã tự xử lý thông minh hơn
 }
 
 setInterval(updateTime,1000);
