@@ -2,7 +2,9 @@
 <html>
 <head>
 <title>wander</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/digital-7" rel="stylesheet">
 
 <style>
 body {
@@ -28,17 +30,40 @@ img {
     height:120px;
 }
 
-/* --- NÚT ROCKET --- */
+/* --- CONTROL PANEL --- */
 #control-panel {
     position: fixed;
     right: 20px;
     bottom: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    align-items: center;
+    gap: 10px;
     z-index: 9999;
 }
 
+/* TIME BOX */
+.time-box {
+    font-family: 'Digital-7', monospace;
+    text-align: center;
+    line-height: 1.1;
+    font-size: 18px;
+}
+
+/* WEEKDAY XOAY */
+.weekday {
+    transform: rotate(90deg);
+    display: inline-block;
+    margin-top: 5px;
+}
+
+/* 2 KHUNG NẰM NGANG */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+/* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
@@ -46,6 +71,7 @@ img {
 }
 </style>
 </head>
+
 <body>
 
 <h1>wander</h1>
@@ -53,14 +79,24 @@ img {
 
 <div class="bottom"></div>
 
-<!-- CHỈ GIỮ ROCKET -->
 <div id="control-panel">
+
+    <!-- TIME -->
+    <div id="time-wrapper">
+        <!-- DATE -->
+        <div class="time-box" id="date-box"></div>
+
+        <!-- CLOCK -->
+        <div class="time-box" id="clock-box"></div>
+    </div>
+
+    <!-- ROCKET -->
     <div class="control-btn" id="rocket-btn">🚀</div>
 </div>
 
 <script>
 // =========================
-// SLIDESHOW ẢNH
+// SLIDESHOW
 // =========================
 let images=[], current=0;
 
@@ -88,15 +124,80 @@ fetch("images.json")
 });
 
 // =========================
-// ROCKET SCROLL
+// ROCKET
 // =========================
 const rocketBtn=document.getElementById("rocket-btn");
 
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
+
+// =========================
+// TIME SYSTEM
+// =========================
+const dateBox = document.getElementById("date-box");
+const clockBox = document.getElementById("clock-box");
+
+function pad(n){
+    return n.toString().padStart(2,'0');
+}
+
+function updateTime(){
+    const now = new Date();
+
+    let year = now.getFullYear().toString();
+    let yy1 = year.slice(0,2);
+    let yy2 = year.slice(2);
+
+    let mm = pad(now.getMonth()+1);
+    let dd = pad(now.getDate());
+
+    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+
+    let hh = pad(now.getHours());
+    let min = pad(now.getMinutes());
+    let ss = pad(now.getSeconds());
+
+    // DATE (5 dòng)
+    dateBox.innerHTML = `
+        ${yy1}<br>
+        ${yy2}<br>
+        ${mm}<br>
+        ${dd}<br>
+        <span class="weekday">${weekday}</span>
+    `;
+
+    // CLOCK (3 dòng)
+    clockBox.innerHTML = `
+        ${hh}<br>
+        ${min}<br>
+        ${ss}
+    `;
+
+    updateContrast();
+}
+
+// =========================
+// AUTO CONTRAST
+// =========================
+function updateContrast(){
+    const bg = window.getComputedStyle(document.body).backgroundColor;
+
+    const rgb = bg.match(/\d+/g);
+    if(!rgb) return;
+
+    const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114)/1000;
+
+    const color = brightness > 128 ? "#000" : "#fff";
+
+    dateBox.style.color = color;
+    clockBox.style.color = color;
+}
+
+setInterval(updateTime,1000);
+updateTime();
+
 </script>
 
 </body>
 </html>
-
