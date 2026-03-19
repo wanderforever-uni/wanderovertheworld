@@ -41,7 +41,17 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* Đã bỏ mix-blend-mode ở đây để không ảnh hưởng đến toàn bộ con trực tiếp */
+    /* Không đặt mix-blend-mode ở đây để cứu tên lửa */
+}
+
+/* 2 KHUNG NẰM NGANG */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+    /* CHÌA KHÓA: Phải có mix-blend-mode ở đây */
+    mix-blend-mode: difference;
+    /* Thêm dòng này để ép trình duyệt nhận diện lớp nền phía sau ảnh */
+    position: relative; 
 }
 
 /* TIME BOX */
@@ -50,7 +60,8 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    color: #fff; 
+    /* BẮT BUỘC là màu trắng (#fff) để hiệu ứng tương phản hoạt động */
+    color: #ffffff; 
 }
 
 /* WEEKDAY XOAY */
@@ -60,20 +71,12 @@ img {
     margin-top: 5px;
 }
 
-/* 2 KHUNG NẰM NGANG */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
-    /* CHÌA KHÓA: Chỉ áp dụng trộn màu cho riêng phần thời gian */
-    mix-blend-mode: difference; 
-}
-
 /* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
     user-select:none;
-    /* Đã bỏ color: #fff để icon 🚀 giữ màu gốc */
+    /* Xóa color: #fff ở đây để 🚀 hiện màu cam/đỏ gốc */
 }
 </style>
 </head>
@@ -95,7 +98,7 @@ img {
 </div>
 
 <script>
-// Giữ nguyên toàn bộ phần Script bên dưới
+// Giữ nguyên toàn bộ JavaScript như bản gốc của bạn
 let images=[], current=0;
 
 function shuffle(arr){
@@ -129,21 +132,15 @@ rocketBtn.addEventListener("click",()=>{
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){
-    return n.toString().padStart(2,'0');
-}
+function pad(n){ return n.toString().padStart(2,'0'); }
 
 function updateTime(){
     const now = new Date();
     let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2);
-    let yy2 = year.slice(2);
-    let mm = pad(now.getMonth()+1);
-    let dd = pad(now.getDate());
+    let yy1 = year.slice(0,2), yy2 = year.slice(2);
+    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
     let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-    let hh = pad(now.getHours());
-    let min = pad(now.getMinutes());
-    let ss = pad(now.getSeconds());
+    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
     dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
     clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
