@@ -181,14 +181,57 @@ function updateTime(){
 // AUTO CONTRAST
 // =========================
 function updateContrast(){
-    const bg = window.getComputedStyle(document.body).backgroundColor;
+    const img = document.getElementById("slide");
+    if(!img.complete) return;
 
-    const rgb = bg.match(/\d+/g);
-    if(!rgb) return;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
 
-    const brightness = (rgb[0]*299 + rgb[1]*587 + rgb[2]*114)/1000;
+    canvas.width = 50;
+    canvas.height = 50;
 
-    const color = brightness > 128 ? "#000" : "#fff";
+    ctx.drawImage(img, 0, 0, 50, 50);
+
+    const data = ctx.getImageData(0, 0, 50, 50).data;
+
+    let r=0, g=0, b=0, count=0;
+
+    for(let i=0;i<data.length;i+=4){
+        r+=data[i];
+        g+=data[i+1];
+        b+=data[i+2];
+        count++;
+    }
+
+    r/=count;
+    g/=count;
+    b/=count;
+
+    // 🎨 màu bổ sung (đảo màu)
+    let nr = 255 - r;
+    let ng = 255 - g;
+    let nb = 255 - b;
+
+    // 🧠 chuẩn hoá độ sáng để luôn dễ đọc
+    const brightness = (nr*299 + ng*587 + nb*114)/1000;
+
+    if(brightness < 120){
+        // quá tối → làm sáng lên
+        nr += 80;
+        ng += 80;
+        nb += 80;
+    } else if(brightness > 200){
+        // quá sáng → làm đậm xuống
+        nr *= 0.7;
+        ng *= 0.7;
+        nb *= 0.7;
+    }
+
+    nr = Math.min(255, Math.max(0, nr));
+    ng = Math.min(255, Math.max(0, ng));
+    nb = Math.min(255, Math.max(0, nb));
+
+    const color = `rgb(${nr},${ng},${nb})`;
 
     dateBox.style.color = color;
     clockBox.style.color = color;
