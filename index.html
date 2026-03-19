@@ -11,8 +11,6 @@ body {
     margin:0;
     text-align:center;
     background:#fff;
-    /* Dòng này quan trọng để control-panel fixed chuẩn */
-    position: relative; 
 }
 
 h1 {
@@ -26,7 +24,7 @@ h1 {
 img {
     width:100%;
     height:auto;
-    display: block; 
+    display: block; /* Tránh khoảng hở dưới ảnh */
 }
 
 .bottom {
@@ -35,7 +33,6 @@ img {
 
 /* --- CONTROL PANEL --- */
 #control-panel {
-    /* Vị trí fixed để chữ luôn chực sẵn ở góc màn hình */
     position: fixed;
     right: 20px;
     bottom: 20px;
@@ -44,37 +41,32 @@ img {
     align-items: center;
     gap: 10px;
     z-index: 9999;
-    /* isolation isolate: Cô lập mix-blend-mode bên trong, không làm ảnh 
-       hưởng ra ngoài, giúp 🚀 không bị đổi màu */
-    isolation: isolate; 
 }
 
-/* KHUNG CHỨA THỜI GIAN */
-#time-wrapper {
-    display: flex;
-    gap: 10px;
-    /* CHÌA KHÓA Ở ĐÂY: Hiệu ứng đảo màu chỉ tác động lên text */
-    mix-blend-mode: difference;
-}
-
+/* TIME BOX */
 .time-box {
     font-family: 'Digital-7', monospace;
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-    /* BẮT BUỘC: Màu trắng kết hợp với 'difference' 
-       -> Trên nền tối (lá cây) sẽ hiện Trắng, trên nền sáng (nền trắng của body) 
-       sẽ tự biến thành Đen */
-    color: #ffffff; 
+    mix-blend-mode: difference;
+    color: #fff; 
 }
 
+/* WEEKDAY XOAY */
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* ROCKET - TUYỆT ĐỐI KHÔNG ĐỔI MÀU */
+/* 2 KHUNG NẰM NGANG */
+#time-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+/* ROCKET */
 .control-btn {
     font-size:32px;
     cursor:pointer;
@@ -100,7 +92,9 @@ img {
 </div>
 
 <script>
-// Giữ nguyên logic JavaScript của bạn
+// =========================
+// SLIDESHOW
+// =========================
 let images=[], current=0;
 
 function shuffle(arr){
@@ -111,9 +105,9 @@ function shuffle(arr){
 }
 
 function changeImage(){
-  if(images.length>0){
-      document.getElementById("slide").src = images[current];
-      current=(current+1)%images.length;
+   if(images.length>0){
+       document.getElementById("slide").src = images[current];
+       current=(current+1)%images.length;
     }
 }
 
@@ -126,32 +120,63 @@ fetch("images.json")
     setInterval(changeImage,5000);
 });
 
+// =========================
+// ROCKET
+// =========================
 const rocketBtn=document.getElementById("rocket-btn");
+
 rocketBtn.addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 });
 
+// =========================
+// TIME SYSTEM
+// =========================
 const dateBox = document.getElementById("date-box");
 const clockBox = document.getElementById("clock-box");
 
-function pad(n){ return n.toString().padStart(2,'0'); }
+function pad(n){
+    return n.toString().padStart(2,'0');
+}
 
 function updateTime(){
     const now = new Date();
-    let year = now.getFullYear().toString();
-    let yy1 = year.slice(0,2), yy2 = year.slice(2);
-    let mm = pad(now.getMonth()+1), dd = pad(now.getDate());
-    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
-    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
 
-    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
-    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
+    let year = now.getFullYear().toString();
+    let yy1 = year.slice(0,2);
+    let yy2 = year.slice(2);
+
+    let mm = pad(now.getMonth()+1);
+    let dd = pad(now.getDate());
+
+    let weekday = ["SUN","MON","TUE","WED","THU","FRI","SAT"][now.getDay()];
+
+    let hh = pad(now.getHours());
+    let min = pad(now.getMinutes());
+    let ss = pad(now.getSeconds());
+
+    dateBox.innerHTML = `
+        ${yy1}<br>
+        ${yy2}<br>
+        ${mm}<br>
+        ${dd}<br>
+        <span class="weekday">${weekday}</span>
+    `;
+
+    clockBox.innerHTML = `
+        ${hh}<br>
+        ${min}<br>
+        ${ss}
+    `;
+    
 }
 
 setInterval(updateTime,1000);
 updateTime();
+
 </script>
 
 </body>
 </html>
+
 
