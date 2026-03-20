@@ -534,7 +534,7 @@ volumeSlider.addEventListener("input", () => {
 
 let airlineData = [];
 
-// load dữ liệu
+// Load dữ liệu
 fetch("airline.json")
     .then(r => r.json())
     .then(data => {
@@ -542,16 +542,11 @@ fetch("airline.json")
         initRows();
     });
 
-function shuffle(arr) {
-    return arr.sort(() => Math.random() - 0.5);
-}
-
-// tạo 1 item
+// Tạo 1 item logo
 function createItem(air) {
     const div = document.createElement("div");
     div.className = "logo-item";
 
-    // fallback: ưu tiên air.country, nếu không có thì lấy air.info
     const name = air.name || "Unknown";
     const country = air.country || "Unknown";
     const logo = air.logo || "https://via.placeholder.com/100?text=Logo";
@@ -562,73 +557,76 @@ function createItem(air) {
         <div class="logo-name">${name}</div>
         <div class="logo-country">${country}</div>
     `;
-
     return div;
 }
 
-// lấy 4 item (không lặp quá 2 lần)
-function pickItems(exclude = []) {
-    let pool = shuffle([...airlineData]);
-
-    let result = [];
-
-    for (let item of pool) {
-        if (result.filter(x => x.name === item.name).length < 2) {
-            result.push(item);
-        }
-        if (result.length === 4) break;
+// Shuffle mảng
+function shuffleArray(arr) {
+    let copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
     }
-
-    return result;
+    return copy;
 }
 
-// tạo row
-function buildRow(rowEl, direction, avoidList = []) {
+// Kiểm tra 2 mảng giống nhau (theo tên)
+function arraysEqual(a, b) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) return false;
+    }
+    return true;
+}
+
+// Build row từ danh sách, trả về track element
+function buildRowWithList(rowEl, list) {
+    rowEl.innerHTML = "";
+
+    // Nhân đôi danh sách để chạy mượt
+    let fullList = [...list, ...list];
     const track = document.createElement("div");
     track.className = "logo-track";
 
-    let items = pickItems();
-
-    // hạn chế trùng giữa 2 hàng (<=25%)
-    if (avoidList.length) {
-        items = items.map(i => {
-            if (avoidList.includes(i.name) && Math.random() > 0.25) {
-                return shuffle(airlineData)[0];
-            }
-            return i;
-        });
-    }
-
-    // nhân đôi để chạy mượt
-    let fullList = [...items, ...items];
-
     fullList.forEach(i => track.appendChild(createItem(i)));
-
-    rowEl.innerHTML = "";
     rowEl.appendChild(track);
 
-    // animation
-    track.style.animation =
-        direction === "left"
-            ? "scroll-left 20s linear infinite"
-            : "scroll-right 20s linear infinite";
+    // Tính chiều dài track và tốc độ: 1 ô đi hết row trong 20s
+    const logoWidth = 100; // px, width mỗi logo
+    const rowWidth = rowEl.offsetWidth;
+    const totalLogos = list.length;
+    const duration = 20 * (fullList.length / totalLogos); // thời gian animation 1 vòng
 
-    return items.map(i => i.name);
+    // Chọn ngẫu nhiên animation trái/phải
+    const direction = Math.random() > 0.5 ? "left" : "right";
+    track.style.animation = `${direction === "left" ? 'scroll-left' : 'scroll-right'} ${duration}s linear forwards`;
+
+    // Khi animation kết thúc 1 vòng, shuffle lại
+    track.addEventListener("animationend", () => {
+        // shuffle lại danh sách
+        const newList = shuffleArray(list);
+        buildRowWithList(rowEl, newList);
+    }, { once: true });
 }
 
-// init
+// Build 2 row không trùng thứ tự
+function buildRowsNoRepeat(topEl, bottomEl) {
+    let topList = shuffleArray(airlineData);
+    let bottomList;
+    do {
+        bottomList = shuffleArray(airlineData);
+    } while (arraysEqual(topList.map(a => a.name), bottomList.map(a => a.name)));
+
+    buildRowWithList(topEl, topList);
+    buildRowWithList(bottomEl, bottomList);
+}
+
+// Init rows
 function initRows() {
     const top = document.getElementById("row-top");
     const bottom = document.getElementById("row-bottom");
 
-    let topList = buildRow(top, "left");
-    buildRow(bottom, "right", topList);
-
-    // refresh mỗi 20s (đồng bộ animation)
-    setInterval(() => {
-        let topList = buildRow(top, "left");
-        buildRow(bottom, "right", topList);
-    }, 20000);
+    buildRowsNoRepeat(top, bottom);
 }
     
 </script>
