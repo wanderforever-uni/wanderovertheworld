@@ -31,5 +31,6 @@
   {"name":"American Airlines","country":"USA","logo":"https://www.logo.wine/a/logo/American_Airlines/American_Airlines-Logo.wine.svg"},
   {"name":"Lufthansa","country":"Germany","logo":"https://www.logo.wine/a/logo/Lufthansa/Lufthansa-Logo.wine.svg"},
   {"name":"Etihad Airways","country":"UAE","logo":"https://logos-world.net/wp-content/uploads/2023/01/Etihad-Airways-Logo-500x281.png"},
-  {"name":"Ethiopian Airlines","country":"Ethiopia","logo":"https://www.logo.wine/a/logo/Ethiopian_Airlines/Ethiopian_Airlines-Logo.wine.svg"}
+  {"name":"Ethiopian Airlines","country":"Ethiopia","logo":"https://www.logo.wine/a/logo/Ethiopian_Airlines/Ethiopian_Airlines-Logo.wine.svg"},
+  {"name":"Air Canada","country":"Canada","logo":"https://www.logo.wine/a/logo/Air_Canada/Air_Canada-Logo.wine.svg"}
 ]
