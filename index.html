@@ -581,7 +581,7 @@ function arraysEqual(a, b) {
 }
 
 // Build row từ danh sách, trả về track element
-function buildRowWithList(rowEl, list) {
+function buildRowWithList(rowEl, list, direction) {
     rowEl.innerHTML = "";
 
     // Nhân đôi danh sách để chạy mượt
@@ -592,21 +592,15 @@ function buildRowWithList(rowEl, list) {
     fullList.forEach(i => track.appendChild(createItem(i)));
     rowEl.appendChild(track);
 
-    // Tính chiều dài track và tốc độ: 1 ô đi hết row trong 20s
-    const logoWidth = 100; // px, width mỗi logo
-    const rowWidth = rowEl.offsetWidth;
-    const totalLogos = list.length;
-    const duration = 100 * (fullList.length / totalLogos); // thời gian animation 1 vòng
+    const duration = 100; // tốc độ mặc định
 
-    // Chọn ngẫu nhiên animation trái/phải
-    const direction = Math.random() > 0.5 ? "left" : "right";
+    // Sử dụng direction được truyền vào
     track.style.animation = `${direction === "left" ? "scroll-left" : "scroll-right"} ${duration}s linear infinite`;
 
     // Khi animation kết thúc 1 vòng, shuffle lại
     track.addEventListener("animationend", () => {
-        // shuffle lại danh sách
         const newList = shuffleArray(list);
-        buildRowWithList(rowEl, newList);
+        buildRowWithList(rowEl, newList, direction);
     }, { once: true });
 }
 
@@ -614,12 +608,14 @@ function buildRowWithList(rowEl, list) {
 function buildRowsNoRepeat(topEl, bottomEl) {
     let topList = shuffleArray(airlineData);
     let bottomList;
+
     do {
         bottomList = shuffleArray(airlineData);
     } while (arraysEqual(topList.map(a => a.name), bottomList.map(a => a.name)));
 
-    buildRowWithList(topEl, topList, "scroll-right");   // row 1: trái→phải
-    buildRowWithList(bottomEl, bottomList, "scroll-left"); // row 2: phải→trái
+    // Gán hẳn chiều cố định cho từng row
+    buildRowWithList(topEl, topList, "right");   // row trên: trái → phải
+    buildRowWithList(bottomEl, bottomList, "left"); // row dưới: phải → trái
 }
 
 // Init rows
