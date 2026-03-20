@@ -343,6 +343,7 @@ img {
 <script>
 let images = [], current = 0;
 
+// Hàm xáo trộn mảng
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -350,20 +351,27 @@ function shuffle(arr) {
     }
 }
 
+// Thay đổi ảnh
 function changeImage() {
     if (images.length > 0) {
         document.getElementById("slide").src = images[current];
-        current = (current + 1) % images.length;
+        current++;
+        if (current >= images.length) {
+            // Khi hiển thị hết, shuffle lại toàn bộ ảnh cho vòng tiếp theo
+            shuffle(images);
+            current = 0;
+        }
     }
 }
 
+// Load images.json
 fetch("images.json")
     .then(r => r.json())
     .then(data => {
-        shuffle(data);
-        images = data.slice(0, 10);
-        changeImage();
-        setInterval(changeImage, 5000);
+        images = [...data]; // Lấy tất cả ảnh
+        shuffle(images);    // Shuffle lần đầu khi load
+        changeImage();      // Hiển thị ảnh đầu tiên
+        setInterval(changeImage, 5000); // 5000ms giữa các ảnh
     });
 
 const rocketBtn = document.getElementById("rocket-btn");
