@@ -730,7 +730,15 @@ fetch("passport.json")
   });
 </script>
 <script>
-    document.getElementById("passport-img").src = "images/sg.webp";
+fetch("passport.json")
+  .then(res => res.json())
+  .then(data => {
+      document.getElementById("passport-img").src = data.passportImage || "https://via.placeholder.com/602x860?text=Passport";
+  })
+  .catch(err => {
+      console.error("Không load được passport.json:", err);
+      document.getElementById("passport-img").src = "https://via.placeholder.com/602x860?text=Passport";
+  });
 </script>
 </body>
 </html>
