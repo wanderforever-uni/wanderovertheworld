@@ -599,7 +599,7 @@ function buildRowWithList(rowEl, list) {
 
     // Chọn ngẫu nhiên animation trái/phải
     const direction = Math.random() > 0.5 ? "left" : "right";
-    track.style.animation = `${direction === "left" ? 'scroll-left' : 'scroll-right'} ${duration}s linear forwards`;
+    track.style.animation = `${direction} ${duration}s linear forwards`;
 
     // Khi animation kết thúc 1 vòng, shuffle lại
     track.addEventListener("animationend", () => {
@@ -617,8 +617,8 @@ function buildRowsNoRepeat(topEl, bottomEl) {
         bottomList = shuffleArray(airlineData);
     } while (arraysEqual(topList.map(a => a.name), bottomList.map(a => a.name)));
 
-    buildRowWithList(topEl, topList);
-    buildRowWithList(bottomEl, bottomList);
+    buildRowWithList(topEl, topList, "scroll-right");   // row 1: trái→phải
+    buildRowWithList(bottomEl, bottomList, "scroll-left"); // row 2: phải→trái
 }
 
 // Init rows
