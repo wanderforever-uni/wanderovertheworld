@@ -381,11 +381,13 @@ const playBtn = document.getElementById("play-btn");
 const volumeBtn = document.getElementById("volume-btn");
 const volumeSlider = document.getElementById("volume-slider");
 
-// Lấy danh sách video từ file JSON
+let originalVideos = [];
+
 fetch("planevideo.json")
     .then(r => r.json())
     .then(data => {
-        videoList = shuffleArray(data).slice(0, 10); // chọn 10 video ngẫu nhiên
+        originalVideos = data;
+        videoList = shuffleArray(originalVideos).slice(0, 10);
         playNextVideo();
     });
 
