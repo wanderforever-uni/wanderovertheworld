@@ -562,14 +562,14 @@ function createItem(air) {
     `;
 }
 
-// lấy 4 item (không lặp quá 1 lần)
+// lấy 4 item (không lặp quá 2 lần)
 function pickItems(exclude = []) {
     let pool = shuffle([...airlineData]);
 
     let result = [];
 
     for (let item of pool) {
-        if (result.filter(x => x.name === item.name).length < 1) {
+        if (result.filter(x => x.name === item.name).length < 2) {
             result.push(item);
         }
         if (result.length === 4) break;
@@ -577,7 +577,6 @@ function pickItems(exclude = []) {
 
     return result;
 }
-
 
 // tạo row
 function buildRow(rowEl, direction, avoidList = []) {
@@ -632,5 +631,6 @@ function initRows() {
 
 </body>
 </html>
+
 
 
