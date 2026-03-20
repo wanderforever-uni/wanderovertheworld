@@ -1,3 +1,9 @@
 {
-  "passportImage": "images/sg.png"
+  "passportImage": "sg.png",
+  "rank": 1,
+  "mobilityScore": 192,
+  "visaFree": 189,
+  "visaOnArrival": 5,
+  "eTA": 0,
+  "visaRequired": 0
 }
