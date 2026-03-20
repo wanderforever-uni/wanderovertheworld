@@ -551,13 +551,10 @@ function createItem(air) {
     const div = document.createElement("div");
     div.className = "logo-item";
 
-    // fallback nếu link lỗi
-    const logo = air.logo || air.image || air.img || "";
-
     div.innerHTML = `
-        <img src="${logo}" onerror="this.src='https://via.placeholder.com/100?text=Logo'">
-        <div class="logo-name">${air.name || ''}</div>
-        <div class="logo-country">${air.country || ''}</div>
+        <img src="${air.logo}">
+        <div class="logo-name">${air.name}</div>
+        <div class="logo-country">${air.country}</div>
     `;
 
     return div;
