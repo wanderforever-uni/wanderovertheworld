@@ -252,8 +252,7 @@ img {
 
             <!-- Khung trên: hình hộ chiếu -->
             <div style="width:100%; max-width:602px; aspect-ratio:602/860; background:#fff; display:flex; justify-content:center; align-items:center; margin:auto;">
-                <img src="https://img.passportindex.org/countries/sg.png" 
-                     style="width:100%; height:100%; object-fit:contain;">
+                <img id="passport-img" style="width:100%; height:100%; object-fit:contain;">
             </div>
 
             <!-- Khung dưới: bảng thông tin -->
@@ -706,7 +705,30 @@ function initRows() {
 }
     
 </script>
+<script>
+fetch("passport.json")
+  .then(res => res.json())
+  .then(data => {
+      // Điền hình hộ chiếu
+      document.getElementById("passport-img").src = data.passportImage || "https://via.placeholder.com/602x860?text=Passport";
 
+      // Nếu muốn điền thêm dữ liệu bảng (rank, mobility score, visa-free…)
+      // Ví dụ bạn đã thêm các id trong bảng:
+      // #passport-rank, #mobility-score, #visa-free, #visa-on-arrival, #eta, #visa-required
+
+      if(data.rank) document.getElementById("passport-rank").textContent = data.rank;
+      if(data.mobilityScore) document.getElementById("mobility-score").textContent = data.mobilityScore;
+      if(data.visaFree) document.getElementById("visa-free").textContent = data.visaFree;
+      if(data.visaOnArrival) document.getElementById("visa-on-arrival").textContent = data.visaOnArrival;
+      if(data.eta) document.getElementById("eta").textContent = data.eta;
+      if(data.visaRequired) document.getElementById("visa-required").textContent = data.visaRequired;
+  })
+  .catch(err => {
+      console.error("Không load được passport.json:", err);
+      // fallback hình placeholder
+      document.getElementById("passport-img").src = "https://via.placeholder.com/602x860?text=Passport";
+  });
+</script>
 </body>
 </html>
 
