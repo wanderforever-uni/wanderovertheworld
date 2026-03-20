@@ -490,7 +490,7 @@ function playNextVideo() {
     if (currentVideoIndex >= videoList.length) {
         // khi hết 10 video, lấy 10 video ngẫu nhiên mới
         currentVideoIndex = 0;
-        videoList = shuffleArray(videoList.concat()).slice(0, 10);
+        videoList = shuffleArray(originalVideos).slice(0, 10);
     }
 }
 
