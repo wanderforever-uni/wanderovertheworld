@@ -563,13 +563,13 @@ function createItem(air) {
 }
 
 // lấy 4 item (không lặp quá 2 lần)
-function pickItems(exclude = []) {
+function pickItems() {
     let pool = shuffle([...airlineData]);
-
     let result = [];
 
     for (let item of pool) {
-        if (result.filter(x => x.name === item.name).length < 2) {
+        // ❌ không cho trùng trong cùng khung
+        if (!result.some(x => x.name === item.name)) {
             result.push(item);
         }
         if (result.length === 4) break;
