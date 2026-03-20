@@ -548,17 +548,18 @@ function shuffle(arr) {
 
 // tạo 1 item
 function createItem(air) {
-    const div = document.createElement("div");
-    div.className = "logo-item";
-
-    div.innerHTML = `
-        <img src="${air.logo}" referrerpolicy="no-referrer"
-             onerror="this.src='https://via.placeholder.com/100?text=Logo'">
-        <div class="logo-name">${air.name}</div>
-        <div class="logo-country">${air.country}</div>
+    return `
+        <div class="air-item">
+            <div class="logo-box">
+                <img src="${air.logo}" 
+                     referrerpolicy="no-referrer"
+                     crossorigin="anonymous"
+                     onerror="this.src='https://via.placeholder.com/100?text=Logo'">
+            </div>
+            <div class="air-name">${air.name}</div>
+            <div class="air-country">${air.info}</div>
+        </div>
     `;
-
-    return div;
 }
 
 // lấy 4 item (không lặp quá 2 lần)
