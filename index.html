@@ -206,7 +206,17 @@ img {
             </div>
 
         </div>
+<!-- KHUNG 3 -->
+<div id="air-extra">
 
+    <!-- Hàng trên -->
+    <div class="logo-row" id="row-top"></div>
+
+    <!-- Hàng dưới -->
+    <div class="logo-row" id="row-bottom"></div>
+
+</div>
+        
        <!-- KHUNG 2 -->
 <div class="air-frame">
     <!-- Video container -->
@@ -260,6 +270,64 @@ img {
     max-width: calc(100% - 80px);
     margin: 50px auto 10px; /* 50px trên, 10px dưới */
     padding: 10px;
+}
+
+/* KHUNG 3 */
+#air-extra {
+    width: 100%;
+    margin-top: 30px;
+}
+
+/* mỗi hàng */
+.logo-row {
+    width: 250px;
+    height: 140px;
+    margin: 20px auto;
+    position: relative;
+    overflow: hidden;
+}
+
+/* container chạy */
+.logo-track {
+    display: flex;
+    position: absolute;
+    gap: 0;
+}
+
+/* mỗi ô */
+.logo-item {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* logo */
+.logo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* text */
+.logo-name {
+    font-size: 12px;
+}
+
+.logo-country {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* animation */
+@keyframes scroll-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@keyframes scroll-right {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
 }
     
 </style>
@@ -464,7 +532,99 @@ volumeSlider.addEventListener("input", () => {
     videoEl.volume = parseFloat(volumeSlider.value);
 });
 
+let airlineData = [];
 
+// load dữ liệu
+fetch("airline.json")
+    .then(r => r.json())
+    .then(data => {
+        airlineData = data;
+        initRows();
+    });
+
+function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+}
+
+// tạo 1 item
+function createItem(air) {
+    const div = document.createElement("div");
+    div.className = "logo-item";
+
+    div.innerHTML = `
+        <img src="${air.logo}">
+        <div class="logo-name">${air.name}</div>
+        <div class="logo-country">${air.country}</div>
+    `;
+
+    return div;
+}
+
+// lấy 4 item (không lặp quá 2 lần)
+function pickItems(exclude = []) {
+    let pool = shuffle([...airlineData]);
+
+    let result = [];
+
+    for (let item of pool) {
+        if (result.filter(x => x.name === item.name).length < 2) {
+            result.push(item);
+        }
+        if (result.length === 4) break;
+    }
+
+    return result;
+}
+
+// tạo row
+function buildRow(rowEl, direction, avoidList = []) {
+    const track = document.createElement("div");
+    track.className = "logo-track";
+
+    let items = pickItems();
+
+    // hạn chế trùng giữa 2 hàng (<=25%)
+    if (avoidList.length) {
+        items = items.map(i => {
+            if (avoidList.includes(i.name) && Math.random() > 0.25) {
+                return shuffle(airlineData)[0];
+            }
+            return i;
+        });
+    }
+
+    // nhân đôi để chạy mượt
+    let fullList = [...items, ...items];
+
+    fullList.forEach(i => track.appendChild(createItem(i)));
+
+    rowEl.innerHTML = "";
+    rowEl.appendChild(track);
+
+    // animation
+    track.style.animation =
+        direction === "left"
+            ? "scroll-left 20s linear infinite"
+            : "scroll-right 20s linear infinite";
+
+    return items.map(i => i.name);
+}
+
+// init
+function initRows() {
+    const top = document.getElementById("row-top");
+    const bottom = document.getElementById("row-bottom");
+
+    let topList = buildRow(top, "left");
+    buildRow(bottom, "right", topList);
+
+    // refresh mỗi 20s (đồng bộ animation)
+    setInterval(() => {
+        let topList = buildRow(top, "left");
+        buildRow(bottom, "right", topList);
+    }, 20000);
+}
+    
 </script>
 
 </body>
