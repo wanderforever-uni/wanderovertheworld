@@ -599,7 +599,7 @@ function buildRowWithList(rowEl, list) {
 
     // Chọn ngẫu nhiên animation trái/phải
     const direction = Math.random() > 0.5 ? "left" : "right";
-    track.style.animation = `${direction} ${duration}s linear forwards`;
+    track.style.animation = `${direction === "left" ? "scroll-left" : "scroll-right"} ${duration}s linear infinite`;
 
     // Khi animation kết thúc 1 vòng, shuffle lại
     track.addEventListener("animationend", () => {
