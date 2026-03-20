@@ -553,7 +553,7 @@ function createItem(air) {
 
     // fallback: ưu tiên air.country, nếu không có thì lấy air.info
     const name = air.name || "Unknown";
-    const country = air.country || air.info || "Unknown";
+    const country = air.country || "Unknown";
     const logo = air.logo || "https://via.placeholder.com/100?text=Logo";
 
     div.innerHTML = `
