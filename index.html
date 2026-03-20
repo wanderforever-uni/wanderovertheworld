@@ -357,49 +357,13 @@ function changeImage() {
     }
 }
 
-let images = [], current = 0;
-
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-}
-
-// đổi ảnh tiếp theo
-function changeImage() {
-    if (images.length > 0) {
-        document.getElementById("slide").src = images[current];
-        current++;
-
-        // Nếu hết mảng, shuffle lại toàn bộ ảnh
-        if (current >= images.length) {
-            current = 0;
-            images = shuffleArray(imagesOriginal); // shuffle lần mới
-        }
-    }
-}
-
-// Hàm shuffle trả về mảng mới
-function shuffleArray(arr) {
-    let copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-
-// Load images.json
-let imagesOriginal = [];
 fetch("images.json")
     .then(r => r.json())
     .then(data => {
-        imagesOriginal = data;
-        images = shuffleArray(imagesOriginal); // shuffle toàn bộ
-        current = 0;
+        shuffle(data);
+        images = data.slice(0, 10);
         changeImage();
-        setInterval(changeImage, 5000); // giữ nguyên thời gian
+        setInterval(changeImage, 5000);
     });
 
 const rocketBtn = document.getElementById("rocket-btn");
