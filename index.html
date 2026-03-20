@@ -592,7 +592,7 @@ function buildRowWithList(rowEl, list, direction) {
     fullList.forEach(i => track.appendChild(createItem(i)));
     rowEl.appendChild(track);
 
-    const duration = 200; // tốc độ mặc định
+    const duration = 250; // tốc độ mặc định
 
     // Sử dụng direction được truyền vào
     track.style.animation = `${direction === "left" ? "scroll-left" : "scroll-right"} ${duration}s linear infinite`;
