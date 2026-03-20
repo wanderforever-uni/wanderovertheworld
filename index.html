@@ -466,9 +466,25 @@ fetch("planevideo.json")
     .then(r => r.json())
     .then(data => {
         originalVideos = data;
-        videoList = shuffleArray(originalVideos).slice(0, 10);
+        videoList = shuffleArray(originalVideos); // ✅ shuffle toàn bộ video
+        currentVideoIndex = 0;
         playNextVideo();
     });
+
+// Phát video tiếp theo
+function playNextVideo() {
+    if (videoList.length === 0) return;
+
+    videoEl.src = videoList[currentVideoIndex];
+    videoEl.play();
+
+    currentVideoIndex++;
+    if (currentVideoIndex >= videoList.length) {
+        // khi hết video, shuffle lại toàn bộ video cho lượt tiếp theo
+        videoList = shuffleArray(originalVideos);
+        currentVideoIndex = 0;
+    }
+}
 
 // Hàm xáo trộn mảng
 function shuffleArray(arr) {
