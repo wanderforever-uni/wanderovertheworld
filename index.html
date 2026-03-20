@@ -548,28 +548,27 @@ function shuffle(arr) {
 
 // tạo 1 item
 function createItem(air) {
-    return `
-        <div class="air-item">
-            <div class="logo-box">
-                <img src="${air.logo}" 
-                     referrerpolicy="no-referrer"
-                     crossorigin="anonymous"
-                     onerror="this.src='https://via.placeholder.com/100?text=Logo'">
-            </div>
-            <div class="air-name">${air.name}</div>
-            <div class="air-country">${air.info}</div>
-        </div>
+    const div = document.createElement("div");
+    div.className = "logo-item";
+
+    div.innerHTML = `
+        <img src="${air.logo}" referrerpolicy="no-referrer"
+             onerror="this.src='https://via.placeholder.com/100?text=Logo'">
+        <div class="logo-name">${air.name}</div>
+        <div class="logo-country">${air.country}</div>
     `;
+
+    return div;
 }
 
 // lấy 4 item (không lặp quá 2 lần)
-function pickItems() {
+function pickItems(exclude = []) {
     let pool = shuffle([...airlineData]);
+
     let result = [];
 
     for (let item of pool) {
-        // ❌ không cho trùng trong cùng khung
-        if (!result.some(x => x.name === item.name)) {
+        if (result.filter(x => x.name === item.name).length < 2) {
             result.push(item);
         }
         if (result.length === 4) break;
@@ -631,6 +630,5 @@ function initRows() {
 
 </body>
 </html>
-
 
 
