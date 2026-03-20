@@ -552,8 +552,8 @@ function createItem(air) {
     div.className = "logo-item";
 
     div.innerHTML = `
-        <img src="${air.logo}" 
-     onerror="this.src='https://via.placeholder.com/100?text=Logo'">
+        <img src="${air.logo}" referrerpolicy="no-referrer"
+             onerror="this.src='https://via.placeholder.com/100?text=Logo'">
         <div class="logo-name">${air.name}</div>
         <div class="logo-country">${air.country}</div>
     `;
