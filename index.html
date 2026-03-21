@@ -617,7 +617,12 @@ img {
 .lower-search .search-suggestions div:hover {
     background-color: #eee;
 }
-
+.lower-name {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;  /* in đậm */
+}
+    
 </style>
     
 <div id="time-wrapper">
@@ -1079,6 +1084,7 @@ function initLowerFrame() {
 // Cập nhật thông tin vào khung
 function updateLowerFrame(frame, countryName) {
     const imgEl = frame.querySelector(".lower-img img");
+    const nameEl = frame.querySelector(".lower-name");
     const rankEl = frame.querySelector(".lower-rank");
     const visaEl = frame.querySelector(".lower-visa");
 
@@ -1086,6 +1092,7 @@ function updateLowerFrame(frame, countryName) {
     const info = passportInfo[countryName];
 
     imgEl.src = passportItem ? (passportItem.image || "https://cdn-icons-png.flaticon.com/512/7893/7893979.png") : "https://cdn-icons-png.flaticon.com/512/7893/7893979.png";
+    nameEl.textContent = countryName || "wait";  // thêm dòng tên quốc gia
     rankEl.textContent = info ? info.rank : "wait";
     visaEl.textContent = info ? info.visa : "wait";
 }
