@@ -1029,7 +1029,7 @@ function fillInfo(name, el) {
     let info = passportInfo[name];
     if (!info) return;
 
-    el.querySelector(".p-rank").textContent = info.rank;
+    el.querySelector(".p-rank").textContent = info.rank ? getOrdinal(info.rank) : "...";
     el.querySelector(".p-visa").textContent = info.visa;
 }
 
