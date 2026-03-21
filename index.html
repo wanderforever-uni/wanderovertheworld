@@ -366,15 +366,21 @@ img {
 
 /* Khung trên */
 .passport-top {
-    width: 602px;
-    height: 860px;
+    width: 520px;
+    height: 738.5px;
     overflow: hidden;
 }
 
+/* Ảnh passport */
 .passport-top img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* giữ tỷ lệ ảnh */
+    object-fit: contain; 
+    /* 🔥 giữ nguyên tỷ lệ, không bị méo */
+
+    image-rendering: auto;
+    /* đảm bảo chất lượng hiển thị tốt */
+    
     display: block;
 }
 
