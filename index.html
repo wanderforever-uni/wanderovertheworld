@@ -534,10 +534,10 @@ img {
 /* Container khung dưới row */
 .passport-row-lower {
     display: flex;
-    gap: 40px;           /* tăng khoảng cách giữa 2 khung */
-    width: 100%; 
-    transform: translateY(100px); 
-    justify-content: center;
+    gap: 20px;
+    width: 100%; /* bằng chiều rộng row trên */
+    transform: translateY(100px); /* dịch toàn bộ xuống 10px */
+    justify-content: center; /* căn giữa 2 khung */
 }
 
 /* Mỗi khung */
@@ -548,10 +548,6 @@ img {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    word-wrap: normal;      /* không xuống dòng */
-    white-space: nowrap;    /* giữ tên 1 dòng */
-    overflow: hidden;       /* cắt phần quá dài */
-    text-overflow: ellipsis; /* hiển thị ... nếu quá dài */
 }
 
 /* Hình ảnh */
