@@ -1066,7 +1066,13 @@ function initLowerFrame() {
         });
     });
 }
-
+// Chuyển số thành thứ tự tiếng Anh
+function getOrdinal(n) {
+    let s = ["th", "st", "nd", "rd"];
+    let v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+    
 // Cập nhật thông tin vào khung
 function updateLowerFrame(frame, countryName) {
     const imgEl = frame.querySelector(".lower-img img");
@@ -1079,7 +1085,7 @@ function updateLowerFrame(frame, countryName) {
 
     imgEl.src = passportItem ? (passportItem.image || "https://cdn-icons-png.flaticon.com/512/7893/7893979.png") : "https://cdn-icons-png.flaticon.com/512/7893/7893979.png";
     nameEl.textContent = countryName || "wait";  // thêm dòng tên quốc gia
-    rankEl.textContent = info ? info.rank : "wait";
+    rankEl.textContent = info ? getOrdinal(info.rank) : "wait";
     visaEl.textContent = info ? info.visa : "wait";
 }
 
