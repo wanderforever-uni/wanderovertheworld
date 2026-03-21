@@ -255,23 +255,21 @@ img {
             </div>
             <!-- Khung dưới -->
             <div class="passport-bottom">
-                <div class="passport-table">
-                    <!-- Row 1: Country -->
-                    <div class="row row-1">
-                        Singapore
-                    </div>
+                <!-- Row 1: Country -->
+                <div class="row row-1">
+                    Singapore
+                </div>
 
-                    <!-- Row 2: Rank -->
-                    <div class="row row-2" id="rank-value">
-                        1st
-                    </div>
+                <!-- Row 2: Rank -->
+                <div class="row row-2" id="rank-value">
+                    1st
+                </div>
 
-                    <!-- Row 3: Visa-free -->
-                    <div class="row row-3">
-                        <div class="left">VISA-FREE DESTINATIONS</div>
-                        <div class="right">195</div>
-                    </div>
-               </div>
+                <!-- Row 3: Visa-free -->
+                <div class="row row-3">
+                    <div class="left">VISA-FREE DESTINATIONS</div>
+                    <div class="right">195</div>
+                </div>
             </div>
         </div>
 
@@ -420,70 +418,48 @@ img {
     flex: 1; /* chiếm chiều ngang còn lại */
 }
 
-/* KHUNG DƯỚI */
+/* Khung dưới */
 .passport-bottom {
-    width: 520px;           /* = width khung ảnh */
+    width: 520px;           /* = width khung ảnh trên */
     min-height: 100px;
+    margin: 0 auto;         /* căn giữa trong cột trái */
     display: flex;
     flex-direction: column;
-    align-items: stretch;   /* row kéo dài full width table */
-    justify-content: flex-start;
-    margin: 0 auto;         /* căn giữa khung-bottom trong cột trái */
+    gap: 8px;               /* khoảng cách giữa các row */
     box-sizing: border-box;
 }
 
-/* bảng */
-.passport-table {
-    width: 100%;            /* full width khung-bottom = 520px */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 0;
+/* Row chung */
+.row-1, .row-2, .row-3 {
+    width: 100%;           /* full khung-bottom */
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
-/* row chung */
-.row {
-    width: 100%;
-}
-
-/* row 1: country */
+/* Row 1: Country */
 .row-1 {
     text-align: center;
     font-size: 18px;
     font-weight: 600;
 }
 
-/* row 2: rank */
+/* Row 2: Rank */
 .row-2 {
     text-align: center;
     font-size: 16px;
 }
 
-/* row 3: 2 cột */
+/* Row 3: 2 cột */
 .row-3 {
     display: flex;
-    justify-content: space-between; 
-    width: 100%;            /* = width table = 520px */
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+    justify-content: space-between; /* 2 cột bám 2 đầu */
+    width: 100%;
+    font-size: 14px;
 }
 
-/* trái: bám sát trái */
-.row-3 .left {
-    text-align: left;    /* căn sát trái */
-    margin: 0;
-    padding: 0;
-}
-
-/* phải: bám sát phải */
-.row-3 .right {
-    text-align: right;   /* căn sát phải */
-    margin: 0;
-    padding: 0;
-}
+.row-3 .left { text-align: left; }
+.row-3 .right { text-align: right; }
     
 #passport-grid {
     width: 100%;
