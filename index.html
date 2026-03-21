@@ -821,27 +821,18 @@ function getOrdinal(n) {
 let rankNumber = 1;
 
 document.getElementById("rank-value").textContent = getOrdinal(rankNumber);
-let passportInfo = {};
 let passports = [];
 let cycles = [];
 let currentRound = 0;
 
-// --- 1. Load passportData.json trước
-fetch("passportData.json")
-  .then(r => r.json())
-  .then(data => {
-      passportInfo = data;
-
-      // --- 2. Sau đó load passport.json
-      fetch("passport.json")
-        .then(r => r.json())
-        .then(data => {
-            passports = data;
-            generateCycle();
-            renderRound();        // lượt đầu tiên hiển thị rank + visa
-            setInterval(nextRound, 20000);
-        });
-  });
+fetch("passport.json")
+    .then(r => r.json())
+    .then(data => {
+        passports = data;
+        generateCycle();
+        renderRound();
+        setInterval(nextRound, 20000);
+    });
     function generateCycle() {
     let shuffled = shuffleArray(passports);
     let m = Math.ceil(passports.length / 10);
