@@ -422,23 +422,25 @@ img {
 
 /* KHUNG DƯỚI */
 .passport-bottom {
+    width: 520px;           /* = width khung ảnh */
+    min-height: 100px;
     display: flex;
     flex-direction: column;
-    align-items: center;     /* căn giữa table theo khung trên */
+    align-items: stretch;   /* row kéo dài full width table */
     justify-content: flex-start;
-    width: 100%;             /* bám theo table */
+    margin: 0 auto;         /* căn giữa khung-bottom trong cột trái */
+    box-sizing: border-box;
 }
 
 /* bảng */
 .passport-table {
-    width: 520px;           /* = khung ảnh */
+    width: 100%;            /* full width khung-bottom = 520px */
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    align-items: stretch;   /* row kéo dài full width table */
 }
 
 /* row chung */
@@ -463,7 +465,7 @@ img {
 .row-3 {
     display: flex;
     justify-content: space-between; 
-    width: 100%;   /* full table = 520px */
+    width: 100%;            /* = width table = 520px */
     padding: 0;
     margin: 0;
     box-sizing: border-box;
