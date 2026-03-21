@@ -817,26 +817,40 @@ function getOrdinal(n) {
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-// ví dụ với Singapore = 1
-let rankNumber = 1;
 
-document.getElementById("rank-value").textContent = getOrdinal(rankNumber);
+// --- PASSPORT SECTION ---
 let passports = [];
+let passportInfo = {};
 let cycles = [];
 let currentRound = 0;
 
-fetch("passport.json")
-    .then(r => r.json())
-    .then(data => {
-        passports = data;
-        generateCycle();
-        renderRound();
-        setInterval(nextRound, 20000);
-    });
-    function generateCycle() {
+// shuffle dùng chung cho tất cả
+function shuffleArray(arr) {
+    let copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+// lấy dữ liệu passport và info đồng thời
+Promise.all([
+    fetch("passport.json").then(r => r.json()),
+    fetch("passportData.json").then(r => r.json())
+]).then(([passportData, passportDetails]) => {
+    passports = passportData;
+    passportInfo = passportDetails;
+
+    generateCycle();
+    renderRound(); // ✅ lượt đầu hiển thị rank/visa
+    setInterval(nextRound, 20000);
+});
+
+// tạo vòng lặp 10 ô
+function generateCycle() {
     let shuffled = shuffleArray(passports);
     let m = Math.ceil(passports.length / 10);
-
     cycles = [];
 
     for (let i = 0; i < m; i++) {
@@ -852,62 +866,50 @@ fetch("passport.json")
 
     currentRound = 0;
 }
-    function renderRound() {
+
+// hiển thị lượt hiện tại
+function renderRound() {
     const row1 = document.getElementById("row-1");
     const row2 = document.getElementById("row-2");
 
     row1.innerHTML = "";
     row2.innerHTML = "";
 
-    let list = cycles[currentRound];
+    let list = cycles[currentRound] || [];
 
     list.forEach((p, i) => {
         let div = createPassportItem(p);
-
-        fillInfo(p.name, div); // 👈 thêm dòng này
+        fillInfo(p.name, div);
 
         if (i < 5) row1.appendChild(div);
         else row2.appendChild(div);
     });
 }
-    function nextRound() {
+
+// chuyển lượt tiếp theo
+function nextRound() {
     currentRound++;
-
-    if (currentRound >= cycles.length) {
-        generateCycle();
-    }
-
+    if (currentRound >= cycles.length) generateCycle();
     renderRound();
 }
-    function createPassportItem(p) {
+
+// tạo 1 item passport
+function createPassportItem(p) {
     const div = document.createElement("div");
     div.className = "passport-item";
 
     div.innerHTML = `
         <div class="img-box">
-            <img src="${p.image}">
+            <img src="${p.image}" alt="${p.name}">
         </div>
         <div class="p-name">${p.name}</div>
         <div class="p-rank">...</div>
         <div class="p-visa">...</div>
     `;
-
     return div;
 }
-    function shuffleArray(arr) {
-    let copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-    let passportInfo = {};
 
-fetch("passportData.json")
-    .then(r => r.json())
-    .then(data => passportInfo = data);
-
+// điền rank/visa
 function fillInfo(name, el) {
     let info = passportInfo[name];
     if (!info) return;
@@ -915,6 +917,8 @@ function fillInfo(name, el) {
     el.querySelector(".p-rank").textContent = info.rank;
     el.querySelector(".p-visa").textContent = info.visa;
 }
+
+
 </script>
 
 </body>
