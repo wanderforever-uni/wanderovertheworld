@@ -155,21 +155,6 @@ img {
     font-size: 14px;
     opacity: 0.7;
 }
-
-/* KHUNG MAP */
-.passport-map-box {
-    width: 1920px;
-    max-width: 100%; /* tránh tràn layout */
-    height: auto;
-}
-
-/* iframe */
-.passport-map-box iframe {
-    width: 100%;
-    height: 800px; /* có thể chỉnh */
-    border: none;
-}
-
 </style>
 </head>
 
@@ -273,7 +258,7 @@ img {
 
                 <div class="passport-table">
                     <!-- Row 1 -->
-                    <div class="row row-1" id="country-name">
+                    <div class="row row-1">
                         Singapore
                     </div>
 
@@ -291,16 +276,7 @@ img {
 
         <!-- Cột phải -->
         <div class="passport-col-right">
-
-            <!-- KHUNG BẢN ĐỒ -->
-            <div class="passport-map-box">
-                <iframe 
-                    id="passport-map"
-                    src="https://www.passportindex.org/passport/singapore/"
-                    loading="lazy">
-                </iframe>
-            </div>
-
+            <p></p>
         </div>
     </div>
    </div>
@@ -804,24 +780,11 @@ let rankNumber = 1;
 
 document.getElementById("rank-value").textContent = getOrdinal(rankNumber);
 
-function updateMap() {
-    const country = document.getElementById("country-name")
-        .textContent
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "-");
-
-    const iframe = document.getElementById("passport-map");
-
-    iframe.src = `https://www.passportindex.org/passport/${country}/`;
-}
-
-window.addEventListener("load", updateMap);
-
 </script>
 
 </body>
 </html>
+
 
 
 
