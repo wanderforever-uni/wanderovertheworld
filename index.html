@@ -262,10 +262,7 @@ img {
                         Singapore
                     </div>
 
-                    <!-- Row 2 -->
-                    <div class="row row-2">
-                        Rank 1
-                    </div>
+                    <div class="row row-2" id="rank-value"></div>
 
                     <!-- Row 3 -->
                     <div class="row row-3">
@@ -771,7 +768,18 @@ function initRows() {
 
     buildRowsNoRepeat(top, bottom);
 }
-    
+
+function getOrdinal(n) {
+    let s = ["th", "st", "nd", "rd"],
+        v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+// ví dụ với Singapore = 1
+let rankNumber = 1;
+
+document.getElementById("rank-value").textContent = getOrdinal(rankNumber);
+
 </script>
 
 </body>
