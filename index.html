@@ -825,14 +825,21 @@ let passports = [];
 let cycles = [];
 let currentRound = 0;
 
-fetch("passport.json")
-    .then(r => r.json())
-    .then(data => {
-        passports = data;
-        generateCycle();
-        renderRound();
-        setInterval(nextRound, 20000);
-    });
+let passports = [];
+let passportInfo = {};
+
+Promise.all([
+    fetch("passport.json").then(r => r.json()),
+    fetch("passportData.json").then(r => r.json())
+]).then(([passportData, passportDetails]) => {
+    passports = passportData;
+    passportInfo = passportDetails;
+
+    generateCycle();
+    renderRound();  // ✅ giờ lượt đầu tiên sẽ hiển thị số rank/visa
+    setInterval(nextRound, 20000);
+});
+    
     function generateCycle() {
     let shuffled = shuffleArray(passports);
     let m = Math.ceil(passports.length / 10);
@@ -902,12 +909,7 @@ fetch("passport.json")
     }
     return copy;
 }
-    let passportInfo = {};
-
-fetch("passportData.json")
-    .then(r => r.json())
-    .then(data => passportInfo = data);
-
+  
 function fillInfo(name, el) {
     let info = passportInfo[name];
     if (!info) return;
