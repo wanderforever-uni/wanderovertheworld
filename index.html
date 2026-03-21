@@ -278,6 +278,36 @@ img {
             <div id="passport-grid">
                 <div class="passport-row" id="row-1"></div>
                 <div class="passport-row" id="row-2"></div>
+                <!-- Khung dưới row trong cột phải -->
+                <div id="row-lower" class="passport-row-lower">
+                    <!-- Khung 1 -->
+                    <div class="lower-frame">
+                        <div class="lower-img">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
+                        </div>
+                        <div class="lower-rank">wait</div>
+                        <div class="lower-visa">wait</div>
+                        <div class="lower-search">
+                            <input type="text" placeholder="Search country..." class="search-input">
+                            <span class="search-btn">☁️</span>
+                            <div class="search-suggestions"></div>
+                        </div>
+                     </div>
+
+                     <!-- Khung 2 -->
+                     <div class="lower-frame">
+                         <div class="lower-img">
+                             <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
+                         </div>
+                         <div class="lower-rank">wait</div>
+                         <div class="lower-visa">wait</div>
+                         <div class="lower-search">
+                             <input type="text" placeholder="Search country..." class="search-input">
+                             <span class="search-btn">☁️</span>
+                             <div class="search-suggestions"></div>
+                         </div>
+                      </div>
+                </div>
             </div>
         </div>
     </div>
@@ -500,7 +530,92 @@ img {
 
 .p-name { font-size: 12px; font-weight: 600; }
 .p-rank, .p-visa { font-size: 12px; }
-    
+
+/* Container khung dưới row */
+.passport-row-lower {
+    display: flex;
+    gap: 20px;
+    width: 100%; /* bằng chiều rộng row trên */
+    margin-top: 10px;
+    justify-content: center; /* căn giữa 2 khung */
+}
+
+/* Mỗi khung */
+.lower-frame {
+    flex: 1;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Hình ảnh */
+.lower-img {
+    width: 100px;
+    height: 100px;
+}
+
+.lower-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Rank và visa */
+.lower-rank, .lower-visa {
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Khung search */
+.lower-search {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    position: relative;
+}
+
+/* Input */
+.lower-search .search-input {
+    flex: 1;
+    padding: 4px 6px;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+/* Nút tìm kiếm */
+.lower-search .search-btn {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* Suggestions dropdown */
+.lower-search .search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ccc;
+    max-height: 100px;
+    overflow-y: auto;
+    display: none;
+    z-index: 999;
+    font-size: 12px;
+}
+
+.lower-search .search-suggestions div {
+    padding: 4px 6px;
+    cursor: pointer;
+}
+
+.lower-search .search-suggestions div:hover {
+    background-color: #eee;
+}
+
 </style>
     
 <div id="time-wrapper">
@@ -919,6 +1034,64 @@ function fillInfo(name, el) {
     el.querySelector(".p-visa").textContent = info.visa;
 }
 
+// Khởi tạo khung dưới
+function initLowerFrame() {
+    const lowerFrames = document.querySelectorAll(".lower-frame");
+
+    lowerFrames.forEach(frame => {
+        const input = frame.querySelector(".search-input");
+        const btn = frame.querySelector(".search-btn");
+        const suggestions = frame.querySelector(".search-suggestions");
+
+        // Gõ chữ trong input
+        input.addEventListener("input", () => {
+            const value = input.value.toLowerCase();
+            const matches = passports.filter(p => p.name.toLowerCase().includes(value));
+            
+            suggestions.innerHTML = "";
+            if (matches.length > 0 && value !== "") {
+                matches.forEach(p => {
+                    const div = document.createElement("div");
+                    div.textContent = p.name;
+                    div.addEventListener("click", () => {
+                        input.value = p.name;
+                        suggestions.style.display = "none";
+                        updateLowerFrame(frame, p.name);
+                    });
+                    suggestions.appendChild(div);
+                });
+                suggestions.style.display = "block";
+            } else {
+                suggestions.style.display = "none";
+            }
+        });
+
+        // Click icon đám mây
+        btn.addEventListener("click", () => {
+            const name = input.value.trim();
+            if (name) updateLowerFrame(frame, name);
+        });
+    });
+}
+
+// Cập nhật thông tin vào khung
+function updateLowerFrame(frame, countryName) {
+    const imgEl = frame.querySelector(".lower-img img");
+    const rankEl = frame.querySelector(".lower-rank");
+    const visaEl = frame.querySelector(".lower-visa");
+
+    const passportItem = passports.find(p => p.name === countryName);
+    const info = passportInfo[countryName];
+
+    imgEl.src = passportItem ? (passportItem.image || "https://cdn-icons-png.flaticon.com/512/7893/7893979.png") : "https://cdn-icons-png.flaticon.com/512/7893/7893979.png";
+    rankEl.textContent = info ? info.rank : "wait";
+    visaEl.textContent = info ? info.visa : "wait";
+}
+
+// Khởi tạo khi load xong
+window.addEventListener("load", () => {
+    initLowerFrame();
+});
 
 </script>
 
