@@ -459,19 +459,22 @@ img {
 /* row 3: 2 cột */
 .row-3 {
     display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    width: 520px;       /* ✅ bằng width khung trên */
+    width: 520px;          /* bằng width khung trên */
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-/* trái */
+/* trái: căn sát trái */
 .row-3 .left {
-    text-align: left;
+    flex: 1;               /* chiếm 50% row */
+    text-align: left;      /* căn sát trái */
 }
 
-/* phải */
+/* phải: căn sát phải */
 .row-3 .right {
-    text-align: right;
+    flex: 1;               /* chiếm 50% row */
+    text-align: right;     /* căn sát phải */
 }
 #passport-grid {
     width: 100%;
