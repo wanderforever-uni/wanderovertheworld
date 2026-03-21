@@ -27,5 +27,15 @@
   { "name": "BURKINA FASO", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/BF.png" },
   { "name": "BURUNDI", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/BI.png" },
   { "name": "CAMBODIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/KH.png" },
-  { "name": "CAMEROON", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CM.png" }
+  { "name": "CAMEROON", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CM.png" },
+  { "name": "CANADA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CA.png" },
+  { "name": "CAPE VERDE ISLANDS", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CV.png" },
+  { "name": "CENTRAL AFRICAN REPUBLIC", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CF.png" },
+  { "name": "CHAD", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/TD.png" },
+  { "name": "CHILE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CL.png" },
+  { "name": "CHINA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CN.png" },
+  { "name": "COLOMBIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CO.png" },
+  { "name": "COMORO ISLANDS", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/KM.png" },
+  { "name": "CONGO (DEM. REP.)", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CD.png" },
+  { "name": "CONGO (REP.)", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CG.png" }
 ]
