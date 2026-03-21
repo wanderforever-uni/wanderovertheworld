@@ -377,17 +377,18 @@ img {
 
 /* Cột trái */
 .passport-col-left {
-    width: 1000px;
+    width: 1000px;       /* giữ mặc định */
     display: flex;
     flex-direction: column;
-    gap: 5px; /* khoảng cách giữa khung trên và khung dưới */
+    align-items: center;  /* ✅ căn giữa tất cả khung con */
+    gap: 5px;             /* khoảng cách giữa khung trên và khung dưới */
 }
 
 }
 
 /* Khung trên */
 .passport-top {
-    width: 520px;
+    width: 520px;         /* giữ width cố định cho ảnh */
     height: 738.5px;
     overflow: hidden;
 }
@@ -396,6 +397,7 @@ img {
 .passport-top img {
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: contain; 
     /* 🔥 giữ nguyên tỷ lệ, không bị méo */
 
@@ -419,12 +421,11 @@ img {
 
 /* KHUNG DƯỚI */
 .passport-bottom {
-    margin: 0 auto;
-    width: 520px; /* bằng khung trên */
+    width: 520px;         /* bằng khung trên */
     min-height: 100px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* căn giữa tất cả nội dung */
+    align-items: center;  /* căn giữa text */
     justify-content: flex-start;
 }
 
