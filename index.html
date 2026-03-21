@@ -377,11 +377,12 @@ img {
 
 /* Cột trái */
 .passport-col-left {
-    width: 1000px;       /* giữ mặc định */
+    width: auto;             /* không cố định 1000px */
+    max-width: 1000px;       /* vẫn giới hạn tối đa */
     display: flex;
     flex-direction: column;
-    align-items: center;  /* ✅ căn giữa tất cả khung con */
-    gap: 5px;             /* khoảng cách giữa khung trên và khung dưới */
+    align-items: center;     /* căn giữa các khung */
+    gap: 5px;
 }
 
 }
@@ -421,21 +422,23 @@ img {
 
 /* KHUNG DƯỚI */
 .passport-bottom {
-    width: 520px;         /* bằng khung trên */
-    min-height: 100px;
     display: flex;
     flex-direction: column;
-    align-items: center;  /* căn giữa text */
+    align-items: center;     /* căn giữa table theo khung trên */
     justify-content: flex-start;
+    width: 100%;             /* bám theo table */
 }
 
 /* bảng */
 .passport-table {
-    width: 100%; /* chiếm toàn bộ khung-bottom */
+    width: 520px;           /* = khung ảnh */
     display: flex;
     flex-direction: column;
-    align-items: center; /* căn giữa các row */
     gap: 8px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    align-items: stretch;   /* row kéo dài full width table */
 }
 
 /* row chung */
@@ -459,8 +462,8 @@ img {
 /* row 3: 2 cột */
 .row-3 {
     display: flex;
-    justify-content: space-between; /* 2 đầu bám sát */
-    width: 100%;                   /* bằng khung trên */
+    justify-content: space-between; 
+    width: 100%;   /* full table = 520px */
     padding: 0;
     margin: 0;
     box-sizing: border-box;
