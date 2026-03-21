@@ -418,14 +418,20 @@ img {
 
 /* KHUNG DƯỚI */
 .passport-bottom {
-    width: 520px; /* bằng khung passport */
+    width: 520px; /* bằng khung trên */
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* căn giữa tất cả nội dung */
+    justify-content: flex-start;
 }
 
 /* bảng */
 .passport-table {
-    width: 100%;
+    width: 100%; /* chiếm toàn bộ khung-bottom */
     display: flex;
     flex-direction: column;
+    align-items: center; /* căn giữa các row */
     gap: 8px;
 }
 
