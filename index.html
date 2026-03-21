@@ -863,6 +863,9 @@ fetch("passport.json")
 
     list.forEach((p, i) => {
         let div = createPassportItem(p);
+
+        fillInfo(p.name, div); // 👈 thêm dòng này
+
         if (i < 5) row1.appendChild(div);
         else row2.appendChild(div);
     });
