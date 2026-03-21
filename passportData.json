@@ -27,5 +27,15 @@
   "BURKINA FASO": { "rank": "76", "visa": "56" },
   "BURUNDI": { "rank": "84", "visa": "48" },
   "CAMBODIA": { "rank": "85", "visa": "47" },
-  "CAMEROON": { "rank": "85", "visa": "47" }
+  "CAMEROON": { "rank": "85", "visa": "47" },
+  "CANADA": { "rank": "7", "visa": "182" },
+  "CAPE VERDE ISLANDS": { "rank": "70", "visa": "63" },
+  "CENTRAL AFRICAN REPUBLIC": { "rank": "84", "visa": "48" },
+  "CHAD": { "rank": "81", "visa": "51" },
+  "CHILE": { "rank": "13", "visa": "174" },
+  "CHINA": { "rank": "55", "visa": "82" },
+  "COLOMBIA": { "rank": "34", "visa": "130" },
+  "COMORO ISLANDS": { "rank": "82", "visa": "50" },
+  "CONGO (DEM. REP.)": { "rank": "89", "visa": "43" },
+  "CONGO (REP.)": { "rank": "86", "visa": "46" }
 }
