@@ -155,57 +155,6 @@ img {
     font-size: 14px;
     opacity: 0.7;
 }
-#passport-frame-4 {
-    display: flex;
-    gap: 10px; /* Khoảng cách giữa 2 cột */
-    margin: 0 auto 30px; /* căn giữa khung 4 so với passport-section */
-    max-width: calc(100% - 105px - 40px); 
-    /* 105px = khung 2 margin phải + khung 3 margin trái 
-       40px là padding trong passport-section */
-}
-
-.passport-column-left {
-    width: 1000px; /* cột trái cố định 1000px */
-    display: flex;
-    flex-direction: column;
-    gap: 5px; /* khoảng cách giữa khung trên và khung dưới */
-}
-
-.passport-column-right {
-    flex: 1; /* cột phải chiếm hết phần còn lại */
-}
-
-/* Khung trên: ảnh hộ chiếu */
-.passport-photo {
-    width: 602px;
-    height: 860px;
-    overflow: hidden;
-}
-
-.passport-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Khung dưới: bảng thông tin */
-.passport-table table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.passport-table td.label {
-    font-weight: 500;
-    padding: 5px 10px;
-    text-align: left;
-    width: 50%;
-}
-
-.passport-table td.value {
-    text-align: right;
-    padding: 5px 10px;
-    font-weight: bold;
-}
 </style>
 </head>
 
@@ -296,50 +245,8 @@ img {
     <h2 class="passport-title">passport</h2>
     <!-- Nội dung bổ sung sau này sẽ nằm ở đây -->
     <div class="passport-content">
-     <!-- KHUNG 4 -->
-<div id="passport-frame-4">
-    <div class="passport-column-left">
-        <!-- Khung trên: ảnh hộ chiếu -->
-        <div class="passport-photo">
-            <img id="passport-img" src="" alt="Passport Image">
-        </div>
-
-        <!-- Khung dưới: bảng thông tin -->
-        <div class="passport-table">
-            <table>
-                <tr>
-                    <td class="label">Rank</td>
-                    <td class="value" id="passport-rank"></td>
-                </tr>
-                <tr>
-                    <td class="label">Mobility Score</td>
-                    <td class="value" id="passport-mobility"></td>
-                </tr>
-                <tr>
-                    <td class="label">Visa-free</td>
-                    <td class="value" id="passport-visafree"></td>
-                </tr>
-                <tr>
-                    <td class="label">Visa on arrival</td>
-                    <td class="value" id="passport-voa"></td>
-                </tr>
-                <tr>
-                    <td class="label">eTA</td>
-                    <td class="value" id="passport-eta"></td>
-                </tr>
-                <tr>
-                    <td class="label">Visa required</td>
-                    <td class="value" id="passport-visa-required"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Cột 2 bên phải: thông tin bổ sung, hiện để trống -->
-    <div class="passport-column-right">
-        <!-- Nội dung bổ sung nếu cần -->
-    </div>
-</div>
+        <!-- ví dụ placeholder -->
+        <p></p>
     </div>
 </div>
 
@@ -436,7 +343,6 @@ img {
 <script>
 let images = [], current = 0;
 
-// Hàm xáo trộn mảng
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -444,27 +350,20 @@ function shuffle(arr) {
     }
 }
 
-// Thay đổi ảnh
 function changeImage() {
     if (images.length > 0) {
         document.getElementById("slide").src = images[current];
-        current++;
-        if (current >= images.length) {
-            // Khi hiển thị hết, shuffle lại toàn bộ ảnh cho vòng tiếp theo
-            shuffle(images);
-            current = 0;
-        }
+        current = (current + 1) % images.length;
     }
 }
 
-// Load images.json
 fetch("images.json")
     .then(r => r.json())
     .then(data => {
-        images = [...data]; // Lấy tất cả ảnh
-        shuffle(images);    // Shuffle lần đầu khi load
-        changeImage();      // Hiển thị ảnh đầu tiên
-        setInterval(changeImage, 5000); // 5000ms giữa các ảnh
+        shuffle(data);
+        images = data.slice(0, 10);
+        changeImage();
+        setInterval(changeImage, 5000);
     });
 
 const rocketBtn = document.getElementById("rocket-btn");
@@ -742,24 +641,11 @@ function initRows() {
 
     buildRowsNoRepeat(top, bottom);
 }
-// Load passport.json
-fetch("passport.json")
-    .then(r => r.json())
-    .then(data => {
-        // Hiển thị ảnh
-        document.getElementById("passport-img").src = "pictures/" + data.passportImage;
-
-        // Điền dữ liệu bảng
-        document.getElementById("passport-rank").textContent = data.rank || "-";
-        document.getElementById("passport-mobility").textContent = data.mobilityScore || "-";
-        document.getElementById("passport-visafree").textContent = data.visaFree || "-";
-        document.getElementById("passport-voa").textContent = data.visaOnArrival || "-";
-        document.getElementById("passport-eta").textContent = data.eTA || "-";
-        document.getElementById("passport-visa-required").textContent = data.visaRequired || "-";
-    });
+    
 </script>
 
 </body>
 </html>
+
 
 
