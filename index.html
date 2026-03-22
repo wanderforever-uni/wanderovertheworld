@@ -465,7 +465,7 @@ img {
 /* Khung dưới */
 .passport-bottom {
     width: 100%;          /* co giãn theo khung trên */
-    max-width: 520px;     /* tối đa = khung trên */
+    max-width: none;     /* tối đa = khung trên */
     margin: 0 auto;
     min-height: 100px;
     display: flex;
@@ -503,12 +503,14 @@ img {
     text-align: center;
     font-size: 18px;
     font-weight: 600;
+    width: 100%;
 }
 
 /* Row 2: Rank */
 .row-2 {
     text-align: center;
     font-size: 16px;
+    width: 100%;
 }
 
 /* Row 3: 2 cột */
@@ -519,8 +521,8 @@ img {
     font-size: 14px;
 }
 
-.row-3 .left { text-align: left; }
-.row-3 .right { text-align: right; }
+.row-3 .left { flex: 1; text-align: left; }
+.row-3 .right { flex: 1; text-align: right; }
     
 #passport-grid {
     width: 100%;
