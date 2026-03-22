@@ -1152,7 +1152,18 @@ function updateLowerFrame(frame, countryName) {
 window.addEventListener("load", () => {
     initLowerFrame();
 });
+    
+function syncBottomWidth() {
+    const top = document.querySelector(".passport-top");
+    const bottom = document.querySelector(".passport-bottom");
+    if(top && bottom){
+        bottom.style.width = top.offsetWidth + "px";
+    }
+}
 
+// Gọi khi load và resize
+window.addEventListener("load", syncBottomWidth);
+window.addEventListener("resize", syncBottomWidth);
 </script>
 
 </body>
