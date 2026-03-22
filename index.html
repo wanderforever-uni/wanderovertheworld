@@ -462,18 +462,21 @@ img {
     display: block;
 }
 
+/* Khung dưới */
+.passport-bottom {
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100px; /* có thể chỉnh tùy ý */
+}
+
 /* Cột phải */
 .passport-col-right {
-    display: flex;
-    gap: 20px;              /* khoảng cách giữa các frame */
-    justify-content: center; /* căn giữa các frame */
-    width: 100%;
-    box-sizing: border-box;
+    flex: 1; /* chiếm chiều ngang còn lại */
 }
 
 /* Khung dưới */
 .passport-bottom {
-    width: 100%;           /* = width khung ảnh trên */
+    width: 520px;           /* = width khung ảnh trên */
     min-height: 100px;
     margin: 0 auto;         /* căn giữa trong cột trái */
     display: flex;
@@ -573,9 +576,8 @@ img {
 
 /* Mỗi khung */
 .lower-frame {
-    flex: 1 1 30%;        /* flex-grow:1, flex-shrink:1, basis:30% */
-    max-width: 200px;     /* vẫn giới hạn tối đa nếu màn hình lớn */
-    min-width: 120px;     /* tránh quá nhỏ */
+    flex: 1;
+    max-width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -584,9 +586,8 @@ img {
 
 /* Hình ảnh */
 .lower-img {
-    width: 100%;           /* chiếm toàn bộ chiều ngang frame */
-    aspect-ratio: 1 / 1;   /* giữ hình vuông */
-    max-width: 100px;
+    width: 100px;
+    height: 100px;
 }
 
 .lower-img img {
@@ -597,13 +598,13 @@ img {
 
 /* Rank và visa */
 .lower-rank, .lower-visa {
-    font-size: clamp(12px, 1.2vw, 14px); /* co dãn theo viewport, nhưng giới hạn min/max */
     text-align: center;
+    font-size: 14px;
 }
 
 .lower-name {
-    font-size: clamp(12px, 1.2vw, 14px); /* co dãn theo viewport, nhưng giới hạn min/max */
     text-align: center;
+    font-size: 14px;
     font-weight: bold;
     white-space: nowrap;       /* không xuống dòng */
     overflow: hidden;          /* cắt nếu quá dài */
@@ -1151,6 +1152,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
