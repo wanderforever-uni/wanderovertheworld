@@ -533,7 +533,14 @@ img {
     display: block;
 }
 
-.p-name { font-size: 12px; font-weight: 600; }
+.p-name {
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1.2;
+    height: 2.4em;        /* 👈 luôn giữ đúng 2 dòng */
+    overflow: hidden;     /* không cho vỡ layout */
+}
 .p-rank, .p-visa { font-size: 12px; }
 
 /* Container khung dưới row */
