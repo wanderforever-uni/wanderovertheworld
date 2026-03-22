@@ -1,592 +1,228 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>wander</title>
+    <title>wander</title>
 
-<!-- --- FONTS --- -->
-<link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
-<link href="https://fonts.cdnfonts.com/css/digital-7" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/digital-7" rel="stylesheet">
 
-<style>
-/* --- GLOBAL --- */
-body {
-    margin: 0;
-    text-align: center;
-    background: #fff;
-}
+    <!-- Styles -->
+    <style>
+        /* --- GLOBAL --- */
+        body { margin: 0; text-align: center; background: #fff; }
+        h1 { font-family: 'Satisfy', cursive; font-size: 70px; font-weight: normal; margin: 40px 0; color: #000; }
+        img { width: 100%; height: auto; display: block; }
+        .bottom { height: 30px; }
 
-h1 {
-    font-family: 'Satisfy', cursive;
-    font-size: 70px;
-    font-weight: normal;
-    margin: 40px 0;
-    color: #000;
-}
+        /* --- TIME WRAPPER --- */
+        #time-wrapper {
+            position: fixed; right: 20px; bottom: 120px; display: flex; gap: 10px; z-index: 9999;
+            mix-blend-mode: exclusion; pointer-events: none;
+        }
+        .time-box {
+            font-family: 'Digital-7', monospace; text-align: center; line-height: 1.1; font-size: 18px;
+            color: #fff; filter: contrast(1000%) grayscale(100%);
+        }
+        .weekday { transform: rotate(90deg); display: inline-block; margin-top: 5px; }
 
-img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
+        /* --- ROCKET --- */
+        #rocket-btn { position: fixed; right: 32px; bottom: 20px; font-size: 32px; cursor: pointer; user-select: none; z-index: 10000; }
 
-.bottom {
-    height: 30px;
-}
+        /* --- AIR SECTION --- */
+        #air-section {
+            position: relative;
+            margin-left: 50px; margin-right: 40px; margin-top: 10px; margin-bottom: 60px;
+            padding: 10px;
+        }
+        .air-title { font-family: 'Satisfy', cursive; font-size: 50px; text-align: center; margin-bottom: 30px; color: #000; }
+        .air-container { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .air-frame { min-height: 100px; }
+        .air-group { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .air-item { text-align: center; }
+        .air-item.center { grid-column: 1 / span 2; }
+        .logo-box { width: 100%; max-width: 250px; aspect-ratio: 1/1; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        .air-name { font-size: 16px; font-weight: 500; line-height: 1.2; height: 2.4em; overflow: hidden; }
+        .air-country { font-size: 14px; opacity: 0.7; line-height: 1.2; height: 2.4em; overflow: hidden; }
 
-/* --- TIME WRAPPER --- */
-#time-wrapper {
-    position: fixed;
-    right: 20px;
-    bottom: 120px;
-    display: flex;
-    gap: 10px;
-    z-index: 9999;
-    mix-blend-mode: exclusion; /* 🔥 đổi từ difference */
-    pointer-events: none;
-}
+        /* --- VIDEO RESPONSIVE --- */
+        #video-container { width: 100%; max-width: 720px; aspect-ratio: 9 / 16; margin: 0 auto; position: relative; }
+        #air-video { width: 100%; height: 100%; object-fit: cover; }
 
-.time-box {
-    font-family: 'Digital-7', monospace;
-    text-align: center;
-    line-height: 1.1;
-    font-size: 18px;
-    color: #fff;
-    filter: contrast(1000%) grayscale(100%);
-}
+        /* --- PASSPORT SECTION --- */
+        .passport-title { font-family: 'Satisfy', cursive; font-size: 50px; text-align: center; margin-bottom: 60px; color: #000; }
+        #passport-section { max-width: calc(100% - 80px); margin: 50px auto 10px; padding: 10px; }
+        .passport-content { font-size: 16px; line-height: 1.5; }
+        .passport-frame { display: flex; gap: 20px; width: calc(100% - 80px); margin: 0 auto; }
+        .passport-col-left { width: auto; max-width: 1000px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .passport-top { width: 520px; height: 738.5px; overflow: hidden; }
+        .passport-top img { width: 100%; height: 100%; display: block; object-fit: contain; image-rendering: auto; }
+        .passport-bottom { width: 520px; min-height: 100px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; }
+        .row-1, .row-2, .row-3 { width: 100%; margin: 0; padding: 0; box-sizing: border-box; }
+        .row-1 { text-align: center; font-size: 18px; font-weight: 600; }
+        .row-2 { text-align: center; font-size: 16px; }
+        .row-3 { display: flex; justify-content: space-between; width: 100%; font-size: 14px; }
+        .row-3 .left { text-align: left; }
+        .row-3 .right { text-align: right; }
+        #passport-grid { width: 100%; display: flex; flex-direction: column; gap: 50px; }
+        .passport-row { display: flex; justify-content: space-between; }
+        .passport-item { width: calc(1477px / 8); aspect-ratio: 1 / 1; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .img-box { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .passport-item img { width: auto; height: 100%; max-width: 100%; object-fit: contain; display: block; }
+        .p-name { font-size: 12px; font-weight: 600; line-height: 1.2; height: 2.4em; overflow: hidden; }
+        .p-rank, .p-visa { font-size: 12px; }
+        .passport-row-lower { display: flex; gap: 50px; width: 100%; transform: translateY(60px); justify-content: center; }
+        .lower-frame { flex: 1; max-width: 200px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .lower-img { width: 100px; height: 100px; }
+        .lower-img img { width: 100%; height: 100%; object-fit: contain; }
+        .lower-rank, .lower-visa { text-align: center; font-size: 14px; }
+        .lower-name { text-align: center; font-size: 14px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lower-search { display: flex; flex-direction: row; align-items: center; gap: 5px; width: 100%; position: relative; }
+        .lower-search .search-input { flex: 1; padding: 4px 6px; font-size: 12px; box-sizing: border-box; }
+        .lower-search .search-suggestions { position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid #ccc; max-height: 100px; overflow-y: auto; display: none; z-index: 999; font-size: 12px; }
+        .lower-search .search-suggestions div { padding: 4px 6px; cursor: pointer; }
+        .lower-search .search-suggestions div:hover { background-color: #eee; }
+        .passport-total { margin-top: 120px; font-family: 'Modelista', cursive; font-size: 200px; text-align: center; color: #A7C7E7; }
+        @font-face { font-family: 'Modelista'; src: url('font/Modelistasignature-ownAV.otf') format('opentype'); font-display: swap; }
 
-.weekday {
-    transform: rotate(90deg);
-    display: inline-block;
-    margin-top: 5px;
-}
-
-/* --- ROCKET BUTTON --- */
-#rocket-btn {
-    position: fixed;
-    right: 32px;
-    bottom: 20px;
-    font-size: 32px;
-    cursor: pointer;
-    user-select: none;
-    z-index: 10000;
-}
-
-/* --- AIR SECTION --- */
-#air-section {
-    position: relative;
-    margin-left: 50px;
-    margin-right: 40px;
-    margin-top: 10px;
-    margin-bottom: 60px;
-    padding: 10px;
-}
-
-.air-title {
-    font-family: 'Satisfy', cursive;
-    font-size: 50px;
-    text-align: center;
-    margin-bottom: 30px;
-    color: #000;
-}
-
-.air-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-}
-
-.air-frame {
-    min-height: 100px;
-}
-
-.air-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.air-item {
-    text-align: center;
-}
-
-.air-item.center {
-    grid-column: 1 / span 2;
-}
-
-.logo-box {
-    width: 100%;
-    max-width: 250px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.air-name {
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.2;
-    height: 2.4em;
-    overflow: hidden;
-}
-
-.air-country {
-    font-size: 14px;
-    opacity: 0.7;
-    line-height: 1.2;
-    height: 2.4em;
-    overflow: hidden;
-}
-
-/* VIDEO RESPONSIVE */
-#video-container {
-    width: 100%;
-    max-width: 720px;
-    aspect-ratio: 9 / 16;
-    margin: 0 auto;
-    position: relative;
-}
-
-#air-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* --- AIR EXTRA LOGOS --- */
-#air-extra {
-    width: 100%;
-    margin-top: 30px;
-}
-
-.logo-row {
-    width: 100%;
-    height: 140px;
-    margin: 20px auto;
-    position: relative;
-    overflow: hidden;
-}
-
-.logo-track {
-    display: flex;
-    position: absolute;
-    flex-wrap: nowrap;
-    gap: 15px;
-}
-
-.logo-item {
-    width: 100px;
-    height: 100px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.logo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.logo-name {
-    font-size: 12px;
-}
-
-.logo-country {
-    font-size: 11px;
-    opacity: 0.7;
-}
-
-@keyframes scroll-left {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-}
-
-@keyframes scroll-right {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0); }
-}
-
-/* --- PASSPORT SECTION --- */
-#passport-section {
-    max-width: calc(100% - 80px);
-    margin: 50px auto 10px;
-    padding: 10px;
-}
-
-.passport-title {
-    font-family: 'Satisfy', cursive;
-    font-size: 50px;
-    text-align: center;
-    margin-bottom: 60px;
-    color: #000;
-}
-
-.passport-content {
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.passport-frame {
-    display: flex;
-    gap: 20px;
-    width: calc(100% - 80px);
-    margin: 0 auto;
-}
-
-.passport-col-left {
-    width: auto;
-    max-width: 1000px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.passport-top {
-    width: 520px;
-    height: 738.5px;
-    overflow: hidden;
-}
-
-.passport-top img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
-    image-rendering: auto;
-}
-
-.passport-bottom {
-    width: 520px;
-    min-height: 100px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    box-sizing: border-box;
-}
-
-.row-1, .row-2, .row-3 {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-.row-1 { text-align: center; font-size: 18px; font-weight: 600; }
-.row-2 { text-align: center; font-size: 16px; }
-.row-3 {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    font-size: 14px;
-}
-.row-3 .left { text-align: left; }
-.row-3 .right { text-align: right; }
-
-.passport-col-right {
-    flex: 1;
-}
-
-#passport-grid {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-}
-
-.passport-row {
-    display: flex;
-    justify-content: space-between;
-}
-
-.passport-item {
-    width: calc(1477px / 8);
-    aspect-ratio: 1 / 1;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.img-box {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.passport-item img {
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-.p-name {
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.2;
-    height: 2.4em;
-    overflow: hidden;
-}
-.p-rank, .p-visa { font-size: 12px; }
-
-.passport-row-lower {
-    display: flex;
-    gap: 50px;
-    width: 100%;
-    transform: translateY(60px);
-    justify-content: center;
-}
-
-.lower-frame {
-    flex: 1;
-    max-width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.lower-img {
-    width: 100px;
-    height: 100px;
-}
-
-.lower-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.lower-rank, .lower-visa { text-align: center; font-size: 14px; }
-.lower-name {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.lower-search {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    position: relative;
-}
-
-.lower-search .search-input {
-    flex: 1;
-    padding: 4px 6px;
-    font-size: 12px;
-    box-sizing: border-box;
-}
-
-.lower-search .search-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    border: 1px solid #ccc;
-    max-height: 100px;
-    overflow-y: auto;
-    display: none;
-    z-index: 999;
-    font-size: 12px;
-}
-
-.lower-search .search-suggestions div {
-    padding: 4px 6px;
-    cursor: pointer;
-}
-
-.lower-search .search-suggestions div:hover {
-    background-color: #eee;
-}
-
-.lower-name {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.passport-total {
-    margin-top: 120px;
-    font-family: 'Modelista', cursive;
-    font-size: 200px;
-    text-align: center;
-    color: #A7C7E7;
-}
-
-@font-face {
-    font-family: 'Modelista';
-    src: url('font/Modelistasignature-ownAV.otf') format('opentype');
-    font-display: swap;
-}
-</style>
+        /* --- AIR EXTRA --- */
+        #air-extra { width: 100%; margin-top: 30px; }
+        .logo-row { width: 100%; height: 140px; margin: 20px auto; position: relative; overflow: hidden; }
+        .logo-track { display: flex; position: absolute; flex-wrap: nowrap; gap: 15px; }
+        .logo-item { width: 100px; height: 100px; text-align: center; flex-shrink: 0; }
+        .logo-item img { width: 100%; height: 100%; object-fit: contain; }
+        .logo-name { font-size: 12px; }
+        .logo-country { font-size: 11px; opacity: 0.7; }
+        @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes scroll-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+    </style>
 </head>
 
 <body>
+    <!-- HEADER -->
+    <h1>wander</h1>
 
-<h1>wander</h1>
-<img id="slide">
-<div class="bottom"></div>
+    <!-- SLIDESHOW -->
+    <img id="slide">
+    <div class="bottom"></div>
 
-<!-- --- AIR SECTION --- -->
-<div id="air-section">
-    <h2 class="air-title">air</h2>
+    <!-- AIR SECTION -->
+    <div id="air-section">
+        <h2 class="air-title">air</h2>
+        <div class="air-container">
 
-    <div class="air-container">
-
-        <!-- KHUNG 1 -->
-        <div class="air-frame">
-            <div class="air-group">
-
-                <!-- Ô 1 -->
-                <div class="air-item center">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Qatar Airways</div>
-                    <div class="air-country">Qatar</div>
-                </div>
-
-                <!-- Ô 2 -->
-                <div class="air-item">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Singapore Airlines</div>
-                    <div class="air-country">Singapore</div>
-                </div>
-
-                <!-- Ô 3 -->
-                <div class="air-item">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Cathay Pacific</div>
-                    <div class="air-country">Hong Kong</div>
-                </div>
-
-            </div>
-
-            <!-- KHUNG 3 -->
-            <div id="air-extra">
-                <div class="logo-row" id="row-top"></div>
-                <div class="logo-row" id="row-bottom"></div>
-            </div>
-        </div>
-
-        <!-- KHUNG 2 -->
-        <div class="air-frame">
-            <div id="video-container">
-                <video id="air-video" autoplay muted playsinline></video>
-                <div id="video-controls" style="display:flex; justify-content:center; gap:30px; margin-top:10px;">
-                    <span id="mute-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-                    <span id="play-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-                    <span id="volume-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-                </div>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<!-- --- PASSPORT SECTION --- -->
-<div id="passport-section">
-    <h2 class="passport-title">passport</h2>
-    <div class="passport-content">
-        <div class="passport-frame">
-
-            <!-- Cột trái -->
-            <div class="passport-col-left">
-                <div class="passport-top">
-                    <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
-                </div>
-                <div class="passport-bottom">
-                    <div class="row row-1">Singapore</div>
-                    <div class="row row-2" id="rank-value">1st</div>
-                    <div class="row row-3">
-                        <div class="left">VISA-FREE DESTINATIONS</div>
-                        <div class="right">195</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cột phải -->
-            <div class="passport-col-right">
-                <div id="passport-grid">
-                    <div class="passport-row" id="row-1"></div>
-                    <div class="passport-row" id="row-2"></div>
-                    <div id="row-lower" class="passport-row-lower">
-                        <div class="lower-frame">
-                            <div class="lower-img">
-                                <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
-                            </div>
-                            <div class="lower-name"><strong>wait</strong></div>
-                            <div class="lower-rank">wait</div>
-                            <div class="lower-visa">wait</div>
-                            <div class="lower-search">
-                                <input type="text" placeholder="Search country..." class="search-input">
-                                <div class="search-suggestions"></div>
-                            </div>
+            <!-- FRAME 1 -->
+            <div class="air-frame">
+                <div class="air-group">
+                    <div class="air-item center">
+                        <div class="logo-box">
+                            <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
                         </div>
-                        <div class="lower-frame">
-                            <div class="lower-img">
-                                <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
-                            </div>
-                            <div class="lower-name"><strong>wait</strong></div>
-                            <div class="lower-rank">wait</div>
-                            <div class="lower-visa">wait</div>
-                            <div class="lower-search">
-                                <input type="text" placeholder="Search country..." class="search-input">
-                                <div class="search-suggestions"></div>
-                            </div>
+                        <div class="air-name">Qatar Airways</div>
+                        <div class="air-country">Qatar</div>
+                    </div>
+                    <div class="air-item">
+                        <div class="logo-box">
+                            <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
+                        </div>
+                        <div class="air-name">Singapore Airlines</div>
+                        <div class="air-country">Singapore</div>
+                    </div>
+                    <div class="air-item">
+                        <div class="logo-box">
+                            <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
+                        </div>
+                        <div class="air-name">Cathay Pacific</div>
+                        <div class="air-country">Hong Kong</div>
+                    </div>
+                </div>
+
+                <!-- AIR EXTRA -->
+                <div id="air-extra">
+                    <div class="logo-row" id="row-top"></div>
+                    <div class="logo-row" id="row-bottom"></div>
+                </div>
+            </div>
+
+            <!-- FRAME 2 -->
+            <div class="air-frame">
+                <div id="video-container">
+                    <video id="air-video" autoplay muted playsinline></video>
+                    <div id="video-controls" style="display:flex; justify-content:center; gap:30px; margin-top:10px;">
+                        <span id="mute-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                        <span id="play-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                        <span id="volume-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                    </div>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSPORT SECTION -->
+    <div id="passport-section">
+        <h2 class="passport-title">passport</h2>
+        <div class="passport-content">
+            <div class="passport-frame">
+                <div class="passport-col-left">
+                    <div class="passport-top">
+                        <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
+                    </div>
+                    <div class="passport-bottom">
+                        <div class="row row-1">Singapore</div>
+                        <div class="row row-2" id="rank-value">1st</div>
+                        <div class="row row-3">
+                            <div class="left">VISA-FREE DESTINATIONS</div>
+                            <div class="right">195</div>
                         </div>
                     </div>
                 </div>
-                <div class="passport-total">199</div>
+                <div class="passport-col-right">
+                    <div id="passport-grid">
+                        <div class="passport-row" id="row-1"></div>
+                        <div class="passport-row" id="row-2"></div>
+                        <div id="row-lower" class="passport-row-lower">
+                            <div class="lower-frame">
+                                <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image"></div>
+                                <div class="lower-name"><strong>wait</strong></div>
+                                <div class="lower-rank">wait</div>
+                                <div class="lower-visa">wait</div>
+                                <div class="lower-search">
+                                    <input type="text" placeholder="Search country..." class="search-input">
+                                    <div class="search-suggestions"></div>
+                                </div>
+                            </div>
+                            <div class="lower-frame">
+                                <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image"></div>
+                                <div class="lower-name"><strong>wait</strong></div>
+                                <div class="lower-rank">wait</div>
+                                <div class="lower-visa">wait</div>
+                                <div class="lower-search">
+                                    <input type="text" placeholder="Search country..." class="search-input">
+                                    <div class="search-suggestions"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="passport-total">199</div>
+                </div>
             </div>
-
         </div>
     </div>
-</div>
 
-<!-- --- TIME + ROCKET --- -->
-<div id="time-wrapper">
-    <div class="time-box" id="date-box"></div>
-    <div class="time-box" id="clock-box"></div>
-</div>
-<div id="rocket-btn">🚀</div>
+    <!-- TIME & ROCKET -->
+    <div id="time-wrapper">
+        <div class="time-box" id="date-box"></div>
+        <div class="time-box" id="clock-box"></div>
+    </div>
+    <div id="rocket-btn">🚀</div>
 
-<script>
-/* --- JS GLOBAL FUNCTIONS, SLIDESHOW, ROCKET, TIME --- */
-/* giữ nguyên tất cả code JS như cũ */
-</script>
-
+    <!-- SCRIPT -->
+    <script>
+        /* --- ALL JS AS ORIGINAL, UNCHANGED --- */
+        /* Slideshow, Rocket, Time, Video, Air Rows, Passport, Lower Frame */
+        /* ... Paste the ENTIRE script content from your original file here ... */
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
