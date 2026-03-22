@@ -3,10 +3,12 @@
 <head>
 <title>wander</title>
 
+<!-- FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/digital-7" rel="stylesheet">
 
 <style>
+/* ==================== GLOBAL STYLES ==================== */
 body {
     margin: 0;
     text-align: center;
@@ -31,7 +33,7 @@ img {
     height: 30px;
 }
 
-/* --- TIME WRAPPER --- */
+/* ==================== TIME WRAPPER ==================== */
 #time-wrapper {
     position: fixed;
     right: 20px;
@@ -39,7 +41,6 @@ img {
     display: flex;
     gap: 10px;
     z-index: 9999;
-
     mix-blend-mode: exclusion; /* 🔥 đổi từ difference */
     pointer-events: none;
 }
@@ -49,20 +50,17 @@ img {
     text-align: center;
     line-height: 1.1;
     font-size: 18px;
-
     color: #fff;
-
-    filter: contrast(1000%) grayscale(100%); 
-    /* 🔥 ép về chỉ đen/trắng tuyệt đối */
+    filter: contrast(1000%) grayscale(100%);
 }
-    
+
 .weekday {
     transform: rotate(90deg);
     display: inline-block;
     margin-top: 5px;
 }
 
-/* --- ROCKET --- */
+/* ==================== ROCKET BUTTON ==================== */
 #rocket-btn {
     position: fixed;
     right: 32px;
@@ -73,24 +71,16 @@ img {
     z-index: 10000;
 }
 
-/* --- AIR SECTION --- */
+/* ==================== AIR SECTION ==================== */
 #air-section {
     position: relative;
-
-    /* canh lề trái cố định */
     margin-left: 50px;
-
-    /* cách time-wrapper 5px */
-    margin-right: 40px; 
-    /* 20px (right của time-wrapper) + ~40px width time + 5px gap */
-
+    margin-right: 40px;
     margin-top: 10px;
     margin-bottom: 60px;
-
     padding: 10px;
 }
 
-/* tiêu đề */
 .air-title {
     font-family: 'Satisfy', cursive;
     font-size: 50px;
@@ -99,36 +89,30 @@ img {
     color: #000;
 }
 
-/* container 2 khung */
 .air-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5px;
 }
 
-/* mỗi khung */
 .air-frame {
     min-height: 100px;
 }
 
-/* group bên trong khung 1 */
 .air-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-/* item */
 .air-item {
     text-align: center;
 }
 
-/* ô trên cùng */
 .air-item.center {
     grid-column: 1 / span 2;
 }
 
-/* logo */
 .logo-box {
     width: 100%;
     max-width: 250px;
@@ -145,7 +129,6 @@ img {
     object-fit: contain;
 }
 
-/* text */
 .air-name {
     font-size: 16px;
     font-weight: 500;
@@ -158,217 +141,31 @@ img {
     font-size: 14px;
     opacity: 0.7;
     line-height: 1.2;
-    height: 2.4em;   /* cố định 2 dòng */
+    height: 2.4em;
     overflow: hidden;
 }
+
 /* VIDEO RESPONSIVE */
 #video-container {
     width: 100%;
-    max-width: 720px;       /* giữ size tối đa */
-    aspect-ratio: 9 / 16;   /* giữ tỷ lệ 720x1280 */
-
+    max-width: 720px;
+    aspect-ratio: 9 / 16;
     margin: 0 auto;
     position: relative;
 }
 
-/* Video fill container */
 #air-video {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* hoặc contain nếu không muốn crop */
-}
-</style>
-</head>
-
-<body>
-
-<h1>wander</h1>
-<img id="slide">
-
-<div class="bottom"></div>
-
-<div id="air-section">
-
-    <h2 class="air-title">air</h2>
-
-    <div class="air-container">
-
-        <!-- KHUNG 1 -->
-        <div class="air-frame">
-
-            <div class="air-group">
-
-                <!-- Ô 1 -->
-                <div class="air-item center">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Qatar Airways</div>
-                    <div class="air-country">Qatar</div>
-                </div>
-
-                <!-- Ô 2 -->
-                <div class="air-item">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Singapore Airlines</div>
-                    <div class="air-country">Singapore</div>
-                </div>
-
-                <!-- Ô 3 -->
-                <div class="air-item">
-                    <div class="logo-box">
-                        <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
-                    </div>
-                    <div class="air-name">Cathay Pacific</div>
-                    <div class="air-country">Hong Kong</div>
-                </div>
-
-            </div>
-
-<!-- KHUNG 3 -->
-<div id="air-extra">
-
-    <!-- Hàng trên -->
-    <div class="logo-row" id="row-top"></div>
-
-    <!-- Hàng dưới -->
-    <div class="logo-row" id="row-bottom"></div>
-
-</div>
-        </div>
-  
-       <!-- KHUNG 2 -->
-<div class="air-frame">
-    <!-- Video container -->
-    <div id="video-container">
-        <video id="air-video" autoplay muted playsinline></video>
-
-        <!-- Star controls -->
-        <div id="video-controls" style="display:flex; justify-content:center; gap:30px; margin-top:10px;">
-            <span id="mute-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-            <span id="play-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-            <span id="volume-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-        </div>
-
-        <!-- Volume slider -->
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
-    </div>
-</div>
-
-
-    </div>
-
-</div>
-
-<!-- KHUNG PASSPORT -->
-<div id="passport-section" style="max-width: calc(100% - 80px); margin: 10px auto; padding: 10px;">
-    <h2 class="passport-title">passport</h2>
-    <!-- Nội dung bổ sung sau này sẽ nằm ở đây -->
-   <div class="passport-content">
-    <!-- KHUNG 4 -->
-    <div class="passport-frame">
-        <!-- Cột trái -->
-        <div class="passport-col-left">
-            <!-- Khung trên: ảnh Singapore Passport -->
-            <div class="passport-top">
-                <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
-            </div>
-            <!-- Khung dưới -->
-            <div class="passport-bottom">
-                <!-- Row 1: Country -->
-                <div class="row row-1">
-                    Singapore
-                </div>
-
-                <!-- Row 2: Rank -->
-                <div class="row row-2" id="rank-value">
-                    1st
-                </div>
-
-                <!-- Row 3: Visa-free -->
-                <div class="row row-3">
-                    <div class="left">VISA-FREE DESTINATIONS</div>
-                    <div class="right">195</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cột phải -->
-        <div class="passport-col-right">
-            <div id="passport-grid">
-                <div class="passport-row" id="row-1"></div>
-                <div class="passport-row" id="row-2"></div>
-                <!-- Khung dưới row trong cột phải -->
-                <div id="row-lower" class="passport-row-lower">
-                    <!-- Khung 1 -->
-                    <div class="lower-frame">
-                        <div class="lower-img">
-                            <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
-                        </div>
-                        <div class="lower-name"><strong>wait</strong></div>
-                        <div class="lower-rank">wait</div>
-                        <div class="lower-visa">wait</div>
-                        <div class="lower-search">
-                            <input type="text" placeholder="Search country..." class="search-input">
-                            <div class="search-suggestions"></div>
-                        </div>
-                     </div>
-
-                     <!-- Khung 2 -->
-                     <div class="lower-frame">
-                         <div class="lower-img">
-                             <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
-                         </div>
-                         <div class="lower-name"><strong>wait</strong></div>
-                         <div class="lower-rank">wait</div>
-                         <div class="lower-visa">wait</div>
-                         <div class="lower-search">
-                             <input type="text" placeholder="Search country..." class="search-input">
-                             <div class="search-suggestions"></div>
-                         </div>
-                      </div>
-                </div>
-            </div>
-            <!-- KHUNG SỐ 199 (độc lập hoàn toàn) -->
-            <div class="passport-total">
-                199
-            </div>
-        </div>
-    </div>
-   </div>
-</div>
-
-<style>
-/* --- Font và style cho passport --- */
-.passport-title {
-    font-family: 'Satisfy', cursive; /* giống air */
-    font-size: 50px;
-    text-align: center;
-    margin-bottom: 60px;
-    color: #000;
+    object-fit: cover;
 }
 
-/* Container nội dung passport */
-.passport-content {
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-#passport-section {
-    max-width: calc(100% - 80px);
-    margin: 50px auto 10px; /* 50px trên, 10px dưới */
-    padding: 10px;
-}
-
-/* KHUNG 3 */
+/* ==================== AIR EXTRA (LOGO ROWS) ==================== */
 #air-extra {
     width: 100%;
     margin-top: 30px;
 }
 
-/* mỗi hàng */
 .logo-row {
     width: 100%;
     height: 140px;
@@ -377,15 +174,13 @@ img {
     overflow: hidden;
 }
 
-/* container chạy */
 .logo-track {
     display: flex;
     position: absolute;
-    flex-wrap: nowrap;   /* đảm bảo không xuống dòng */
-    gap: 15px;           /* khoảng cách giữa các ô */
+    flex-wrap: nowrap;
+    gap: 15px;
 }
 
-/* mỗi ô */
 .logo-item {
     width: 100px;
     height: 100px;
@@ -393,14 +188,12 @@ img {
     flex-shrink: 0;
 }
 
-/* logo */
 .logo-item img {
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
 
-/* text */
 .logo-name {
     font-size: 12px;
 }
@@ -415,108 +208,90 @@ img {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
 }
-
 @keyframes scroll-right {
     from { transform: translateX(-50%); }
     to { transform: translateX(0); }
 }
 
-/* KHUNG 4 */
+/* ==================== PASSPORT SECTION ==================== */
+.passport-title {
+    font-family: 'Satisfy', cursive;
+    font-size: 50px;
+    text-align: center;
+    margin-bottom: 60px;
+    color: #000;
+}
+
+#passport-section {
+    max-width: calc(100% - 80px);
+    margin: 50px auto 10px;
+    padding: 10px;
+}
+
+.passport-content {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
 .passport-frame {
     display: flex;
-    gap: 20px; /* khoảng cách giữa 2 cột */
-    width: calc(100% - 80px); /* tổng ngang passport trừ margin */
+    gap: 20px;
+    width: calc(100% - 80px);
     margin: 0 auto;
 }
 
 /* Cột trái */
 .passport-col-left {
-    width: auto;             /* không cố định 1000px */
-    max-width: 1000px;       /* vẫn giới hạn tối đa */
+    width: auto;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
-    align-items: center;     /* căn giữa các khung */
+    align-items: center;
     gap: 5px;
-}
-
 }
 
 /* Khung trên */
 .passport-top {
-    width: 520px;         /* giữ width cố định cho ảnh */
+    width: 520px;
     height: 738.5px;
     overflow: hidden;
 }
 
-/* Ảnh passport */
 .passport-top img {
     width: 100%;
     height: 100%;
-    display: block;
-    object-fit: contain; 
-    /* 🔥 giữ nguyên tỷ lệ, không bị méo */
-
-    image-rendering: auto;
-    /* đảm bảo chất lượng hiển thị tốt */
-    
-    display: block;
+    object-fit: contain;
 }
 
 /* Khung dưới */
 .passport-bottom {
-    margin: 0 auto;
-    width: 100%;
-    min-height: 100px; /* có thể chỉnh tùy ý */
-}
-
-/* Cột phải */
-.passport-col-right {
-    flex: 1; /* chiếm chiều ngang còn lại */
-}
-
-/* Khung dưới */
-.passport-bottom {
-    width: 520px;           /* = width khung ảnh trên */
+    width: 520px;
     min-height: 100px;
-    margin: 0 auto;         /* căn giữa trong cột trái */
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;               /* khoảng cách giữa các row */
+    gap: 8px;
     box-sizing: border-box;
 }
 
-/* Row chung */
 .row-1, .row-2, .row-3 {
-    width: 100%;           /* full khung-bottom */
+    width: 100%;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Row 1: Country */
-.row-1 {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-/* Row 2: Rank */
-.row-2 {
-    text-align: center;
-    font-size: 16px;
-}
-
-/* Row 3: 2 cột */
-.row-3 {
-    display: flex;
-    justify-content: space-between; /* 2 cột bám 2 đầu */
-    width: 100%;
-    font-size: 14px;
-}
-
+.row-1 { text-align: center; font-size: 18px; font-weight: 600; }
+.row-2 { text-align: center; font-size: 16px; }
+.row-3 { display: flex; justify-content: space-between; font-size: 14px; }
 .row-3 .left { text-align: left; }
 .row-3 .right { text-align: right; }
-    
+
+/* Cột phải */
+.passport-col-right {
+    flex: 1;
+}
+
 #passport-grid {
     width: 100%;
     display: flex;
@@ -529,52 +304,14 @@ img {
     justify-content: space-between;
 }
 
-.passport-item {
-    width: calc(1477px / 8);
-    aspect-ratio: 1 / 1;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.img-box {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.passport-item img {
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-    display: block;
-}
-
-.p-name {
-    font-size: 12px;
-    font-weight: 600;
-
-    line-height: 1.2;
-    height: 2.4em;        /* 👈 luôn giữ đúng 2 dòng */
-    overflow: hidden;     /* không cho vỡ layout */
-}
-.p-rank, .p-visa { font-size: 12px; }
-
-/* Container khung dưới row */
 .passport-row-lower {
     display: flex;
     gap: 50px;
-    width: 100%; /* bằng chiều rộng row trên */
-    transform: translateY(60px); /* dịch toàn bộ xuống 10px */
-    justify-content: center; /* căn giữa 2 khung */
+    width: 100%;
+    transform: translateY(60px);
+    justify-content: center;
 }
 
-/* Mỗi khung */
 .lower-frame {
     flex: 1;
     max-width: 200px;
@@ -584,34 +321,12 @@ img {
     gap: 5px;
 }
 
-/* Hình ảnh */
-.lower-img {
-    width: 100px;
-    height: 100px;
-}
+.lower-img { width: 100px; height: 100px; }
+.lower-img img { width: 100%; height: 100%; object-fit: contain; }
 
-.lower-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+.lower-name { text-align: center; font-size: 14px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lower-rank, .lower-visa { text-align: center; font-size: 14px; }
 
-/* Rank và visa */
-.lower-rank, .lower-visa {
-    text-align: center;
-    font-size: 14px;
-}
-
-.lower-name {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    white-space: nowrap;       /* không xuống dòng */
-    overflow: hidden;          /* cắt nếu quá dài */
-    text-overflow: ellipsis;   /* hiển thị ... nếu quá dài */
-}
-    
-/* Khung search */
 .lower-search {
     display: flex;
     flex-direction: row;
@@ -621,7 +336,6 @@ img {
     position: relative;
 }
 
-/* Input */
 .lower-search .search-input {
     flex: 1;
     padding: 4px 6px;
@@ -629,7 +343,6 @@ img {
     box-sizing: border-box;
 }
 
-/* Suggestions dropdown */
 .lower-search .search-suggestions {
     position: absolute;
     top: 100%;
@@ -648,15 +361,8 @@ img {
     padding: 4px 6px;
     cursor: pointer;
 }
+.lower-search .search-suggestions div:hover { background-color: #eee; }
 
-.lower-search .search-suggestions div:hover {
-    background-color: #eee;
-}
-.lower-name {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;  /* in đậm */
-}
 .passport-total {
     margin-top: 120px;
     font-family: 'Modelista', cursive;
@@ -664,13 +370,134 @@ img {
     text-align: center;
     color: #A7C7E7;
 }
+
 @font-face {
     font-family: 'Modelista';
     src: url('font/Modelistasignature-ownAV.otf') format('opentype');
     font-display: swap;
 }
 </style>
-    
+</head>
+
+<body>
+
+<h1>wander</h1>
+<img id="slide">
+
+<div class="bottom"></div>
+
+<!-- ==================== AIR SECTION ==================== -->
+<div id="air-section">
+    <h2 class="air-title">air</h2>
+    <div class="air-container">
+        <!-- KHUNG 1 -->
+        <div class="air-frame">
+            <div class="air-group">
+                <div class="air-item center">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Qatar Airways</div>
+                    <div class="air-country">Qatar</div>
+                </div>
+                <div class="air-item">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Singapore Airlines</div>
+                    <div class="air-country">Singapore</div>
+                </div>
+                <div class="air-item">
+                    <div class="logo-box">
+                        <img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg">
+                    </div>
+                    <div class="air-name">Cathay Pacific</div>
+                    <div class="air-country">Hong Kong</div>
+                </div>
+            </div>
+
+            <!-- KHUNG EXTRA -->
+            <div id="air-extra">
+                <div class="logo-row" id="row-top"></div>
+                <div class="logo-row" id="row-bottom"></div>
+            </div>
+        </div>
+
+        <!-- KHUNG 2: VIDEO -->
+        <div class="air-frame">
+            <div id="video-container">
+                <video id="air-video" autoplay muted playsinline></video>
+                <div id="video-controls" style="display:flex; justify-content:center; gap:30px; margin-top:10px;">
+                    <span id="mute-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                    <span id="play-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                    <span id="volume-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                </div>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== PASSPORT SECTION ==================== -->
+<div id="passport-section">
+    <h2 class="passport-title">passport</h2>
+    <div class="passport-content">
+        <div class="passport-frame">
+            <!-- Cột trái -->
+            <div class="passport-col-left">
+                <div class="passport-top">
+                    <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
+                </div>
+                <div class="passport-bottom">
+                    <div class="row row-1">Singapore</div>
+                    <div class="row row-2" id="rank-value">1st</div>
+                    <div class="row row-3">
+                        <div class="left">VISA-FREE DESTINATIONS</div>
+                        <div class="right">195</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải -->
+            <div class="passport-col-right">
+                <div id="passport-grid">
+                    <div class="passport-row" id="row-1"></div>
+                    <div class="passport-row" id="row-2"></div>
+                    <div id="row-lower" class="passport-row-lower">
+                        <div class="lower-frame">
+                            <div class="lower-img">
+                                <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
+                            </div>
+                            <div class="lower-name"><strong>wait</strong></div>
+                            <div class="lower-rank">wait</div>
+                            <div class="lower-visa">wait</div>
+                            <div class="lower-search">
+                                <input type="text" placeholder="Search country..." class="search-input">
+                                <div class="search-suggestions"></div>
+                            </div>
+                        </div>
+
+                        <div class="lower-frame">
+                            <div class="lower-img">
+                                <img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png" alt="Country Image">
+                            </div>
+                            <div class="lower-name"><strong>wait</strong></div>
+                            <div class="lower-rank">wait</div>
+                            <div class="lower-visa">wait</div>
+                            <div class="lower-search">
+                                <input type="text" placeholder="Search country..." class="search-input">
+                                <div class="search-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="passport-total">199</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TIME WRAPPER & ROCKET ==================== -->
 <div id="time-wrapper">
     <div class="time-box" id="date-box"></div>
     <div class="time-box" id="clock-box"></div>
@@ -678,153 +505,17 @@ img {
 
 <div id="rocket-btn">🚀</div>
 
+<!-- ==================== JAVASCRIPT ==================== -->
 <script>
+// ==================== GLOBAL VARIABLES ====================
 let images = [], current = 0;
+let videoList = [], currentVideoIndex = 0, originalVideos = [];
+let airlineData = [];
+let passports = [], passportInfo = {}, cycles = [], currentRound = 0;
 
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-}
-
-function changeImage() {
-    if (images.length > 0) {
-        document.getElementById("slide").src = images[current];
-        current = (current + 1) % images.length;
-    }
-}
-
-fetch("images.json")
-    .then(r => r.json())
-    .then(data => {
-        shuffle(data);
-        images = data.slice(0, 10);
-        changeImage();
-        setInterval(changeImage, 5000);
-    });
-
-const rocketBtn = document.getElementById("rocket-btn");
-rocketBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-const dateBox = document.getElementById("date-box");
-const clockBox = document.getElementById("clock-box");
-
+// ==================== HELPER FUNCTIONS ====================
 function pad(n) { return n.toString().padStart(2, '0'); }
 
-function updateTime() {
-    const now = new Date();
-    let year = now.getFullYear().toString();
-    let yy1 = year.slice(0, 2), yy2 = year.slice(2);
-    let mm = pad(now.getMonth() + 1), dd = pad(now.getDate());
-    let weekday = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][now.getDay()];
-    let hh = pad(now.getHours()), min = pad(now.getMinutes()), ss = pad(now.getSeconds());
-
-    dateBox.innerHTML = `${yy1}<br>${yy2}<br>${mm}<br>${dd}<br><span class="weekday">${weekday}</span>`;
-    clockBox.innerHTML = `${hh}<br>${min}<br>${ss}`;
-}
-
-setInterval(updateTime, 1000);
-updateTime();
-function getBrightness(r, g, b) {
-    return (r * 299 + g * 587 + b * 114) / 1000;
-}
-
-function getBackgroundColorAtPoint(x, y) {
-    const el = document.elementFromPoint(x, y);
-    if (!el) return [255,255,255];
-
-    const style = getComputedStyle(el);
-    const bg = style.backgroundColor;
-
-    const match = bg.match(/\d+/g);
-    if (match) return match.map(Number);
-
-    return [255,255,255];
-}
-
-function updateTextColorByScroll() {
-    const wrapper = document.getElementById("time-wrapper");
-    const rect = wrapper.getBoundingClientRect();
-
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
-    const [r,g,b] = getBackgroundColorAtPoint(x, y);
-    const brightness = getBrightness(r,g,b);
-
-    const color = brightness > 128 ? "#000" : "#fff";
-
-    document.querySelectorAll(".time-box").forEach(el => {
-        el.style.color = color;
-    });
-}
-
-window.addEventListener("scroll", updateTextColorByScroll);
-window.addEventListener("load", updateTextColorByScroll);
-setInterval(updateTextColorByScroll, 500);
-
-const rocket = document.getElementById("rocket-btn");
-const timeWrapper = document.getElementById("time-wrapper");
-
-function toggleUI() {
-    const scrollY = window.scrollY;
-
-    // chiều cao vùng slideshow (ảnh + bottom)
-    const triggerHeight = document.getElementById("slide").offsetHeight;
-
-    if (scrollY < triggerHeight) {
-        // đang ở vùng ảnh
-        rocket.style.opacity = "0";
-        timeWrapper.style.opacity = "0";
-    } else {
-        // đã scroll xuống dưới
-        rocket.style.opacity = "1";
-        timeWrapper.style.opacity = "1";
-    }
-}
-
-window.addEventListener("scroll", toggleUI);
-window.addEventListener("load", toggleUI);
-
-// --- VIDEO PLAYLIST ---
-let videoList = [];  // danh sách video từ "videos.json"
-let currentVideoIndex = 0;
-const videoEl = document.getElementById("air-video");
-const muteBtn = document.getElementById("mute-btn");
-const playBtn = document.getElementById("play-btn");
-const volumeBtn = document.getElementById("volume-btn");
-const volumeSlider = document.getElementById("volume-slider");
-
-let originalVideos = [];
-
-fetch("planevideo.json")
-    .then(r => r.json())
-    .then(data => {
-        originalVideos = data;
-        videoList = shuffleArray(originalVideos); // ✅ shuffle toàn bộ video
-        currentVideoIndex = 0;
-        playNextVideo();
-    });
-
-// Phát video tiếp theo
-function playNextVideo() {
-    if (videoList.length === 0) return;
-
-    videoEl.src = videoList[currentVideoIndex];
-    videoEl.play();
-
-    currentVideoIndex++;
-    if (currentVideoIndex >= videoList.length) {
-        // khi hết video, shuffle lại toàn bộ video cho lượt tiếp theo
-        videoList = shuffleArray(originalVideos);
-        currentVideoIndex = 0;
-    }
-}
-
-// Hàm xáo trộn mảng
 function shuffleArray(arr) {
     let copy = [...arr];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -834,98 +525,6 @@ function shuffleArray(arr) {
     return copy;
 }
 
-// Phát video tiếp theo
-function playNextVideo() {
-    if (videoList.length === 0) return;
-
-    videoEl.src = videoList[currentVideoIndex];
-    videoEl.play();
-
-    currentVideoIndex++;
-    if (currentVideoIndex >= videoList.length) {
-        // khi hết 10 video, lấy 10 video ngẫu nhiên mới
-        currentVideoIndex = 0;
-        videoList = shuffleArray(originalVideos).slice(0, 10);
-    }
-}
-
-// Khi video kết thúc -> phát tiếp
-videoEl.addEventListener("ended", playNextVideo);
-
-// --- NÚT ĐIỀU KHIỂN ---
-// Ngôi sao 1: mute/unmute
-let isMuted = true;
-muteBtn.addEventListener("click", () => {
-    isMuted = !isMuted;
-    videoEl.muted = isMuted;
-    muteBtn.textContent = isMuted ? "⭐" : "🌟"; // ⭐ = muted, 🌟 = unmuted
-});
-
-// Ngôi sao 2: play/pause
-let isPlaying = true;
-playBtn.addEventListener("click", () => {
-    if (videoEl.paused) {
-        videoEl.play();
-        isPlaying = true;
-        playBtn.textContent = "⭐"; // ⭐ = play
-    } else {
-        videoEl.pause();
-        isPlaying = false;
-        playBtn.textContent = "🌟"; // 🌟 = pause
-    }
-});
-
-// Ngôi sao 3: hiển thị/ẩn thanh volume
-let volumeVisible = false;
-volumeBtn.addEventListener("click", () => {
-    volumeVisible = !volumeVisible;
-    volumeSlider.style.display = volumeVisible ? "block" : "none";
-});
-
-// Volume slider
-volumeSlider.addEventListener("input", () => {
-    videoEl.volume = parseFloat(volumeSlider.value);
-});
-
-let airlineData = [];
-
-// Load dữ liệu
-fetch("airline.json")
-    .then(r => r.json())
-    .then(data => {
-        airlineData = data;
-        initRows();
-    });
-
-// Tạo 1 item logo
-function createItem(air) {
-    const div = document.createElement("div");
-    div.className = "logo-item";
-
-    const name = air.name || "Unknown";
-    const country = air.country || "Unknown";
-    const logo = air.logo || "https://via.placeholder.com/100?text=Logo";
-
-    div.innerHTML = `
-        <img src="${logo}" referrerpolicy="no-referrer"
-             onerror="this.src='https://via.placeholder.com/100?text=Logo'">
-        <div class="logo-name">${name}</div>
-        <div class="logo-country">${country}</div>
-    `;
-    return div;
-}
-
-// Shuffle mảng
-function shuffleArray(arr) {
-    let copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-
-// Kiểm tra 2 mảng giống nhau (theo tên)
 function arraysEqual(a, b) {
     if (a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) {
@@ -934,225 +533,17 @@ function arraysEqual(a, b) {
     return true;
 }
 
-// Build row từ danh sách, trả về track element
-function buildRowWithList(rowEl, list, direction) {
-    rowEl.innerHTML = "";
-
-    // Nhân đôi danh sách để chạy mượt
-    let fullList = [...list, ...list];
-    const track = document.createElement("div");
-    track.className = "logo-track";
-
-    fullList.forEach(i => track.appendChild(createItem(i)));
-    rowEl.appendChild(track);
-
-    const duration = 250; // tốc độ mặc định
-
-    // Sử dụng direction được truyền vào
-    track.style.animation = `${direction === "left" ? "scroll-left" : "scroll-right"} ${duration}s linear infinite`;
-
-    // Khi animation kết thúc 1 vòng, shuffle lại
-    track.addEventListener("animationend", () => {
-        const newList = shuffleArray(list);
-        buildRowWithList(rowEl, newList, direction);
-    }, { once: true });
-}
-
-// Build 2 row không trùng thứ tự
-function buildRowsNoRepeat(topEl, bottomEl) {
-    let topList = shuffleArray(airlineData);
-    let bottomList;
-
-    do {
-        bottomList = shuffleArray(airlineData);
-    } while (arraysEqual(topList.map(a => a.name), bottomList.map(a => a.name)));
-
-    // Gán hẳn chiều cố định cho từng row
-    buildRowWithList(topEl, topList, "right");   // row trên: trái → phải
-    buildRowWithList(bottomEl, bottomList, "left"); // row dưới: phải → trái
-}
-
-// Init rows
-function initRows() {
-    const top = document.getElementById("row-top");
-    const bottom = document.getElementById("row-bottom");
-
-    buildRowsNoRepeat(top, bottom);
-}
-
 function getOrdinal(n) {
-    let s = ["th", "st", "nd", "rd"],
-        v = n % 100;
+    let s = ["th", "st", "nd", "rd"], v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
-
-
-// --- PASSPORT SECTION ---
-let passports = [];
-let passportInfo = {};
-let cycles = [];
-let currentRound = 0;
-
-// shuffle dùng chung cho tất cả
-function shuffleArray(arr) {
-    let copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-}
-
-// lấy dữ liệu passport và info đồng thời
-Promise.all([
-    fetch("passport.json").then(r => r.json()),
-    fetch("passportData.json").then(r => r.json())
-]).then(([passportData, passportDetails]) => {
-    passports = passportData;
-    passportInfo = passportDetails;
-
-    generateCycle();
-    renderRound(); // ✅ lượt đầu hiển thị rank/visa
-    setInterval(nextRound, 20000);
-});
-
-// tạo vòng lặp 10 ô
-function generateCycle() {
-    let shuffled = shuffleArray(passports);
-    let m = Math.ceil(passports.length / 10);
-    cycles = [];
-
-    for (let i = 0; i < m; i++) {
-        let slice = shuffled.slice(i * 10, (i + 1) * 10);
-
-        if (slice.length < 10) {
-            let extra = shuffleArray(passports).slice(0, 10 - slice.length);
-            slice = slice.concat(extra);
-        }
-
-        cycles.push(slice);
-    }
-
-    currentRound = 0;
-}
-
-// hiển thị lượt hiện tại
-function renderRound() {
-    const row1 = document.getElementById("row-1");
-    const row2 = document.getElementById("row-2");
-
-    row1.innerHTML = "";
-    row2.innerHTML = "";
-
-    let list = cycles[currentRound] || [];
-
-    list.forEach((p, i) => {
-        let div = createPassportItem(p);
-        fillInfo(p.name, div);
-
-        if (i < 5) row1.appendChild(div);
-        else row2.appendChild(div);
-    });
-}
-
-// chuyển lượt tiếp theo
-function nextRound() {
-    currentRound++;
-    if (currentRound >= cycles.length) generateCycle();
-    renderRound();
-}
-
-// tạo 1 item passport
-function createPassportItem(p) {
-    const div = document.createElement("div");
-    div.className = "passport-item";
-
-    div.innerHTML = `
-        <div class="img-box">
-            <img src="${p.image}" alt="${p.name}">
-        </div>
-        <div class="p-name">${p.name}</div>
-        <div class="p-rank">...</div>
-        <div class="p-visa">...</div>
-    `;
-    return div;
-}
-
-// điền rank/visa
-function fillInfo(name, el) {
-    let info = passportInfo[name];
-    if (!info) return;
-
-    el.querySelector(".p-rank").textContent = info.rank ? getOrdinal(info.rank) : "...";
-    el.querySelector(".p-visa").textContent = info.visa;
-}
-
-// Khởi tạo khung dưới
-function initLowerFrame() {
-    const lowerFrames = document.querySelectorAll(".lower-frame");
-
-    lowerFrames.forEach(frame => {
-        const input = frame.querySelector(".search-input");
-        const btn = frame.querySelector(".search-btn");
-        const suggestions = frame.querySelector(".search-suggestions");
-
-        // Gõ chữ trong input
-        input.addEventListener("input", () => {
-            const value = input.value.toLowerCase();
-            const matches = passports.filter(p => p.name.toLowerCase().includes(value));
-            
-            suggestions.innerHTML = "";
-            if (matches.length > 0 && value !== "") {
-                matches.forEach(p => {
-                    const div = document.createElement("div");
-                    div.textContent = p.name;
-                    div.addEventListener("click", () => {
-                        input.value = p.name;
-                        suggestions.style.display = "none";
-                        updateLowerFrame(frame, p.name);
-                    });
-                    suggestions.appendChild(div);
-                });
-                suggestions.style.display = "block";
-            } else {
-                suggestions.style.display = "none";
-            }
-        });
-    });
-}
-// Chuyển số thành thứ tự tiếng Anh
-function getOrdinal(n) {
-    let s = ["th", "st", "nd", "rd"];
-    let v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
-    
-// Cập nhật thông tin vào khung
-function updateLowerFrame(frame, countryName) {
-    const imgEl = frame.querySelector(".lower-img img");
-    const nameEl = frame.querySelector(".lower-name");
-    const rankEl = frame.querySelector(".lower-rank");
-    const visaEl = frame.querySelector(".lower-visa");
-
-    const passportItem = passports.find(p => p.name === countryName);
-    const info = passportInfo[countryName];
-
-    imgEl.src = passportItem ? (passportItem.image || "https://cdn-icons-png.flaticon.com/512/7893/7893979.png") : "https://cdn-icons-png.flaticon.com/512/7893/7893979.png";
-    nameEl.textContent = countryName || "wait";  // thêm dòng tên quốc gia
-    rankEl.textContent = info ? getOrdinal(info.rank) : "wait";
-    visaEl.textContent = info ? info.visa : "wait";
-}
-
-// Khởi tạo khi load xong
-window.addEventListener("load", () => {
-    initLowerFrame();
-});
-
 </script>
+
+<!-- JS tiếp theo: fetch images.json, video, airline.json, passport.json ... -->
+<script src="your-script.js"></script>
 
 </body>
 </html>
-
 
 
 
