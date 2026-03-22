@@ -464,13 +464,9 @@ img {
 
 /* Khung dưới */
 .passport-bottom {
-    width: 100%;           /* full container của khung cha */
-    max-width: 520px;      /* optional: vẫn giới hạn tối đa bằng ảnh */
-    margin: 0 auto;        /* căn giữa với khung cha */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    box-sizing: border-box;
+    margin: 0 auto;
+    width: 100%;
+    min-height: 100px; /* có thể chỉnh tùy ý */
 }
 
 /* Cột phải */
@@ -499,48 +495,27 @@ img {
 
 /* Row 1: Country */
 .row-1 {
-    width: 100%;
-    margin: 0;
-    padding: 0 5px;        /* padding nhỏ để text không sát biên */
-    box-sizing: border-box;
-    height: auto;           /* bỏ chiều cao cố định */
-    overflow: visible;
-    text-align: center;     /* căn giữa */
-    font-size: clamp(12px, 2vw, 18px);  /* co giãn font theo viewport */
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 /* Row 2: Rank */
 .row-2 {
-    width: 100%;
-    margin: 0;
-    padding: 0 5px;        /* padding nhỏ để text không sát biên */
-    box-sizing: border-box;
-    height: auto;           /* bỏ chiều cao cố định */
-    overflow: visible;
-    text-align: center;     /* căn giữa */
-    font-size: clamp(12px, 2vw, 18px);  /* co giãn font theo viewport */
+    text-align: center;
+    font-size: 16px;
 }
 
 /* Row 3: 2 cột */
 .row-3 {
     display: flex;
-    justify-content: space-between; /* bám 2 đầu */
+    justify-content: space-between; /* 2 cột bám 2 đầu */
     width: 100%;
-    margin: 0;
-    padding: 0 5px;
-    box-sizing: border-box;
-    font-size: clamp(12px, 1.5vw, 14px); /* co giãn font */
+    font-size: 14px;
 }
 
-.row-3 .left {
-    text-align: left;
-    flex: 1;                 /* chiếm nửa khung, co giãn */
-}
-
-.row-3 .right {
-    text-align: right;
-    flex: 1;                 /* chiếm nửa khung, co giãn */
-}
+.row-3 .left { text-align: left; }
+.row-3 .right { text-align: right; }
     
 #passport-grid {
     width: 100%;
@@ -1177,6 +1152,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
