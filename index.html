@@ -495,27 +495,48 @@ img {
 
 /* Row 1: Country */
 .row-1 {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 600;
+    width: 100%;
+    margin: 0;
+    padding: 0 5px;        /* padding nhỏ để text không sát biên */
+    box-sizing: border-box;
+    height: auto;           /* bỏ chiều cao cố định */
+    overflow: visible;
+    text-align: center;     /* căn giữa */
+    font-size: clamp(12px, 2vw, 18px);  /* co giãn font theo viewport */
 }
 
 /* Row 2: Rank */
 .row-2 {
-    text-align: center;
-    font-size: 16px;
+    width: 100%;
+    margin: 0;
+    padding: 0 5px;        /* padding nhỏ để text không sát biên */
+    box-sizing: border-box;
+    height: auto;           /* bỏ chiều cao cố định */
+    overflow: visible;
+    text-align: center;     /* căn giữa */
+    font-size: clamp(12px, 2vw, 18px);  /* co giãn font theo viewport */
 }
 
 /* Row 3: 2 cột */
 .row-3 {
     display: flex;
-    justify-content: space-between; /* 2 cột bám 2 đầu */
+    justify-content: space-between; /* bám 2 đầu */
     width: 100%;
-    font-size: 14px;
+    margin: 0;
+    padding: 0 5px;
+    box-sizing: border-box;
+    font-size: clamp(12px, 1.5vw, 14px); /* co giãn font */
 }
 
-.row-3 .left { text-align: left; }
-.row-3 .right { text-align: right; }
+.row-3 .left {
+    text-align: left;
+    flex: 1;                 /* chiếm nửa khung, co giãn */
+}
+
+.row-3 .right {
+    text-align: right;
+    flex: 1;                 /* chiếm nửa khung, co giãn */
+}
     
 #passport-grid {
     width: 100%;
