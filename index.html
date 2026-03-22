@@ -464,9 +464,13 @@ img {
 
 /* Khung dưới */
 .passport-bottom {
-    margin: 0 auto;
-    width: 100%;
-    min-height: 100px; /* có thể chỉnh tùy ý */
+    width: 100%;           /* full container của khung cha */
+    max-width: 520px;      /* optional: vẫn giới hạn tối đa bằng ảnh */
+    margin: 0 auto;        /* căn giữa với khung cha */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
 }
 
 /* Cột phải */
