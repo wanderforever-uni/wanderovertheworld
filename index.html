@@ -125,44 +125,69 @@
 
         .air-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
+            grid-template-columns: 1fr 1fr; /* Chia đôi 50/50 */
+            gap: 0.52vw;                   /* Khoảng cách 20px chuẩn */
+            align-items: stretch;          /* Chiều cao 2 bên luôn bằng nhau */
+            width: 100%;
         }
 
-        .air-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        /* Khung Trái chứa các bộ Logo */
+        .air-frame-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Dòng 1 (1 ô) và Dòng 2 (2 ô) */
+        .air-row-top { display: flex; justify-content: center; width: 100%; margin-bottom: 2vw; }
+        .air-row-middle { display: flex; justify-content: center; gap: 3vw; width: 100%; margin-bottom: 4vw; }
+
+        /* Ô lớn 500x500 */
+        .logo-box-large {
+            width: 13.02vw; height: 13.02vw;
+            margin: 0 auto 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Ô nhỏ 200x200 cho Running Logos */
+        .logo-box-small {
+            width: 5.21vw; height: 5.21vw;
+            margin: 0 auto 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #video-controls {
+            display: flex; 
+            justify-content: center; 
+            gap: 0.78vw;        /* Khoảng cách linh hoạt */
+            margin-top: 0.26vw; 
+        }
+
+        #video-controls span {
+            cursor: pointer; 
+            font-size: 0.83vw;   /* Kích thước ngôi sao linh hoạt theo màn hình */
+            user-select: none;
+        }
+
+        #volume-slider {
+            display: none; 
+            width: 5.21vw;      /* Thanh trượt linh hoạt */
+            margin: 0.26vw auto;
+        }
+        
+        .logo-box-large img, .logo-box-small img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
         }
 
         .air-item { text-align: center; }
-        .air-item.center { grid-column: 1 / span 2; }
-
-        .logo-box {
-            width: 100%;
-            max-width: 250px;
-            aspect-ratio: 1 / 1;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
         .air-name { font-size: 16px; font-weight: 500; line-height: 1.2; height: 2.4em; overflow: hidden; }
         .air-country { font-size: 14px; opacity: 0.7; line-height: 1.2; height: 2.4em; overflow: hidden; }
 
-        /* Video */
+        /* Video 720x1280 */
         #video-container {
-            width: 100%;
-            max-width: 720px;
-            aspect-ratio: 9 / 16;
+            width: 18.75vw; /* 720px */
+            aspect-ratio: 720 / 1280;
             margin: 0 auto;
+            background: #000;
             position: relative;
         }
 
@@ -172,12 +197,17 @@
             object-fit: cover;
         }
 
-        /* Running Logos (Khung 3) */
-        #air-extra { width: 100%; margin-top: 30px; }
+        /* --- Running Logos (Khung 3) - CHUẨN KÍCH THƯỚC 200x200 --- */
+        #air-extra { 
+            width: 100%; 
+            margin-top: 0.78vw; /* ~30px */
+        }
+
         .logo-row {
             width: 100%;
-            height: 140px;
-            margin: 20px auto;
+            /* Tăng chiều cao lên để chứa đủ ô 200px và 2 dòng chữ bên dưới */
+            height: 7.5vw;      /* Khoảng 280px trên màn 4K để không bị cấn chữ */
+            margin: 0.52vw auto; 
             position: relative;
             overflow: hidden;
         }
@@ -186,13 +216,32 @@
             display: flex;
             position: absolute;
             flex-wrap: nowrap;
-            gap: 15px;
+            gap: 0.52vw;        /* Khoảng cách 20px giữa các logo */
         }
 
-        .logo-item { width: 100px; height: 100px; text-align: center; flex-shrink: 0; }
-        .logo-item img { width: 100%; height: 100%; object-fit: contain; }
-        .logo-name { font-size: 12px; }
-        .logo-country { font-size: 11px; opacity: 0.7; }
+        .logo-item { 
+            width: 5.21vw;      /* ĐÚNG CHUẨN 200px trên màn 4K */
+            height: 5.21vw;     /* ĐÚNG CHUẨN 200px trên màn 4K */
+            text-align: center; 
+            flex-shrink: 0; 
+        }
+
+        .logo-item img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain;
+            image-rendering: high-quality;  /* Ưu tiên chất lượng hiển thị */
+        }
+
+        .logo-name { 
+            font-size: 0.42vw;  /* Khoảng 16px trên màn 4K cho dễ đọc */
+            margin-top: 0.26vw; /* ~10px */
+        }
+
+        .logo-country { 
+            font-size: 0.36vw;  /* Khoảng 14px trên màn 4K */
+            opacity: 0.7; 
+        }
 
         @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         @keyframes scroll-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
@@ -310,20 +359,22 @@
     <div id="air-section">
         <h2 class="air-title">air</h2>
         <div class="air-container">
-            <div class="air-frame">
-                <div class="air-group">
-                    <div class="air-item center">
-                        <div class="logo-box"><img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg"></div>
+            <div class="air-frame-left">
+                <div class="air-row-top">
+                    <div class="air-item">
+                        <div class="logo-box-large"><img src="https://www.logo.wine/a/logo/Qatar_Airways/Qatar_Airways-Logo.wine.svg"></div>
                         <div class="air-name">Qatar Airways</div>
                         <div class="air-country">Qatar</div>
                     </div>
+                </div>
+                <div class="air-row-middle">
                     <div class="air-item">
-                        <div class="logo-box"><img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg"></div>
+                        <div class="logo-box-large"><img src="https://www.logo.wine/a/logo/Singapore_Airlines/Singapore_Airlines-Logo.wine.svg"></div>
                         <div class="air-name">Singapore Airlines</div>
                         <div class="air-country">Singapore</div>
                     </div>
                     <div class="air-item">
-                        <div class="logo-box"><img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg"></div>
+                        <div class="logo-box-large"><img src="https://www.logo.wine/a/logo/Cathay_Pacific/Cathay_Pacific-Logo.wine.svg"></div>
                         <div class="air-name">Cathay Pacific</div>
                         <div class="air-country">Hong Kong</div>
                     </div>
@@ -334,18 +385,18 @@
                 </div>
             </div>
 
-            <div class="air-frame">
+            <div class="air-frame-right">
                 <div id="video-container">
                     <video id="air-video" autoplay muted playsinline></video>
-                    <div id="video-controls" style="display:flex; justify-content:center; gap:30px; margin-top:10px;">
-                        <span id="mute-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-                        <span id="play-btn" style="cursor:pointer; font-size:32px;">⭐</span>
-                        <span id="volume-btn" style="cursor:pointer; font-size:32px;">⭐</span>
+                    <div id="video-controls">
+                        <span id="mute-btn">⭐</span>
+                        <span id="play-btn">⭐</span>
+                        <span id="volume-btn">⭐</span>
                     </div>
-                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" style="display:none; width:200px; margin:10px auto;">
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01">
                 </div>
             </div>
-        </div>
+       </div>
     </div>
 
     <div id="passport-section">
