@@ -23,10 +23,19 @@
 
         h1 {
             font-family: 'Satisfy', cursive;
-            font-size: 70px;
+            /* 70px trên màn hình 3840px tương đương khoảng 1.82vw */
+            /* Công thức: (70 / 3840) * 100 = 1.8229 */
+            font-size: 1.82vw; 
+    
             font-weight: normal;
-            margin: 40px 0;
+    
+            /* Margin 40px tương đương khoảng 1.04vw */
+            margin: 1.04vw 0; 
+    
             color: #000;
+            text-align: center;
+            width: 100%;
+            display: block;
         }
 
         img {
