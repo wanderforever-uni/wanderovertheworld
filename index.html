@@ -125,8 +125,8 @@
 
         .air-container {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Chia đôi 50/50 */
-            gap: 0.52vw;                   /* Khoảng cách 20px chuẩn */
+            grid-template-columns: 1.2fr 0.8fr; 
+            gap: 1.5vw;
             align-items: stretch;          /* Chiều cao 2 bên luôn bằng nhau */
             width: 100%;
         }
@@ -136,24 +136,42 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
 
-        /* Dòng 1 (1 ô) và Dòng 2 (2 ô) */
-        .air-row-top { display: flex; justify-content: center; width: 100%; margin-bottom: 2vw; }
-        .air-row-middle { display: flex; justify-content: center; gap: 3vw; width: 100%; margin-bottom: 4vw; }
+        /* Thay đổi các thông số margin cũ của bạn */
+        .air-row-top { 
+            display: flex; 
+            justify-content: center; 
+            width: 100%; 
+            margin-bottom: 2vw;   /* Giảm xuống từ 2vw */
+         }
 
-        /* Ô lớn 500x500 */
+         .air-row-middle { 
+             display: flex; 
+             justify-content: center; 
+             gap: 3vw;             /* Giảm xuống từ 3vw */
+             width: 100%; 
+             margin-bottom: 4vw; /* Giảm xuống từ 4vw */
+         }
+
+        /* Ô lớn 345x345 */
         .logo-box-large {
-            width: 13.02vw; height: 13.02vw;
-            margin: 0 auto 10px;
-            display: flex; align-items: center; justify-content: center;
+            width: 9vw;  /* ~345px trên 4K */
+            height: 9vw;
+            margin: 0 auto 0.5vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Ô nhỏ 200x200 cho Running Logos */
+        /* Ô nhỏ 160x160 cho Running Logos */
         .logo-box-small {
-            width: 5.21vw; height: 5.21vw;
-            margin: 0 auto 8px;
-            display: flex; align-items: center; justify-content: center;
+            width: 4.2vw; /* ~160px trên 4K */
+            height: 4.2vw;
+            margin: 0 auto 0.3vw;
+            display: flex; align-items: center; 
+            justify-content: center;
         }
         #video-controls {
             display: flex; 
@@ -179,16 +197,31 @@
         }
 
         .air-item { text-align: center; }
-        .air-name { font-size: 16px; font-weight: 500; line-height: 1.2; height: 2.4em; overflow: hidden; }
-        .air-country { font-size: 14px; opacity: 0.7; line-height: 1.2; height: 2.4em; overflow: hidden; }
+        .air-name { 
+            font-size: 0.8vw;     /* Chuyển sang vw để đồng bộ màn hình 4K */
+            font-weight: 600; 
+            line-height: 1.2; 
+            min-height: 2.4em;    /* Dùng min-height thay vì height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .air-country { 
+            font-size: 0.6vw; 
+            opacity: 0.7; 
+            line-height: 1.2; 
+            min-height: 1.2em; 
+            overflow: hidden; }
 
         /* Video 720x1280 */
         #video-container {
-            width: 18.75vw; /* 720px */
+            width: 100%;          /* Để nó chiếm hết 0.8fr của cột phải */
+            max-width: 15vw;      /* Giới hạn độ rộng vừa phải */
             aspect-ratio: 720 / 1280;
             margin: 0 auto;
             background: transparent;
             position: relative;
+            overflow: hidden;
         }
 
         #air-video {
@@ -220,8 +253,9 @@
         }
 
         .logo-item { 
-            width: 5.21vw;      /* ĐÚNG CHUẨN 200px trên màn 4K */
-            height: 5.21vw;     /* ĐÚNG CHUẨN 200px trên màn 4K */
+            width: 4.2vw; /* ~160px trên 4K */
+            height: 4.2vw;
+            margin: 0 auto 0.3vw;
             text-align: center; 
             flex-shrink: 0; 
         }
