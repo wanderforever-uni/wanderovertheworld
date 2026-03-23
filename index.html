@@ -209,17 +209,24 @@
             font-size: 1vw;     /* Chuyển sang vw để đồng bộ màn hình 4K */
             font-weight: bold; 
             line-height: 1.2; 
-            min-height: 2.4em;    /* Dùng min-height thay vì height */
+            min-height: 2.4vw;    /* Dùng min-height thay vì height */
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            text-align: center;
+            overflow: visible;
         }
         .air-country { 
             font-size: 0.7vw; 
             opacity: 0.7; 
             line-height: 1.2; 
-            min-height: 1.2em; 
-            overflow: hidden; }
+            min-height: 1.7vw; 
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            overflow: visible;
+        }
 
         /* Video 720x1280 */
         #video-container {
