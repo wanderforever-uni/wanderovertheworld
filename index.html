@@ -98,18 +98,28 @@
         /* --- 3. AIR SECTION --- */
         #air-section {
             position: relative;
-            margin-left: 50px;
-            margin-right: 40px;
-            margin-top: 10px;
-            margin-bottom: 60px;
-            padding: 10px;
+            /* 1. Thiết lập lề trái và phải bằng nhau để khung LUÔN CĂN GIỮ */
+            /* Con số 2.76vw đảm bảo cạnh phải cách Tên lửa đúng 10px trên màn 4K */
+            margin-left: 2.76vw;   
+            margin-right: 2.76vw;
+            margin-top: 0.26vw;    /* ~10px */
+            margin-bottom: 1.56vw; /* ~60px */
+            padding: 0.26vw;       /* ~10px */
+            width: auto;           /* Tự động tính chiều ngang dựa trên margin */
+            height: auto;          /* QUAN TRỌNG: Khung sẽ cao bằng nội dung bên trong */
+    
+            /* Đảm bảo nội dung bên trong (float/absolute nếu có) không làm vỡ khung */
+            overflow: hidden;      
+            display: block;
         }
 
         .air-title {
             font-family: 'Satisfy', cursive;
-            font-size: 50px;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 1.3vw;    /* Kích thước chữ "air" 50px */
+            text-align: center;  /* Luôn căn giữa trong khung đã được căn giữa */
+            width: 100%;
+            display: block;
+            margin-bottom: 0.78vw; /* Kích thước 30px */
             color: #000;
         }
 
