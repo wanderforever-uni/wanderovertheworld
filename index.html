@@ -292,11 +292,14 @@
             color: #000;        /* Đảm bảo màu đen rõ nét */
             text-align: center;
             width: 100%;
-            line-height: 1.2;
-            height: 1.1vw; 
+            line-height: 1.4;
+            height: 1.4vw; 
     
-            overflow: hidden;
-            margin-top: 0.3vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible; /* Thay vì hidden, hãy dùng visible để kiểm tra, sau đó đổi lại hidden khi đã chuẩn */
+            margin-top: 0.4vw;
         }
 
         .logo-country { 
@@ -305,13 +308,13 @@
             opacity: 0.9;
             text-align: center;
             width: 100%;
-            line-height: 1.2;
-            height: 0.5vw;
+            line-height: 1.4;
+            height: 0.7vw;
             display: flex;
             align-items: center;
             justify-content: center;
     
-            overflow: hidden;
+            overflow: visible;
             margin-top: 0.1vw;
         }
 
