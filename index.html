@@ -56,10 +56,10 @@
         /* --- 2. UI ELEMENTS (Clock & Rocket) --- */
         #time-wrapper {
             position: fixed;
-            right: 20px;
-            bottom: 120px;
+            right: 0.52vw;   /* Tương ứng 20px */
+            bottom: 3.125vw; /* Tương ứng 120px */
             display: flex;
-            gap: 10px;
+            gap: 0.26vw;     /* Tương ứng 10px */
             z-index: 9999;
             mix-blend-mode: exclusion;
             pointer-events: none;
@@ -69,7 +69,7 @@
             font-family: 'Digital-7', monospace;
             text-align: center;
             line-height: 1.1;
-            font-size: 18px;
+            font-size: 0.47vw; /* Tương ứng 18px */
             color: #fff;
             filter: contrast(1000%) grayscale(100%);
         }
@@ -77,17 +77,22 @@
         .weekday {
             transform: rotate(90deg);
             display: inline-block;
-            margin-top: 5px;
+            margin-top: 0.13vw; /* Khoảng cách lề chữ Thứ linh hoạt */
         }
 
         #rocket-btn {
             position: fixed;
-            right: 32px;
-            bottom: 20px;
-            font-size: 32px;
+            right: 0.83vw;   /* Tương ứng 32px */
+            bottom: 0.52vw;  /* Tương ứng 20px */
+            font-size: 0.83vw; /* Tương ứng 32px */
             cursor: pointer;
             user-select: none;
             z-index: 10000;
+            transition: transform 0.3s ease; /* Thêm hiệu ứng mượt khi di chuột vào */
+        }
+        /* Thêm hiệu ứng phóng nhẹ khi di chuột để tăng tính tương tác */
+        #rocket-btn:hover {
+            transform: scale(1.2);
         }
 
         /* --- 3. AIR SECTION --- */
