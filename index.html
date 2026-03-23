@@ -199,7 +199,7 @@
         .air-item { text-align: center; }
         .air-name { 
             font-size: 0.8vw;     /* Chuyển sang vw để đồng bộ màn hình 4K */
-            font-weight: 600; 
+            font-weight: bold; 
             line-height: 1.2; 
             min-height: 2.4em;    /* Dùng min-height thay vì height */
             display: flex;
@@ -268,8 +268,11 @@
         }
 
         .logo-name { 
-            font-size: 0.42vw;  /* Khoảng 16px trên màn 4K cho dễ đọc */
-            margin-top: 0.26vw; /* ~10px */
+            font-size: 0.42vw;  /* Khoảng 16px trên màn 4K */
+            font-weight: bold;  /* THÊM DÒNG NÀY ĐỂ IN ĐẬM */
+            margin-top: 0.26vw; /* Khoảng cách với logo ~10px */
+            color: #000;        /* Đảm bảo màu đen rõ nét */
+            text-align: center;
         }
 
         .logo-country { 
