@@ -374,17 +374,19 @@
         .passport-main-image-box {
             width: 100%; /* Chiếm hết chiều ngang khung trái (~ khung trái Air) */
             aspect-ratio: 1040 / 1477; /* Tỉ lệ chuẩn của passport */
-            display: block;
+            display: flex;
             overflow: visible;
             justify-content: center;
             align-items: flex-start;
             margin-bottom: 1vw;
+            background: transparent;
         }
 
         .passport-main-image-box img {
             max-height: 100%;
             max-width: 100%;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
             display: block;
             /* Logic phóng to 200% như bạn yêu cầu */
             transform: scale(1); /* Mặc định hoặc chỉnh lên 1.2, 1.5 nếu muốn zoom */
