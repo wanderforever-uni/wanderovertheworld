@@ -818,9 +818,9 @@
                                 sugg.style.display = "none";
                                 const info = passportInfo[m.name];
                                 frame.querySelector(".lower-img img").src = m.image;
-                                frame.querySelector(".lower-name").textContent = m.name;
-                                frame.querySelector(".lower-rank").textContent = info ? getOrdinal(info.rank) : "wait";
-                                frame.querySelector(".lower-visa").textContent = info ? info.visa : "wait";
+                                frame.querySelector(".p-name").textContent = m.name;
+                                frame.querySelector(".p-rank").textContent = info ? getOrdinal(info.rank) : "wait";
+                                frame.querySelector(".p-visa").textContent = info ? info.visa : "wait";
                             };
                             sugg.appendChild(d);
                         });
