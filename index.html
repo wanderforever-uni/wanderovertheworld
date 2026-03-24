@@ -353,11 +353,12 @@
 
         .passport-container {
             display: grid;
-            grid-template-columns: 30% 1fr; /* Tỉ lệ y hệt khung Air */
+            grid-template-columns: 25vw 1fr; /* Tỉ lệ y hệt khung Air */
             gap: 1.5vw;
             align-items: stretch; /* Chiều cao 2 bên bằng nhau */
             width: 100%;
             box-sizing: border-box;
+            padding: 0 4vw;
         }
 
         /* Khung Trái Passport */
@@ -371,7 +372,7 @@
         }
 
         .passport-main-image-box {
-            width: 18vw;
+            width: 20vw;
             aspect-ratio: 1040 / 1477; /* Tỉ lệ chuẩn của passport */
             display: flex;
             justify-content: center;
@@ -382,14 +383,14 @@
         }
 
         .passport-main-image-box img {
-            max-height: 100%;
-            max-width: 100%;
+            width: 100%;
+            height: auto;
             object-fit: contain;
             image-rendering: high-quality;
         }
 
         .passport-info-rows {
-            width: 18vw;
+            width: 20vw;
             display: flex;
             flex-direction: column;
             gap: 0.8vw; /* Khoảng cách giữa các dòng */
