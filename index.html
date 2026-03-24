@@ -330,104 +330,194 @@
 
         /* --- 4. PASSPORT SECTION --- */
         #passport-section {
-            max-width: calc(100% - 80px);
-            margin: 50px auto 10px;
-            padding: 10px;
+            position: relative;
+            margin-left: 3.8vw;   /* Đồng bộ với Air */
+            margin-right: 3.8vw;
+            margin-top: 5vw;      /* Khoảng cách giữa 2 section lớn */
+            margin-bottom: 5vw;
+            padding: 0.26vw;
+            width: auto;
+            overflow: hidden;
+            display: block;
         }
 
         .passport-title {
             font-family: 'Satisfy', cursive;
-            font-size: 50px;
+            font-size: 3.9vw;    /* Bằng kích thước chữ "air" */
             text-align: center;
-            margin-bottom: 60px;
+            width: 100%;
+            display: block;
+            margin-bottom: 1.5vw;
             color: #000;
         }
 
-        .passport-frame {
-            display: flex;
-            gap: 20px;
-            width: calc(100% - 80px);
-            margin: 0 auto;
+        .passport-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; /* Tỉ lệ y hệt khung Air */
+            gap: 1.5vw;
+            align-items: stretch; /* Chiều cao 2 bên bằng nhau */
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .passport-col-left {
-            width: auto;
-            max-width: 1000px;
+        /* Khung Trái Passport */
+        .passport-frame-left {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            justify-content: flex-start;
+            width: 100%;
         }
 
-        .passport-top { width: 520px; height: 738.5px; overflow: hidden; }
-        .passport-top img { width: 100%; height: 100%; object-fit: contain; }
+        .passport-main-image-box {
+            width: 100%; /* Chiếm hết chiều ngang khung trái (~ khung trái Air) */
+            aspect-ratio: 1040 / 1477; /* Tỉ lệ chuẩn của passport */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2vw;
+        }
 
-        .passport-bottom {
-            width: 520px;
-            min-height: 100px;
-            margin: 0 auto;
+        .passport-main-image-box img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .passport-info-rows {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.8vw; /* Khoảng cách giữa các dòng */
         }
 
-        .row-1 { text-align: center; font-size: 18px; font-weight: 600; }
-        .row-2 { text-align: center; font-size: 16px; }
-        .row-3 { display: flex; justify-content: space-between; font-size: 14px; }
+        .pass-row-name {
+            font-size: 1.8vw;
+            font-weight: bold;
+            text-align: center;
+            min-height: 4.5vw; /* Phòng hờ 2 dòng nếu tên quá dài */
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .passport-col-right { flex: 1; }
-        #passport-grid { display: flex; flex-direction: column; gap: 50px; }
-        .passport-row { display: flex; justify-content: space-between; }
+        .pass-row-rank {
+            font-size: 1.4vw;
+            text-align: center;
+            color: #333;
+        }
+
+        .pass-row-visa {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1vw;
+            font-weight: 500;
+            padding: 0 1vw;
+        }
+
+        /* Khung Phải Passport */
+        .passport-frame-right {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }    
+
+        #passport-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vw; /* Khoảng cách giữa 2 hàng passport */
+        }
+
+        .passport-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 ô đều nhau */
+            gap: 0.8vw;
+            width: 100%;
+        }
 
         .passport-item {
-            width: calc(1477px / 8);
-            aspect-ratio: 1 / 1;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            text-align: center;
         }
 
-        .img-box { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        .img-box img { height: 100%; max-width: 100%; object-fit: contain; }
-        .p-name { font-size: 12px; font-weight: 600; line-height: 1.2; height: 2.4em; overflow: hidden; }
+        .img-box {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Khung ô vuông */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.4vw;
+        }
+
+        .img-box img {
+            height: 100%; /* Lấy chiều dọc làm tiêu chuẩn như bạn yêu cầu */
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        /* Text trong khung nhỏ */
+        .p-name { 
+            font-size: 0.65vw; 
+            font-weight: bold; 
+            min-height: 1.6vw; /* Phòng hờ nhảy dòng */
+            line-height: 1.2;
+            margin-bottom: 0.2vw;
+        }
+        .p-rank, .p-visa { font-size: 0.55vw; opacity: 0.8; }
+
+        /* Khung tìm kiếm (Search Section) */
+        .passport-search-area {
+            margin-top: 2vw;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vw;
+        }
 
         .passport-row-lower {
             display: flex;
-            gap: 50px;
-            width: 100%;
-            transform: translateY(60px);
-            justify-content: center;
+            justify-content: space-around;
+            gap: 2vw;
         }
 
         .lower-frame {
             flex: 1;
-            max-width: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
         }
 
-        .lower-img { width: 100px; height: 100px; }
-        .lower-img img { width: 100%; height: 100%; object-fit: contain; }
-        .lower-search { width: 100%; position: relative; display: flex; gap: 5px; }
-        .search-input { flex: 1; padding: 4px 6px; font-size: 12px; }
-        .search-suggestions {
-            position: absolute; top: 100%; left: 0; width: 100%;
-            background: #fff; border: 1px solid #ccc; max-height: 100px;
-            overflow-y: auto; display: none; z-index: 999; font-size: 12px;
+        .lower-img {
+            height: 4vw; /* Bằng khoảng 1/2 ô nhỏ ở trên */
+            aspect-ratio: 1040 / 1477;
+            margin-bottom: 0.5vw;
         }
-        .search-suggestions div { padding: 4px 6px; cursor: pointer; }
-        .search-suggestions div:hover { background-color: #eee; }
 
+        .lower-img img { height: 100%; object-fit: contain; }
+
+        .lower-search {
+            margin-top: 0.5vw;
+            width: 100%;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.3vw;
+            font-size: 0.7vw;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        /* Con số 199 cuối cùng */
         .passport-total {
-            margin-top: 120px;
+            margin-top: 2vw;
             font-family: 'Modelista', cursive;
-            font-size: 200px;
+            font-size: 8vw; /* Rất lớn và nổi bật */
             text-align: center;
-            color: #A7C7E7;
+            color: #2D1B33; /* Tím đen */
         }
     </style>
 </head>
@@ -483,51 +573,54 @@
 
     <div id="passport-section">
         <h2 class="passport-title">passport</h2>
-        <div class="passport-content">
-            <div class="passport-frame">
-                <div class="passport-col-left">
-                    <div class="passport-top">
-                        <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
+    
+        <div class="passport-container">
+            <div class="passport-frame-left">
+                <div class="passport-main-image-box">
+                    <img src="https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" alt="Singapore Passport">
+                </div>
+                <div class="passport-info-rows">
+                    <div class="pass-row-name">Singapore</div>
+                    <div class="pass-row-rank">1st</div>
+                    <div class="pass-row-visa">
+                        <span>VISA-FREE DESTINATIONS</span>
+                        <span>195</span>
                     </div>
-                    <div class="passport-bottom">
-                        <div class="row row-1">Singapore</div>
-                        <div class="row row-2" id="rank-value">1st</div>
-                        <div class="row row-3">
-                            <div class="left">VISA-FREE DESTINATIONS</div>
-                            <div class="right">195</div>
+                </div>
+            </div>
+
+            <div class="passport-frame-right">
+                <div id="passport-grid">
+                    <div class="passport-row" id="row-1"></div>
+                    <div class="passport-row" id="row-2"></div>
+                </div>
+
+                <div class="passport-search-area">
+                    <div class="passport-row-lower">
+                        <div class="lower-frame">
+                            <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png"></div>
+                            <div class="p-name"><strong>wait</strong></div>
+                            <div class="p-rank">wait</div>
+                            <div class="p-visa">wait</div>
+                            <div class="lower-search">
+                                <input type="text" placeholder="Search country..." class="search-input">
+                                <div class="search-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="lower-frame">
+                            <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png"></div>
+                            <div class="p-name"><strong>wait</strong></div>
+                            <div class="p-rank">wait</div>
+                            <div class="p-visa">wait</div>
+                            <div class="lower-search">
+                                <input type="text" placeholder="Search country..." class="search-input">
+                                <div class="search-suggestions"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="passport-col-right">
-                    <div id="passport-grid">
-                        <div class="passport-row" id="row-1"></div>
-                        <div class="passport-row" id="row-2"></div>
-                        <div class="passport-row-lower">
-                            <div class="lower-frame">
-                                <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png"></div>
-                                <div class="lower-name"><strong>wait</strong></div>
-                                <div class="lower-rank">wait</div>
-                                <div class="lower-visa">wait</div>
-                                <div class="lower-search">
-                                    <input type="text" placeholder="Search country..." class="search-input">
-                                    <div class="search-suggestions"></div>
-                                </div>
-                            </div>
-                            <div class="lower-frame">
-                                <div class="lower-img"><img src="https://cdn-icons-png.flaticon.com/512/7893/7893979.png"></div>
-                                <div class="lower-name"><strong>wait</strong></div>
-                                <div class="lower-rank">wait</div>
-                                <div class="lower-visa">wait</div>
-                                <div class="lower-search">
-                                    <input type="text" placeholder="Search country..." class="search-input">
-                                    <div class="search-suggestions"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="passport-total">199</div>
-                </div>
+                <div class="passport-total">199</div>
             </div>
         </div>
     </div>
@@ -690,10 +783,11 @@
                     const info = passportInfo[p.name] || {};
                     const div = document.createElement("div");
                     div.className = "passport-item";
-                    div.innerHTML = `<div class="img-box"><img src="${p.image}"></div>
-                                     <div class="p-name">${p.name}</div>
-                                     <div class="p-rank">${info.rank ? getOrdinal(info.rank) : "..."}</div>
-                                     <div class="p-visa">${info.visa || "..."}</div>`;
+                    div.innerHTML = `
+                        <div class="img-box"><img src="${p.image}"></div>
+                        <div class="p-name">${p.name}</div>
+                        <div class="p-rank">${info.rank ? getOrdinal(info.rank) : "..."}</div>
+                        <div class="p-visa">${info.visa || "..."}</div>`;
                     if (i < 5) r1.appendChild(div); else r2.appendChild(div);
                 });
             };
