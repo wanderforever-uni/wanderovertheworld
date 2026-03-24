@@ -353,7 +353,7 @@
 
         .passport-container {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr; /* Tỉ lệ y hệt khung Air */
+            grid-template-columns: max-content 1fr; /* Tỉ lệ y hệt khung Air */
             gap: 1.5vw;
             align-items: stretch; /* Chiều cao 2 bên bằng nhau */
             width: 100%;
@@ -376,7 +376,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 2vw;
+            margin-bottom: 0.8vw;
             align-items: flex-start; /* Ảnh bám sát mép trên của Box */
             margin-top: 0;
         }
@@ -417,6 +417,7 @@
             font-size: 1.1vw;
             font-weight: 500;
             padding: 0 1vw;
+            width: 100%;
         }
 
         /* Khung Phải Passport */
