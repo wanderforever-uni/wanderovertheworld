@@ -353,7 +353,7 @@
 
         .passport-container {
             display: grid;
-            grid-template-columns: max-content 1fr; /* Tỉ lệ y hệt khung Air */
+            grid-template-columns: 30% 1fr; /* Tỉ lệ y hệt khung Air */
             gap: 1.5vw;
             align-items: stretch; /* Chiều cao 2 bên bằng nhau */
             width: 100%;
@@ -367,15 +367,16 @@
             align-items: center;
             justify-content: flex-start;
             margin-top: 0;
+            width: 100%;
         }
 
         .passport-main-image-box {
-            width: 13vw;
+            width: 18vw;
             aspect-ratio: 1040 / 1477; /* Tỉ lệ chuẩn của passport */
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 0.8vw;
+            margin-bottom: 1vw;
             align-items: flex-start; /* Ảnh bám sát mép trên của Box */
             margin-top: 0;
         }
@@ -384,17 +385,18 @@
             max-height: 100%;
             max-width: 100%;
             object-fit: contain;
+            image-rendering: high-quality;
         }
 
         .passport-info-rows {
-            width: 13vw;
+            width: 18vw;
             display: flex;
             flex-direction: column;
             gap: 0.8vw; /* Khoảng cách giữa các dòng */
         }
 
         .pass-row-name {
-            font-size: 1.8vw;
+            font-size: 2vw;
             font-weight: bold;
             text-align: center;
             min-height: auto; /* Phòng hờ 2 dòng nếu tên quá dài 4.5*/
@@ -406,7 +408,7 @@
         }
 
         .pass-row-rank {
-            font-size: 1.4vw;
+            font-size: 1.6vw;
             text-align: center;
             color: #333;
             margin-bottom: 0.5vw;
@@ -417,8 +419,8 @@
             justify-content: space-between;
             align-items: center;
             font-size: 1.1vw;
-            font-weight: 500;
-            padding: 0.4vw 0;
+            font-weight: 600;
+            padding-top: 0.8vw;
             width: 100%;
         }
 
