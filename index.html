@@ -339,7 +339,7 @@
             width: auto;
             overflow: hidden;
             display: block;
-        }
+        }    
 
         .passport-title {
             font-family: 'Satisfy', cursive;
@@ -347,18 +347,17 @@
             text-align: center;
             width: 100%;
             display: block;
-            margin-bottom: 4vw;
+            margin-bottom: 1.5vw;
             color: #000;
         }
 
         .passport-container {
             display: grid;
-            grid-template-columns: 25vw 1fr; /* Tỉ lệ y hệt khung Air */
+            grid-template-columns: 1.2fr 0.8fr; /* Tỉ lệ y hệt khung Air */
             gap: 1.5vw;
             align-items: stretch; /* Chiều cao 2 bên bằng nhau */
             width: 100%;
             box-sizing: border-box;
-            padding: 0 4vw;
         }
 
         /* Khung Trái Passport */
@@ -367,71 +366,62 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            margin-top: 0;
             width: 100%;
         }
 
         .passport-main-image-box {
-            width: 20vw;
+            width: 100%; /* Chiếm hết chiều ngang khung trái (~ khung trái Air) */
             aspect-ratio: 1040 / 1477; /* Tỉ lệ chuẩn của passport */
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 1vw;
-            align-items: flex-start; /* Ảnh bám sát mép trên của Box */
-            margin-top: 0;
+            margin-bottom: 2vw;
         }
 
         .passport-main-image-box img {
-            width: 100%;
-            height: auto;
+            max-height: 100%;
+            max-width: 100%;
             object-fit: contain;
-            image-rendering: high-quality;
         }
 
         .passport-info-rows {
-            width: 20vw;
+            width: 100%;
             display: flex;
             flex-direction: column;
             gap: 0.8vw; /* Khoảng cách giữa các dòng */
         }
 
         .pass-row-name {
-            font-size: 2vw;
+            font-size: 1.8vw;
             font-weight: bold;
             text-align: center;
-            min-height: auto; /* Phòng hờ 2 dòng nếu tên quá dài 4.5*/
+            min-height: 4.5vw; /* Phòng hờ 2 dòng nếu tên quá dài */
             line-height: 1.2;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0.5vw;
         }
 
         .pass-row-rank {
-            font-size: 1.6vw;
+            font-size: 1.4vw;
             text-align: center;
             color: #333;
-            margin-bottom: 0.5vw;
         }
 
         .pass-row-visa {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 1.1vw;
-            font-weight: 600;
-            padding-top: 0.8vw;
-            width: 100%;
+            font-weight: 500;
+            padding: 0 1vw;
         }
 
         /* Khung Phải Passport */
         .passport-frame-right {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             width: 100%;
-        }    
+        }
 
         #passport-grid {
             display: flex;
