@@ -1074,13 +1074,13 @@
                         const matrix = new DOMMatrixReadOnly(style.transform);
                         currentY = matrix.m42;
 
-                        thankTrack.style.transform = "translateY(${currentY}px)";
+                        thankTrack.style.transform = "none";
                         currentY -= e.deltaY * 0.5;
                         thankTrack.style.transform = `translateY(${currentY}px)`;
                     }, { passive: false });
 
                     thankFrame.addEventListener("mouseleave", () => {
-                        if (thankTrack.style.transform = "translateY(${currentY}px)";) {
+                        if (thankTrack.style.transform = "none";) {
                             thankTrack.style.animationPlayState = "running";
                             return;
                         }
