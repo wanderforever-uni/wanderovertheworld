@@ -667,7 +667,7 @@
             to { transform: translateY(-100%); }
         }
         #thank-info-frame:hover #thank-track {
-            animation-play-state: paused; /* Tạm dừng chuyển động tự động */
+            animation-play-state: paused !important; /* Tạm dừng chuyển động tự động */
         }
     </style>
 </head>
@@ -1089,9 +1089,19 @@
 
                     // Khi rời chuột ra, chạy tiếp animation từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        const duration = shuffled.length * 3;
+                        const duration = thankData.length * 3;
                         // Tính toán sơ bộ để animation tiếp tục mượt (hoặc reset đơn giản)
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        thankTrack.style.transform = "none"; // QUAN TRỌNG: Xóa bỏ vị trí thủ công
+                    });
+                    // Thêm sự kiện này ngay trên hoặc dưới sự kiện "wheel"
+                    thankFrame.addEventListener("mouseenter", () => {
+                        const style = window.getComputedStyle(thankTrack);
+                        const matrix = new DOMMatrixReadOnly(style.transform);
+                        currentY = matrix.m42; // Chốt vị trí hiện tại
+
+                        thankTrack.style.animation = "none"; // Tắt animation để đứng yên
+                        thankTrack.style.transform = `translateY(${currentY}px)`; // Giữ vị trí đó
                     });
                 });
         }
