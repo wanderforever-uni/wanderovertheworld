@@ -1073,55 +1073,43 @@
                     thankFrame.addEventListener("wheel", (e) => {
                         e.preventDefault();
 
-                        // Chốt vị trí thực tế khi bắt đầu lăn
                         const style = window.getComputedStyle(thankTrack);
                         const matrix = new DOMMatrixReadOnly(style.transform);
                         currentY = matrix.m42;
 
-                        // Tắt animation để điều khiển bằng tay
                         thankTrack.style.animation = "none";
-                
-                        // Cập nhật vị trí theo con lăn
                         currentY -= e.deltaY * 0.5;
                         thankTrack.style.transform = `translateY(${currentY}px)`;
                     }, { passive: false });
 
                     thankFrame.addEventListener("mouseleave", () => {
-                        // Nếu chỉ hover mà không lăn chuột, cho chạy tiếp bình thường
                         if (thankTrack.style.animation !== "none") {
                             thankTrack.style.animationPlayState = "running";
                             return;
                         }
 
-                        // NẾU ĐÃ LĂN CHUỘT: Cần tạo một Keyframe động để trôi tiếp từ currentY
                         const style = window.getComputedStyle(thankTrack);
                         const matrix = new DOMMatrixReadOnly(style.transform);
-                        const finalY = matrix.m42; // Vị trí cuối cùng sau khi lăn
-
-                        // Tạo tên animation duy nhất để ép trình duyệt nhận diện mới
+                        const finalY = matrix.m42; 
+                        
                         const dynamicAnimName = `scroll-continue-${Date.now()}`;
-                
-                        // Tạo style element để chèn keyframe mới: từ vị trí hiện tại trôi lên trên
-                        const styleSheet = document.createElement("style");
-                        styleSheet.innerHTML = `
-                            @keyframes ${dynamicAnimName} {
+                        const styleEl = document.createElement("style");
+                        styleEl.innerHTML = `
+                            @keyframes ${dynamicName} {
                                 from { transform: translateY(${finalY}px); }
                                 to { transform: translateY(-100%); }
                             }
                         `;
-                        document.head.appendChild(styleSheet);
+                        document.head.appendChild(styleEl);
 
-                        // Tính toán thời gian còn lại dựa trên quãng đường còn lại để tốc độ không bị thay đổi
-                        const totalDist = thankTrack.offsetHeight + finalY;
-                        const baseDuration = (thankData.length * 3) * (totalDist / (thankTrack.offsetHeight + thankFrame.offsetHeight));
+                        thankTrack.style.transform = "none";
 
-                        thankTrack.style.animation = `${dynamicAnimName} ${Math.max(baseDuration, 2)}s linear forwards`;
-                
-                        // Khi chạy xong animation "tiếp nối" này, trả lại animation gốc tuần hoàn
-                        thankTrack.onanimationend = () => {
-                            styleSheet.remove(); // Dọn dẹp
-                            renderScroll(); 
-                        };
+                        void thankTrack.offsetWidth;
+
+                        const duration = thankData.length * 3;
+                        thankTrack.style.animation = `${dynamicName} ${duration}s linear infinite`;
+                        
+                        thankTrack.onanimationiteration = () => styleEl.remove();
                     });
                 });
         }
