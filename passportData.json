@@ -140,5 +140,16 @@
   "PHILIPPINES": { "rank": "68", "visa": "65" },
   "POLAND": { "rank": "6", "visa": "183" },
   "PORTUGAL": { "rank": "5", "visa": "184" },
-  "QATAR": { "rank": "45", "visa": "111" }
+  "QATAR": { "rank": "45", "visa": "111" },
+  "ROMANIA": { "rank": "11", "visa": "177" },
+  "RUSSIAN FEDERATION": { "rank": "44", "visa": "113" },
+  "RWANDA": { "rank": "67", "visa": "66" },
+  "SAMOA": { "rank": "35", "visa": "129" },
+  "SAN MARINO": { "rank": "16", "visa": "166" },
+  "SAUDI ARABIA": { "rank": "51", "visa": "87" },
+  "SENEGAL": { "rank": "76", "visa": "56" },
+  "SERBIA": { "rank": "30", "visa": "135" },
+  "SEYCHELLES": { "rank": "22", "visa": "154" },
+  "SIERRA LEONE": { "rank": "71", "visa": "62" },
+  "SINGAPORE": { "rank": "1", "visa": "192" }
 }
