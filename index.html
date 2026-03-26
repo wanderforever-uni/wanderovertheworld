@@ -638,6 +638,9 @@
             width: 100%;
             display: flex;
             flex-direction: column;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         .thank-row {
@@ -1050,7 +1053,10 @@
                         // Ngẫu nhiên hóa thứ tự
                         let shuffled = shuffleArray(thankData);
                 
-                        shuffled.forEach(item => {
+                        // TẠO DANH SÁCH NHÂN ĐÔI (A + A)
+                        const doubleList = [...shuffled, ...shuffled];
+
+                        doubleList.forEach(item => {
                             const row = document.createElement("div");
                             row.className = "thank-row";
                             row.innerHTML = `
@@ -1060,8 +1066,9 @@
                             thankTrack.appendChild(row);
                         });
 
-                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+    // Thời gian chạy dựa trên số lượng item GỐC (không phải double)
+    const duration = shuffled.length * 3; 
+    thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
                     renderScroll();
