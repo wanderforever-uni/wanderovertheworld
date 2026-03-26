@@ -1070,6 +1070,7 @@
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
+                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
                         thankTrack.style.animationPlayState = "running";
                     });
 
