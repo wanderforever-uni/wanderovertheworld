@@ -666,6 +666,11 @@
             from { transform: translateY(30vw); }
             to { transform: translateY(-100%); }
         }
+
+        #thank-info-frame:hover .thank-scroll-track {
+            animation-play-state: paused;
+            cursor: pointer; /* Thêm con trỏ để người dùng biết có thể tương tác */
+        }
     </style>
 </head>
 
@@ -1029,6 +1034,7 @@
         });
         /* --- 6. THANKFULNESS LOGIC --- */
         const thankTrack = document.getElementById("thank-track");
+        const thankFrame = document.getElementById("thank-info-frame");
 
         function loadThankfulness() {
             fetch("thankfulness.json")
@@ -1063,6 +1069,22 @@
                     // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
                     thankTrack.addEventListener('animationiteration', () => {
                         renderScroll();
+
+                        // --- ĐẶT ĐOẠN MÃ CỦA BẠN TẠI ĐÂY ---
+                    thankFrame.addEventListener("mouseenter", () => {
+                        thankTrack.style.animationPlayState = "paused";
+                    });
+
+                    thankFrame.addEventListener("mouseleave", () => {
+                        thankTrack.style.animationPlayState = "running";
+                    });
+                    // ----------------------------------
+
+                    thankTrack.addEventListener('animationiteration', () => {
+                        // Tối ưu: Chỉ xáo trộn nếu chuột không ở trong khung
+                        if (thankTrack.style.animationPlayState !== "paused") {
+                            renderScroll();
+                        }
                     });
                 });
         }
