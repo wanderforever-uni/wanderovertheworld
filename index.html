@@ -669,12 +669,8 @@
 
         /* Animation cuộn từ dưới lên */
         @keyframes scroll-up {
-            0% {
-                transform: translateY(0); /* Dòng đầu tiên nằm ngay vị trí bắt đầu */
-            }
-            100% {
-                transform: translateY(-50%); /* Chạy đến một nửa danh sách đã nhân đôi */
-            }
+            from { transform: translateY(30vw); } /* Luôn bắt đầu từ đáy khung */
+            to { transform: translateY(-100%); }   /* Chạy đến khi dòng cuối cùng biến mất khỏi đỉnh */
         }
         #thank-info-frame:hover .thank-scroll-track {
             animation-play-state: paused !important;
@@ -1054,13 +1050,12 @@
 
                     const renderScroll = () => {
                         thankTrack.innerHTML = "";
+                        thankTrack.style.animation = 'none';
+                        void thankTrack.offsetWidth;
                         // Ngẫu nhiên hóa thứ tự
                         let shuffled = shuffleArray(thankData);
                 
-                        // TẠO DANH SÁCH NHÂN ĐÔI (A + A)
-                        const doubleList = [...shuffled, ...shuffled];
-
-                        doubleList.forEach(item => {
+                        shuffled.forEach(item => {
                             const row = document.createElement("div");
                             row.className = "thank-row";
                             row.innerHTML = `
@@ -1070,9 +1065,12 @@
                             thankTrack.appendChild(row);
                         });
 
-    // Thời gian chạy dựa trên số lượng item GỐC (không phải double)
-    const duration = shuffled.length * 3; 
-    thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        // Thời gian chạy dựa trên số lượng item GỐC (không phải double)
+                        const duration = shuffled.length * 3; 
+                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        thankTrack.onanimationend = () => {
+                            startNewThankfulSet(); 
+                        };
                     };
 
                     renderScroll();
