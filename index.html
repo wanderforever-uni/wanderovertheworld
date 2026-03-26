@@ -1098,17 +1098,15 @@
 
                     // Khi rời chuột ra, chạy tiếp animation từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        // 1. Kiểm tra nếu animation đang bị dừng (do mouseenter) thì cho chạy lại
-                        thankTrack.style.animationPlayState = "running";
-                        // Nếu bạn ĐÃ lăn chuột (tức là animation đã bị set thành "none")
-                        if (thankTrack.style.animation === "none") {
-                            const duration = thankData.length * 3;
-                            thankTrack.style.transform = "none"; 
-                            thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                        } else {
-                            // Nếu CHỈ lia chuột vào rồi ra (chưa lăn), thì chỉ cần resume
+                        if (thankTrack.style.animation !== "none") {
                             thankTrack.style.animationPlayState = "running";
+                            return;
                         }
+
+                        const duration = thankData.length * 3;
+                        thankTrack.style.transform = "none";
+                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        thankTrack.style.animationPlayState = "running";
                     });
                 });
         }
