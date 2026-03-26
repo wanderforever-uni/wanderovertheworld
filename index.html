@@ -669,8 +669,12 @@
 
         /* Animation cuộn từ dưới lên */
         @keyframes scroll-up {
-            from { transform: translateY(30vw); }
-            to { transform: translateY(-100%); }
+            0% {
+                transform: translateY(0); /* Dòng đầu tiên nằm ngay vị trí bắt đầu */
+            }
+            100% {
+                transform: translateY(-50%); /* Chạy đến một nửa danh sách đã nhân đôi */
+            }
         }
         #thank-info-frame:hover .thank-scroll-track {
             animation-play-state: paused !important;
