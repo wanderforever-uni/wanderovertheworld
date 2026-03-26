@@ -151,5 +151,24 @@
   { "name": "SERBIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/RS.png" },
   { "name": "SEYCHELLES", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SC.png" },
   { "name": "SIERRA LEONE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SL.png" },
-  { "name": "SINGAPORE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" }
+  { "name": "SINGAPORE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" },
+  { "name": "SLOVAKIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SK.png" },
+  { "name": "SLOVENIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SI.png" },
+  { "name": "SOLOMON ISLANDS", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SB.png" },
+  { "name": "SOMALIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SO.png" },
+  { "name": "SOUTH AFRICA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/ZA.png" },
+  { "name": "SOUTH KOREA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/KR.png" },
+  { "name": "SOUTH SUDAN", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SS.png" },
+  { "name": "SPAIN", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/ES.png" },
+  { "name": "SRI LANKA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/LK.png" },
+  { "name": "ST. KITTS AND NEVIS", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/KN.png" },
+  { "name": "ST. LUCIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/LC.png" },
+  { "name": "ST. VINCENT AND THE GRENADINES", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/VC.png" },
+  { "name": "SUDAN", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SD.png" },
+  { "name": "SURINAME", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SR.png" },
+  { "name": "SWEDEN", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SE.png" },
+  { "name": "SWITZERLAND", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/CH.png" },
+  { "name": "SYRIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SY.png" },
+  { "name": "SÃO TOMÉ AND PRÍNCIPE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/ST.png" }
+]
 ]
