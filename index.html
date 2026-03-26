@@ -10,8 +10,8 @@
     <style>
         /* --- 1. GENERAL STYLES --- */
         @font-face {
-            font-family: 'Super Adorable';
-            src: url('https://db.onlinewebfonts.com/t/79495679900890696788226066223594.woff2') format('woff2');
+            font-family: 'Typographica';
+            src: url('https://db.onlinewebfonts.com/t/24f513903f6f16428807d8534571c667.woff2') format('woff2');
             font-display: swap;
         }
 
@@ -333,7 +333,7 @@
             position: relative;
             margin-left: 3.8vw;   /* Đồng bộ với Air */
             margin-right: 3.8vw;
-            margin-top: 5vw;      /* Khoảng cách giữa 2 section lớn */
+            margin-top: 8vw;      /* Khoảng cách giữa 2 section lớn */
             margin-bottom: 5vw;
             padding: 0.26vw;
             width: auto;
@@ -481,6 +481,7 @@
         /* Khung tìm kiếm (Search Section) */
         .passport-search-area {
             margin-top: 1vw;
+            margin-bottom: 2vw;
             display: flex;
             flex-direction: column;
             gap: 1.5vw;
@@ -504,9 +505,9 @@
         }
 
         .lower-frame .p-name {
-            font-size: 1.1vw;
+            font-size: 0.55vw;
             font-weight: bold;
-            min-height: 2.8vw;
+            min-height: 1.5vw;
             margin-bottom: 0.3vw;
             display: flex;
             align-items: center;
@@ -517,9 +518,9 @@
 
         .lower-frame .p-rank, 
         .lower-frame .p-visa {
-            font-size: 0.8vw; 
+            font-size: 0.45vw; 
             opacity: 0.9;
-            min-height: 1.2vw; 
+            min-height: 1.1vw; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -529,14 +530,17 @@
         .lower-img {
             height: 7vw; /* Bằng khoảng 1/2 ô nhỏ ở trên */
             aspect-ratio: 1040 / 1477;
-            margin-bottom: 0.8vw;
+            margin-bottom: 0.5vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .lower-img img { height: 100%; object-fit: contain; }
 
         .lower-search {
             margin-top: 1vw;
-            width: 15vw;
+            width: 10vw;
             position: relative;
             display: flex;
             justify-content: center;
@@ -544,9 +548,9 @@
 
         .search-input {
             width: 100%;
-            height: 2.2vw;
+            height: 2vw;
             padding: 0.4vw 0.4vw; /* Thêm padding trái/phải để chữ không sát viền */
-            font-size: 0.8vw;
+            font-size: 0.5vw;
             border: 1px solid #ccc;
             box-sizing: border-box;
             text-align: center;
@@ -568,8 +572,8 @@
         }
 
         .search-suggestions div {
-            padding: 0.3vw;
-            font-size: 0.7vw;
+            padding: 0.25vw;
+            font-size: 0.45vw;
             cursor: pointer;
             text-align: left;
         }
@@ -578,14 +582,89 @@
             background-color: #f0f0f0;
         }
 
+        /* Màu nền khi dùng phím mũi tên di chuyển qua các đề xuất */
+        .search-suggestions div.active {
+            background-color: #e0e0e0 !important;
+            font-weight: bold;
+            color: #000;
+        }
+
         /* Con số 199 cuối cùng */
         .passport-total {
-            margin-top: 1vw;
-            opacity: 0.5;
-            font-family: 'Super Adorable', cursive;
-            font-size: 8.5vw; /* Rất lớn và nổi bật */
+            margin-top: 2vw;
+            opacity: 1;
+            font-family: 'Typographica', sans-serif;
+            font-size: 8vw; /* Rất lớn và nổi bật */
             text-align: center;
-            color: #2D1B33; /* Tím đen */
+            color: #7B1B38; /* Tím đen - đỏ bordeaux */
+        }
+
+        /* --- 6. THANKFULNESS SECTION --- */
+        #thankfulness-section {
+            position: relative;
+            margin-left: 3.8vw;
+            margin-right: 3.8vw;
+            margin-top: 5vw;
+            margin-bottom: 5vw;
+            display: block;
+            overflow: hidden;
+         }
+
+        .thank-title {
+            font-family: 'Satisfy', cursive;
+            font-size: 3.9vw; /* Cùng kích thước với .air-title */
+            text-align: center;
+            width: 100%;
+            display: block;
+            margin-bottom: 2vw; /* Khoảng cách hợp lý xuống khung thông tin */
+            color: #000;
+        }
+
+        #thank-info-frame {
+            width: 80%; /* Chiều rộng hẹp hơn khung Thankfulness để luôn nằm giữa */
+            margin: 0 auto;
+            position: relative;
+            height: 30vw; /* Giới hạn hiển thị khoảng 11 dòng, bạn có thể điều chỉnh theo nội dung */
+            overflow: hidden; /* Để ẩn các dòng ngoài khung */
+            -webkit-mask-image: linear-gradient(transparent, black 15%, black 85%, transparent);
+            mask-image: linear-gradient(transparent, black 15%, black 85%, transparent);
+        }
+
+        .thank-scroll-track {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .thank-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 0.8vw; /* Khoảng cách giữa các dòng */
+            font-size: 1vw;
+            line-height: 1.4;
+            align-items: flex-start;
+        }
+
+        .thank-part-1 {
+            flex: 0 0 10%; /* Tỉ lệ 1/10 */
+            font-weight: bold;
+            text-align: right;
+            padding-right: 1.5vw;
+            box-sizing: border-box;
+        }
+
+        .thank-part-2 {
+            flex: 0 0 90%; /* Tỉ lệ 9/10 */
+            text-align: left;
+            word-break: break-all; /* Tránh text quá dài làm vỡ khung */
+            opacity: 0.8;
+        }
+
+        /* Animation cuộn từ dưới lên */
+        @keyframes scroll-up {
+            from { transform: translateY(30vw); }
+            to { transform: translateY(-100%); }
         }
     </style>
 </head>
@@ -692,7 +771,14 @@
             </div>
         </div>
     </div>
-
+    <div id="thankfulness-section">
+        <h2 class="thank-title">thankfulness</h2>
+        <div id="thank-info-frame">
+            <div id="thank-track" class="thank-scroll-track">
+                </div>
+        </div>
+    </div>
+    
     <div id="time-wrapper">
         <div class="time-box" id="date-box"></div>
         <div class="time-box" id="clock-box"></div>
@@ -867,14 +953,18 @@
                 render();
             }, 20000);
 
-            // Search Logic
+            // Search Logic (Updated với phím mũi tên và Enter)
             document.querySelectorAll(".lower-frame").forEach(frame => {
                 const input = frame.querySelector(".search-input");
                 const sugg = frame.querySelector(".search-suggestions");
+                let currentFocus = -1; // Biến theo dõi dòng đang chọn cho riêng từng khung
+
                 input.addEventListener("input", () => {
                     const val = input.value.toLowerCase();
                     const matches = passports.filter(p => p.name.toLowerCase().includes(val));
                     sugg.innerHTML = "";
+                    currentFocus = -1; // Reset vị trí chọn khi gõ chữ mới
+
                     if (val && matches.length) {
                         matches.forEach(m => {
                             const d = document.createElement("div");
@@ -891,12 +981,96 @@
                             sugg.appendChild(d);
                         });
                         sugg.style.display = "block";
-                    } else sugg.style.display = "none";
+                    } else {
+                        sugg.style.display = "none";
+                    }
+                });
+
+                // Xử lý sự kiện bàn phím
+                input.addEventListener("keydown", function(e) {
+                    let x = sugg.getElementsByTagName("div");
+                    if (e.key === "ArrowDown") {
+                        currentFocus++;
+                        addActive(x);
+                    } else if (e.key === "ArrowUp") {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+
+                function addActive(x) {
+                    if (!x || x.length === 0) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = x.length - 1;
+                    x[currentFocus].classList.add("active");
+                    // Đảm bảo dòng được chọn luôn hiển thị trong khung cuộn
+                    x[currentFocus].scrollIntoView({ block: "nearest" });
+                }
+
+                function removeActive(x) {
+                    for (let i = 0; i < x.length; i++) {
+                        x[i].classList.remove("active");
+                    }
+                }
+
+                // Ẩn danh sách khi nhấp chuột ra ngoài
+                document.addEventListener("click", function (e) {
+                    if (e.target !== input && e.target !== sugg) {
+                        sugg.style.display = "none";
+                    }
                 });
             });
         });
+        /* --- 6. THANKFULNESS LOGIC --- */
+        const thankTrack = document.getElementById("thank-track");
+
+        function loadThankfulness() {
+            fetch("thankfulness.json")
+                .then(response => response.json())
+                .then(data => {
+                    let thankData = data;
+
+                    const renderScroll = () => {
+                        thankTrack.innerHTML = "";
+                        // Ngẫu nhiên hóa thứ tự
+                        let shuffled = shuffleArray(thankData);
+                
+                        shuffled.forEach(item => {
+                            const row = document.createElement("div");
+                            row.className = "thank-row";
+                            row.innerHTML = `
+                                <div class="thank-part-1">${item[0]}</div>
+                                <div class="thank-part-2">${item[1]}</div>
+                            `;
+                            thankTrack.appendChild(row);
+                        });
+
+                        // Tính toán thời gian animation dựa trên số lượng dòng (mỗi dòng di chuyển qua khung mất 10s)
+                        // Tuy nhiên theo yêu cầu "mỗi dòng di chuyển hết khung là 10s" 
+                        // Ta áp dụng animation cho cả track:
+                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
+                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                    };
+
+                    renderScroll();
+
+                    // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
+                    thankTrack.addEventListener('animationiteration', () => {
+                        renderScroll();
+                    });
+                });
+        }
+
+        loadThankfulness();
     </script>
 </body>
 </html>
+
 
 
