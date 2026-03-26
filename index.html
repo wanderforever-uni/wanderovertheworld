@@ -1032,36 +1032,45 @@
             fetch("thankfulness.json")
                 .then(response => response.json())
                 .then(data => {
-                    let thankData = data;
-
-                    const renderScroll = () => {
+                    const renderScroll = (items) => {
                         thankTrack.innerHTML = "";
-                        // Ngẫu nhiên hóa thứ tự
-                        let shuffled = shuffleArray(thankData);
                 
-                        shuffled.forEach(item => {
+                        // Nhân đôi mảng để tạo hiệu ứng cuộn vô tận không vết cắt
+                        const doubledItems = [...items, ...items];
+
+                        doubledItems.forEach(item => {
                             const row = document.createElement("div");
                             row.className = "thank-row";
+                    
+                            // Xử lý hiển thị link: Rút gọn link Unsplash/Logo thành tên miền để đẹp hơn
+                            let displayValue = item[1];
+                            try {
+                                if (item[1].startsWith('http')) {
+                                    const url = new URL(item[1]);
+                                    // Ví dụ: "unsplash.com" hoặc "logo.wine"
+                                    displayValue = url.hostname.replace('www.', ''); 
+                                }
+                            } catch(e) { /* Nếu không phải URL thì giữ nguyên */ }
+
                             row.innerHTML = `
                                 <div class="thank-part-1">${item[0]}</div>
-                                <div class="thank-part-2">${item[1]}</div>
+                                <div class="thank-part-2">${displayValue}</div>
                             `;
                             thankTrack.appendChild(row);
                         });
 
-                        // Tính toán thời gian animation dựa trên số lượng dòng (mỗi dòng di chuyển qua khung mất 10s)
-                        // Tuy nhiên theo yêu cầu "mỗi dòng di chuyển hết khung là 10s" 
-                        // Ta áp dụng animation cho cả track:
-                        const duration = 150; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
+                        // Tính toán thời gian cuộn dựa trên số lượng item gốc
+                        // Cứ 1 item cho khoảng 2.5 giây để tốc độ vừa phải, dễ đọc
+                        const duration = items.length * 2.5;
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
-                    renderScroll();
+                    // Khởi chạy với danh sách đã xáo trộn
+                    renderScroll(shuffleArray(data));
 
-                    // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
-                    thankTrack.addEventListener('animationiteration', () => {
-                        renderScroll();
-                    });
+                    // Khi di chuột vào thì dừng lại để xem link/nguồn
+                    thankTrack.addEventListener('mouseenter', () => thankTrack.style.animationPlayState = 'paused');
+                    thankTrack.addEventListener('mouseleave', () => thankTrack.style.animationPlayState = 'running');
                 });
         }
 
