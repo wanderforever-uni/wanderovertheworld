@@ -1093,7 +1093,10 @@
                         const finalY = matrix.m42;
                         
                         const dynamicAnimName = `scroll-continue-${Date.now()}`;
+                        const duration = thankData.length * 3;
+                        
                         const styleEl = document.createElement("style");
+                        styleEl.id = "dynamic-style";
                         styleEl.innerHTML = `
                             @keyframes ${dynamicAnimName} {
                                 from { transform: translateY(${finalY}px); }
@@ -1106,12 +1109,12 @@
 
                         void thankTrack.offsetWidth;
 
-                        const duration = thankData.length * 3; 
                         thankTrack.style.animation = `${dynamicAnimName} ${duration}s linear`;
                         
                         thankTrack.onanimationend = () => {
-                            styleEl.remove();
                             thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                            styleEl.remove();
+                            thankTrack.onanimationend = null;
                         };
                     });
                 });
