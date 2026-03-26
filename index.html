@@ -1042,9 +1042,7 @@
 
                     const renderScroll = () => {
                         thankTrack.innerHTML = "";
-                        // Ngẫu nhiên hóa thứ tự
                         let shuffled = shuffleArray(thankData);
-                
                         shuffled.forEach(item => {
                             const row = document.createElement("div");
                             row.className = "thank-row";
@@ -1055,58 +1053,75 @@
                             thankTrack.appendChild(row);
                         });
 
-                        // Tính toán thời gian animation dựa trên số lượng dòng (mỗi dòng di chuyển qua khung mất 10s)
-                        // Tuy nhiên theo yêu cầu "mỗi dòng di chuyển hết khung là 10s" 
-                        // Ta áp dụng animation cho cả track:
-                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
+                        const duration = shuffled.length * 3;
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
                     renderScroll();
 
-                    // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
                     thankTrack.addEventListener('animationiteration', () => {
                         renderScroll();
                     });
+
                     // --- TÍNH NĂNG LĂN CHUỘT (WHEEL) ---
                     let currentY = 0;
 
-                    // 1. Khi chuột vào: Chỉ tạm dừng, không tắt animation
                     thankFrame.addEventListener("mouseenter", () => {
                         thankTrack.style.animationPlayState = "paused";
                     });
 
                     thankFrame.addEventListener("wheel", (e) => {
-                        e.preventDefault(); // Ngăn cuộn trang chính
+                        e.preventDefault();
 
-                    // Nếu đang có animation, ta phải chốt vị trí hiện tại và tắt nó đi để tự lăn
-                    if (thankTrack.style.animation !== "none") {
-                        // Lấy vị trí hiện tại của track khi bắt đầu lăn
+                        // Chốt vị trí thực tế khi bắt đầu lăn
                         const style = window.getComputedStyle(thankTrack);
                         const matrix = new DOMMatrixReadOnly(style.transform);
                         currentY = matrix.m42;
+
+                        // Tắt animation để điều khiển bằng tay
                         thankTrack.style.animation = "none";
-                    }
-
-                    // Tăng/giảm vị trí dựa trên con lăn (tốc độ 0.5 để mượt hơn)
-                    currentY -= e.deltaY * 0.5;
-
-                    // Tạm dừng animation và áp dụng vị trí thủ công
-                    currentY -= e.deltaY * 0.5;
-                    thankTrack.style.transform = `translateY(${currentY}px)`;
+                
+                        // Cập nhật vị trí theo con lăn
+                        currentY -= e.deltaY * 0.5;
+                        thankTrack.style.transform = `translateY(${currentY}px)`;
                     }, { passive: false });
 
-                    // Khi rời chuột ra, chạy tiếp animation từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
+                        // Nếu chỉ hover mà không lăn chuột, cho chạy tiếp bình thường
                         if (thankTrack.style.animation !== "none") {
                             thankTrack.style.animationPlayState = "running";
                             return;
                         }
 
-                        const duration = thankData.length * 3;
-                        thankTrack.style.transform = "none";
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                        thankTrack.style.animationPlayState = "running";
+                        // NẾU ĐÃ LĂN CHUỘT: Cần tạo một Keyframe động để trôi tiếp từ currentY
+                        const style = window.getComputedStyle(thankTrack);
+                        const matrix = new DOMMatrixReadOnly(style.transform);
+                        const finalY = matrix.m42; // Vị trí cuối cùng sau khi lăn
+
+                        // Tạo tên animation duy nhất để ép trình duyệt nhận diện mới
+                        const dynamicAnimName = `scroll-continue-${Date.now()}`;
+                
+                        // Tạo style element để chèn keyframe mới: từ vị trí hiện tại trôi lên trên
+                        const styleSheet = document.createElement("style");
+                        styleSheet.innerHTML = `
+                            @keyframes ${dynamicAnimName} {
+                                from { transform: translateY(${finalY}px); }
+                                to { transform: translateY(-100%); }
+                            }
+                        `;
+                        document.head.appendChild(styleSheet);
+
+                        // Tính toán thời gian còn lại dựa trên quãng đường còn lại để tốc độ không bị thay đổi
+                        const totalDist = thankTrack.offsetHeight + finalY;
+                        const baseDuration = (thankData.length * 3) * (totalDist / (thankTrack.offsetHeight + thankFrame.offsetHeight));
+
+                        thankTrack.style.animation = `${dynamicAnimName} ${Math.max(baseDuration, 2)}s linear forwards`;
+                
+                        // Khi chạy xong animation "tiếp nối" này, trả lại animation gốc tuần hoàn
+                        thankTrack.onanimationend = () => {
+                            styleSheet.remove(); // Dọn dẹp
+                            renderScroll(); 
+                        };
                     });
                 });
         }
