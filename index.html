@@ -663,7 +663,7 @@
 
         /* Animation cuộn từ dưới lên */
         @keyframes scroll-up {
-            from { transform: translateY(100%); }
+            from { transform: translateY(30vw); }
             to { transform: translateY(-100%); }
         }
     </style>
@@ -1054,7 +1054,7 @@
                         // Tính toán thời gian animation dựa trên số lượng dòng (mỗi dòng di chuyển qua khung mất 10s)
                         // Tuy nhiên theo yêu cầu "mỗi dòng di chuyển hết khung là 10s" 
                         // Ta áp dụng animation cho cả track:
-                        const duration = 150; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
+                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
