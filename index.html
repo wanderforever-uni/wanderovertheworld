@@ -1071,37 +1071,45 @@
                     // --- TÍNH NĂNG LĂN CHUỘT (WHEEL) ---
                     let currentY = 0;
 
+                    // 1. Khi chuột vào: Chỉ tạm dừng, không tắt animation
+                    thankFrame.addEventListener("mouseenter", () => {
+                        thankTrack.style.animationPlayState = "paused";
+                    });
+
                     thankFrame.addEventListener("wheel", (e) => {
                         e.preventDefault(); // Ngăn cuộn trang chính
 
+                    // Nếu đang có animation, ta phải chốt vị trí hiện tại và tắt nó đi để tự lăn
+                    if (thankTrack.style.animation !== "none") {
                         // Lấy vị trí hiện tại của track khi bắt đầu lăn
                         const style = window.getComputedStyle(thankTrack);
                         const matrix = new DOMMatrixReadOnly(style.transform);
-                        currentY = matrix.m42; 
+                        currentY = matrix.m42;
+                        thankTrack.style.animation = "none";
+                    }
 
-                        // Tăng/giảm vị trí dựa trên con lăn (tốc độ 0.5 để mượt hơn)
-                        currentY -= e.deltaY * 0.5;
+                    // Tăng/giảm vị trí dựa trên con lăn (tốc độ 0.5 để mượt hơn)
+                    currentY -= e.deltaY * 0.5;
 
-                        // Tạm dừng animation và áp dụng vị trí thủ công
-                        thankTrack.style.animation = "none"; 
-                        thankTrack.style.transform = `translateY(${currentY}px)`;
+                    // Tạm dừng animation và áp dụng vị trí thủ công
+                    currentY -= e.deltaY * 0.5;
+                    thankTrack.style.transform = `translateY(${currentY}px)`;
                     }, { passive: false });
 
                     // Khi rời chuột ra, chạy tiếp animation từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        const duration = thankData.length * 3;
-                        // Tính toán sơ bộ để animation tiếp tục mượt (hoặc reset đơn giản)
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                        thankTrack.style.transform = "none"; // QUAN TRỌNG: Xóa bỏ vị trí thủ công
-                    });
-                    // Thêm sự kiện này ngay trên hoặc dưới sự kiện "wheel"
-                    thankFrame.addEventListener("mouseenter", () => {
-                        const style = window.getComputedStyle(thankTrack);
-                        const matrix = new DOMMatrixReadOnly(style.transform);
-                        currentY = matrix.m42; // Chốt vị trí hiện tại
-
-                        thankTrack.style.animation = "none"; // Tắt animation để đứng yên
-                        thankTrack.style.transform = `translateY(${currentY}px)`; // Giữ vị trí đó
+                        // Nếu bạn ĐÃ lăn chuột (tức là animation đã bị set thành "none")
+                        if (thankTrack.style.animation === "none") {
+                            // Ta không gán lại renderScroll (vì sẽ bị nhảy về đầu)
+                            // Mà ta để animation chạy tiếp từ vị trí hiện tại bằng cách gán lại keyframe động (phức tạp)
+                            // HOẶC đơn giản nhất: Reset lại để nó trôi từ dưới lên cho đồng bộ:
+                            const duration = thankData.length * 3;
+                            thankTrack.style.transform = "none"; 
+                            thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        } else {
+                            // Nếu CHỈ lia chuột vào rồi ra (chưa lăn), thì chỉ cần resume
+                            thankTrack.style.animationPlayState = "running";
+                        }
                     });
                 });
         }
