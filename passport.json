@@ -140,5 +140,16 @@
   { "name": "PHILIPPINES", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/PH.png" },
   { "name": "POLAND", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/PL.png" },
   { "name": "PORTUGAL", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/PT.png" },
-  { "name": "QATAR", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/QA.png" }
+  { "name": "QATAR", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/QA.png" },
+  { "name": "ROMANIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/RO.png" },
+  { "name": "RUSSIAN FEDERATION", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/RU.png" },
+  { "name": "RWANDA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/RW.png" },
+  { "name": "SAMOA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/WS.png" },
+  { "name": "SAN MARINO", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SM.png" },
+  { "name": "SAUDI ARABIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SA.png" },
+  { "name": "SENEGAL", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SN.png" },
+  { "name": "SERBIA", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/RS.png" },
+  { "name": "SEYCHELLES", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SC.png" },
+  { "name": "SIERRA LEONE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SL.png" },
+  { "name": "SINGAPORE", "image": "https://cdn.henleyglobal.com/themes/hgo/public/assets/img/passports/SG.png" }
 ]
