@@ -638,9 +638,6 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
         }
 
         .thank-row {
@@ -669,8 +666,8 @@
 
         /* Animation cuộn từ dưới lên */
         @keyframes scroll-up {
-            from { transform: translateY(30vw); } /* Luôn bắt đầu từ đáy khung */
-            to { transform: translateY(-100%); }   /* Chạy đến khi dòng cuối cùng biến mất khỏi đỉnh */
+            from { transform: translateY(30vw); }
+            to { transform: translateY(-100%); }
         }
         #thank-info-frame:hover .thank-scroll-track {
             animation-play-state: paused !important;
@@ -1050,8 +1047,6 @@
 
                     const renderScroll = () => {
                         thankTrack.innerHTML = "";
-                        thankTrack.style.animation = 'none';
-                        void thankTrack.offsetWidth;
                         // Ngẫu nhiên hóa thứ tự
                         let shuffled = shuffleArray(thankData);
                 
@@ -1065,12 +1060,8 @@
                             thankTrack.appendChild(row);
                         });
 
-                        // Thời gian chạy dựa trên số lượng item GỐC (không phải double)
-                        const duration = shuffled.length * 3; 
+                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                        thankTrack.onanimationend = () => {
-                            startNewThankfulSet(); 
-                        };
                     };
 
                     renderScroll();
@@ -1096,6 +1087,7 @@
     </script>
 </body>
 </html>
+
 
 
 
