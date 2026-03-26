@@ -942,7 +942,8 @@
                 const r1 = document.getElementById("row-1"), r2 = document.getElementById("row-2");
                 r1.innerHTML = ""; r2.innerHTML = "";
                 cycles[currentRound].forEach((p, i) => {
-                    const info = passportInfo[p.name] || {};
+                    const countryKey = p.name.normalize("NFC").toUpperCase().trim();
+                    const info = passportInfo[countryKey] || {};
                     const div = document.createElement("div");
                     div.className = "passport-item";
                     div.innerHTML = `
@@ -980,7 +981,8 @@
                             d.onclick = () => {
                                 input.value = m.name;
                                 sugg.style.display = "none";
-                                const info = passportInfo[m.name];
+                                const countryKey = m.name.normalize("NFC").toUpperCase().trim();
+                                const info = passportInfo[countryKey];
                                 frame.querySelector(".lower-img img").src = m.image;
                                 frame.querySelector(".p-name").textContent = m.name;
                                 frame.querySelector(".p-rank").textContent = info ? getOrdinal(info.rank) : "wait";
