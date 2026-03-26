@@ -1090,13 +1090,12 @@
                         const finalY = matrix.m42;
                         
                         const dynamicAnimName = `scroll-continue-${Date.now()}`;
-                        const duration = thankData.length * 3;
                         
                         const styleEl = document.createElement("style");
                         styleEl.id = "dynamic-style";
                         styleEl.innerHTML = `
                             @keyframes ${dynamicAnimName} {
-                                from { transform: translateY(${finalY}px); }
+                                from { transform: translateY(${currentY}px); }
                                 to { transform: translateY(-100%); }
                             }
                         `;
@@ -1104,14 +1103,16 @@
 
                         thankTrack.style.transform = "none";
 
-                        void thankTrack.offsetWidth;
-
-                        thankTrack.style.animation = `${dynamicAnimName} ${duration}s linear`;
+                        const duration = thankData.length * 3;
+                        thankTrack.style.animation = `${dynamicName} ${duration}s linear forwards`;
                         
-                        thankTrack.onanimationend = () => {
-                            thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                            styleEl.remove();
-                            thankTrack.onanimationend = null;
+                        thankTrack.onanimationend = (e) => {
+                            if (e.animationName === dynamicName) {
+                                // Trở về trạng thái ban đầu của bạn
+                                thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                                styleEl.remove(); // Xóa style tạm cho sạch bộ nhớ
+                                thankTrack.onanimationend = null; 
+                            }
                         };
                     });
                 });
