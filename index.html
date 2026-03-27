@@ -1081,8 +1081,8 @@
                             thankTrack.appendChild(row);
                         });
 
-                        thankTrack.style.paddingTop = "0vw"; 
-                        thankTrack.style.paddingBottom = "0vw";
+                        thankTrack.style.paddingTop = "30vw"; 
+                        thankTrack.style.paddingBottom = "30vw";
                 
                         // Reset vị trí cuộn về 0 (đỉnh của padding-top)
                         thankFrame.scrollTop = 0;
@@ -1113,6 +1113,10 @@
                             }
                         }, 30); // Tốc độ cuộn (ms), số càng nhỏ cuộn càng nhanh
                     }
+
+                    setTimeout(() => {
+                        requestAnimationFrame(step);
+                    }, 50);
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
