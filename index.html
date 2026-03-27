@@ -1089,109 +1089,23 @@
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        const frameHeight = thankFrame.clientHeight;
-                        const contentHeight = thankTrack.scrollHeight;
-
-                         // Tính lại vị trí dựa trên scroll hiện tại
-                        const scrollOffset = thankFrame.scrollTop;
-
-                        // offset cuối cùng = vị trí animation + scroll người dùng
-                        const currentOffset = pauseOffset - scrollOffset;
-
-                        const duration = contentHeight * 0.05; // bạn có thể chỉnh tốc độ tại đây
-
-                        // Chạy lại animation từ vị trí mới
-                        thankTrack.style.transform = `translateY(${currentOffset}px)`;
+                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
+                        thankTrack.style.animationPlayState = "running";
                     });
 
                     // Khi di chuột vào, tạm dừng
                     thankFrame.addEventListener("mouseenter", () => {
-                        const style = window.getComputedStyle(thankTrack);
-                        const matrix = new DOMMatrixReadOnly(style.transform);
-
-                        const currentY = matrix.m42;
-
-                        // Freeze tại vị trí hiện tại
-                        thankTrack.style.animation = "none";
-                        thankTrack.style.transform = `translateY(${currentY}px)`;
+                        thankTrack.style.animationPlayState = "paused";
                     });
-
-                    // Khi user scroll → cập nhật lại vị trí transform theo scroll
-                    thankFrame.addEventListener("scroll", () => {
-                        isUserScrolling = true;
-
-                        const style = window.getComputedStyle(thankTrack);
-                        const matrix = new DOMMatrixReadOnly(style.transform);
-                        const currentY = matrix.m42;
-
-                        // Đồng bộ transform với scroll
-                        const newY = currentY - thankFrame.scrollTop;
-
-                        thankTrack.style.transform = `translateY(${newY}px)`;
-                    });
-
 
                     // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
                     thankTrack.addEventListener('animationiteration', () => {
-                        const style = window.getComputedStyle(thankTrack);
-                        const matrix = new DOMMatrixReadOnly(style.transform);
-
-                        const currentY = matrix.m42;
-
-                        // Reset scroll về 0 để tránh cộng dồn sai lệch
-                        thankFrame.scrollTop = 0;
-
-                        const duration = thankTrack.children.length * 2.5;
-
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
-                        thankTrack.style.transform = `translateY(${currentY}px)`;
-
-                        isUserScrolling = false;
+                        renderScroll();
                     });
                 });
         }
 
         loadThankfulness();
-        let autoScrollSpeed = 0.3; // tốc độ cuộn (px/frame)
-        let isPaused = false;
-        let rafId = null;
-
-        function startAutoScroll() {
-            if (rafId) cancelAnimationFrame(rafId);
-
-            function step() {
-                if (!isPaused) {
-                    thankFrame.scrollTop += autoScrollSpeed;
-
-                    // Khi scroll tới cuối → quay lại đầu
-                    if (thankFrame.scrollTop >= (thankTrack.scrollHeight - thankFrame.clientHeight)) {
-                        thankFrame.scrollTop = 0;
-                    }
-                }
-                rafId = requestAnimationFrame(step);
-            }
-
-            rafId = requestAnimationFrame(step);
-        }
-
-        // Bắt đầu cuộn
-        startAutoScroll();
-
-
-        // Hover vào → dừng
-        thankFrame.addEventListener("mouseenter", () => {
-            isPaused = true;
-        });
-
-        // Hover ra → chạy tiếp từ vị trí hiện tại
-        thankFrame.addEventListener("mouseleave", () => {
-            isPaused = false;
-        });
-
-        // Khi user scroll → giữ nguyên vị trí, không reset
-        thankFrame.addEventListener("wheel", () => {
-            isPaused = true;
-        });
     </script>
 </body>
 </html>
