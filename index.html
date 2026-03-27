@@ -1081,21 +1081,44 @@
                             thankTrack.appendChild(row);
                         });
 
-                        const duration = finalArray.length * 3; 
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        // Tắt animation CSS cũ để dùng JS điều khiển
+                        thankTrack.style.animation = "none";
+                        thankTrack.style.position = "relative"; 
+                
+                        // Thiết lập trạng thái ban đầu
+                        startAutoScroll();
                     };
 
-                    renderScroll();
+                    let scrollInterval;
+                    let isHovered = false;
+
+                    function startAutoScroll() {
+                        if (scrollInterval) clearInterval(scrollInterval);
+                        scrollInterval = setInterval(() => {
+                            if (!isHovered) {
+                                // Tự động cuộn xuống 1px
+                                thankFrame.scrollTop += 1;
+                        
+                                // Nếu cuộn hết thì quay lại đầu (Loop)
+                                if (thankFrame.scrollTop >= (thankFrame.scrollHeight - thankFrame.offsetHeight)) {
+                                    thankFrame.scrollTop = 0;
+                                    renderScroll(); // Xáo trộn lại khi xong 1 vòng
+                                }
+                            }
+                        }, 30); // Tốc độ cuộn (ms), số càng nhỏ cuộn càng nhanh
+                    }
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
-                        thankTrack.style.animationPlayState = "running";
+                        isHovered = false;
+                        thankFrame.style.overflowY = "hidden"; // Ẩn scroll để trông sạch sẽ
+                        startAutoScroll();
                     });
 
                     // Khi di chuột vào, tạm dừng
                     thankFrame.addEventListener("mouseenter", () => {
-                        thankTrack.style.animationPlayState = "paused";
+                        isHovered = true;
+                        thankFrame.style.overflowY = "auto"; // Hiện scroll để lăn chuột
                     });
 
                     // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
