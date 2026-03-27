@@ -1049,10 +1049,29 @@
 
                     const renderScroll = () => {
                         thankTrack.innerHTML = "";
-                        // Ngẫu nhiên hóa thứ tự
-                        let shuffled = shuffleArray(thankData);
-                
-                        shuffled.forEach(item => {
+                        // 1. Nhóm dữ liệu theo nội dung ở Mục 1 (item[0])
+                        const groups = thankData.reduce((acc, item) => {
+                            const key = item[0];
+                            if (!acc[key]) acc[key] = [];
+                            acc[key].push(item);
+                            return acc;
+                        }, {});
+
+                        // 2. Xử lý xáo trộn
+                        let finalArray = [];
+    
+                        // Lấy danh sách các nhóm (keys) và xáo trộn thứ tự xuất hiện của các nhóm
+                        const groupKeys = shuffleArray(Object.keys(groups));
+
+                        groupKeys.forEach(key => {
+                            // Xáo trộn nội bộ các dòng trong cùng một nhóm
+                            const shuffledGroup = shuffleArray(groups[key]);
+                            // Nối vào mảng cuối cùng
+                            finalArray = finalArray.concat(shuffledGroup);
+                        });
+
+                        // 3. Hiển thị dữ liệu đã được xử lý
+                        finalArray.forEach(item => {
                             const row = document.createElement("div");
                             row.className = "thank-row";
                             row.innerHTML = `
@@ -1062,7 +1081,7 @@
                             thankTrack.appendChild(row);
                         });
 
-                        const duration = shuffled.length * 3; // Bạn có thể tăng giảm số này để đạt tốc độ mong muốn cho toàn bộ danh sách
+                        const duration = finalArray.length * 3; 
                         thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
