@@ -1089,8 +1089,20 @@
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
-                        thankTrack.style.animationPlayState = "running";
+                        const frameHeight = thankFrame.clientHeight;
+                        const contentHeight = thankTrack.scrollHeight;
+
+                         // Tính lại vị trí dựa trên scroll hiện tại
+                        const scrollOffset = thankFrame.scrollTop;
+
+                        // offset cuối cùng = vị trí animation + scroll người dùng
+                        const currentOffset = pauseOffset - scrollOffset;
+
+                        const duration = contentHeight * 0.05; // bạn có thể chỉnh tốc độ tại đây
+
+                        // Chạy lại animation từ vị trí mới
+                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
+                        thankTrack.style.transform = `translateY(${currentOffset}px)`;
                     });
 
                     // Khi di chuột vào, tạm dừng
