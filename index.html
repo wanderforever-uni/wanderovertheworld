@@ -1101,7 +1101,6 @@
                         const duration = contentHeight * 0.05; // bạn có thể chỉnh tốc độ tại đây
 
                         // Chạy lại animation từ vị trí mới
-                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                         thankTrack.style.transform = `translateY(${currentOffset}px)`;
                     });
 
@@ -1118,6 +1117,46 @@
         }
 
         loadThankfulness();
+        let autoScrollSpeed = 0.3; // tốc độ cuộn (px/frame)
+        let isPaused = false;
+        let rafId = null;
+
+        function startAutoScroll() {
+            if (rafId) cancelAnimationFrame(rafId);
+
+            function step() {
+                if (!isPaused) {
+                    thankFrame.scrollTop += autoScrollSpeed;
+
+                    // Khi scroll tới cuối → quay lại đầu
+                    if (thankFrame.scrollTop >= (thankTrack.scrollHeight - thankFrame.clientHeight)) {
+                        thankFrame.scrollTop = 0;
+                    }
+                }
+                rafId = requestAnimationFrame(step);
+            }
+
+            rafId = requestAnimationFrame(step);
+        }
+
+        // Bắt đầu cuộn
+        startAutoScroll();
+
+
+        // Hover vào → dừng
+        thankFrame.addEventListener("mouseenter", () => {
+            isPaused = true;
+        });
+
+        // Hover ra → chạy tiếp từ vị trí hiện tại
+        thankFrame.addEventListener("mouseleave", () => {
+            isPaused = false;
+        });
+
+        // Khi user scroll → giữ nguyên vị trí, không reset
+        thankFrame.addEventListener("wheel", () => {
+            isPaused = true;
+        });
     </script>
 </body>
 </html>
