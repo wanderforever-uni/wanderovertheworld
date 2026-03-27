@@ -1089,13 +1089,45 @@
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
-                        thankTrack.style.animationPlayState = "running";
+                        const currentScroll = thankFrame.scrollTop;
+                        const totalHeight = thankTrack.offsetHeight;
+    
+                        // Tính toán quãng đường còn lại để chạy tiếp
+                        const remainingDistance = totalHeight - currentScroll;
+                        const totalDuration = finalArray.length * 3; // Tổng thời gian ban đầu
+                        const remainingDuration = (remainingDistance / totalHeight) * totalDuration;
+
+                        // Thiết lập animation mới chạy từ vị trí hiện tại lên hết
+                        thankTrack.style.position = "absolute";
+                        thankTrack.style.transform = `translateY(${-currentScroll}px)`; 
+    
+                        // Tạo keyframe động hoặc dùng transition để tiếp nối mượt mà
+                        // Đơn giản nhất là reset lại animation gốc nhưng căn chỉnh lại thời gian
+                        thankTrack.style.animation = `scroll-up ${remainingDuration}s linear forwards`;
+    
+                        // Khi chạy hết animation "chắp vá" này thì trả về animation tuần hoàn gốc
+                        thankTrack.onanimationend = () => {
+                            renderScroll();
+                        };
                     });
 
                     // Khi di chuột vào, tạm dừng
                     thankFrame.addEventListener("mouseenter", () => {
-                        thankTrack.style.animationPlayState = "paused";
+                        const computedStyle = window.getComputedStyle(thankTrack);
+                        const matrix = new DOMMatrixReadOnly(computedStyle.transform);
+                        const currentY = matrix.m42; // Lấy vị trí Y hiện tại của animation
+
+                        // 1. Dừng animation hoàn toàn
+                        thankTrack.style.animation = "none";
+        
+                        // 2. Đưa track về vị trí 0 để dùng scrollTop điều khiển
+                        thankTrack.style.transform = "none";
+                        thankTrack.style.position = "relative";
+
+                        // 3. Tính toán vị trí cuộn tương đương để không bị "giật" hình
+                        // Vị trí cuộn = Chiều cao khung - vị trí Y hiện tại
+                        const scrollPos = thankFrame.offsetHeight - currentY;
+                        thankFrame.scrollTop = scrollPos;
                     });
 
                     // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
