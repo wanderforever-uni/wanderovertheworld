@@ -1114,9 +1114,16 @@
                         }, 30); // Tốc độ cuộn (ms), số càng nhỏ cuộn càng nhanh
                     }
 
-                    setTimeout(() => {
-                        requestAnimationFrame(step);
-                    }, 50);
+                   // --- THAY ĐỔI Ở ĐÂY ĐỂ ÉP CHẠY NGAY KHI RELOAD ---
+                   renderScroll();
+
+                   // Đợi trình duyệt vẽ xong hoàn toàn (Double Frame)
+                   requestAnimationFrame(() => {
+                       requestAnimationFrame(() => {
+                           // Kích hoạt vòng lặp cuộn
+                        step();
+                       });
+                  });
 
                     // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
