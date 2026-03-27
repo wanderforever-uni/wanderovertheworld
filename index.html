@@ -1081,6 +1081,12 @@
                             thankTrack.appendChild(row);
                         });
 
+                        thankTrack.style.paddingTop = "30vw"; 
+                        thankTrack.style.paddingBottom = "30vw";
+                
+                        // Reset vị trí cuộn về 0 (đỉnh của padding-top)
+                        thankFrame.scrollTop = 0;
+
                         // Tắt animation CSS cũ để dùng JS điều khiển
                         thankTrack.style.animation = "none";
                         thankTrack.style.position = "relative"; 
