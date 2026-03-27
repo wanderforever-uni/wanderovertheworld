@@ -627,8 +627,6 @@
             height: 30vw; /* Giới hạn hiển thị khoảng 11 dòng, bạn có thể điều chỉnh theo nội dung */
             overflow: auto; /* Để ẩn các dòng ngoài khung */
             overflow-x: hidden;
-            overflow-y: auto; 
-            scrollbar-width: none;
             -webkit-mask-image: linear-gradient(transparent, black 15%, black 85%, transparent);
             mask-image: linear-gradient(transparent, black 15%, black 85%, transparent);
             scrollbar-width: none; 
@@ -636,7 +634,7 @@
         }
 
         .thank-scroll-track {
-            position: relative; /* Đổi từ absolute sang relative */
+            position: absolute;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -1042,9 +1040,6 @@
         /* --- 6. THANKFULNESS LOGIC --- */
         const thankTrack = document.getElementById("thank-track");
         const thankFrame = document.getElementById("thank-info-frame");
-        let scrollInterval;
-        let isHovered = false;
-        let scrollSpeed = 0.5; // Tốc độ cuộn (pixel mỗi khung hình), tăng lên nếu muốn nhanh hơn
 
         function loadThankfulness() {
             fetch("thankfulness.json")
@@ -1086,47 +1081,21 @@
                             thankTrack.appendChild(row);
                         });
 
-                        // 3. Nhân đôi nội dung để tạo hiệu ứng cuộn vô tận mượt mà
-                        const clone = thankTrack.innerHTML;
-                        thankTrack.innerHTML += clone;
-                
-                        // Reset vị trí cuộn về đầu
-                        thankFrame.scrollTop = 0;
+                        const duration = finalArray.length * 3; 
+                        thankTrack.style.animation = `scroll-up ${duration}s linear infinite`;
                     };
 
-                    setupContent();
-            
-                    // Bắt đầu cuộn
-                    if (scrollInterval) cancelAnimationFrame(scrollInterval);
-                    scrollInterval = requestAnimationFrame(step);
+                    renderScroll();
 
-                    // Xử lý sự kiện Hover
-                    thankFrame.addEventListener("mouseenter", () => {
-                        isHovered = true; // Dừng cuộn tự động nhưng vẫn cho phép lăn chuột (scroll) tự nhiên
-                    });
-
+                    // Khi di chuột ra khỏi khung, đảm bảo animation chạy tiếp từ vị trí hiện tại
                     thankFrame.addEventListener("mouseleave", () => {
-                        isHovered = false; // Tiếp tục cuộn từ vị trí hiện tại của thanh cuộn
+                        thankFrame.scrollTo({ top: 0, behavior: 'instant' });
+                        thankTrack.style.animationPlayState = "running";
                     });
-                });
 
                     // Khi di chuột vào, tạm dừng
                     thankFrame.addEventListener("mouseenter", () => {
-                        const computedStyle = window.getComputedStyle(thankTrack);
-                        const matrix = new DOMMatrixReadOnly(computedStyle.transform);
-                        const currentY = matrix.m42; // Lấy vị trí Y hiện tại của animation
-
-                        // 1. Dừng animation hoàn toàn
-                        thankTrack.style.animation = "none";
-        
-                        // 2. Đưa track về vị trí 0 để dùng scrollTop điều khiển
-                        thankTrack.style.transform = "none";
-                        thankTrack.style.position = "relative";
-
-                        // 3. Tính toán vị trí cuộn tương đương để không bị "giật" hình
-                        // Vị trí cuộn = Chiều cao khung - vị trí Y hiện tại
-                        const scrollPos = thankFrame.offsetHeight - currentY;
-                        thankFrame.scrollTop = scrollPos;
+                        thankTrack.style.animationPlayState = "paused";
                     });
 
                     // Lắng nghe sự kiện animation lặp lại để xáo trộn lại thứ tự
