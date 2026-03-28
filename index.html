@@ -674,78 +674,6 @@
         }
 
         #thank-info-frame::-webkit-scrollbar { display: none; }
-
-        /* --- 7. VOYAGE SECTION --- */
-        #voyage-section {
-            position: relative;
-            margin-left: 3.8vw;
-            margin-right: 3.8vw;
-            margin-top: 5vw;
-            margin-bottom: 5vw;
-            display: block;
-        }        
-
-        .voyage-title {
-            font-family: 'Satisfy', cursive;
-            font-size: 3.9vw; /* Khớp .air-title */
-            text-align: center;
-            width: 100%;
-            display: block;
-            margin-bottom: 2vw; /* Khoảng cách xuống khung video - Giống khung Air */
-            color: #000;
-        }
-
-        .voyage-container {
-            display: flex;
-            justify-content: space-between; /* Khung 1 sát lề trái, khung 4 sát lề phải */
-            align-items: flex-start;
-            width: 100%;
-        }
-
-        .voyage-column {
-            flex: 0 0 23.5%; /* Độ rộng 4 cột */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Căn giữa bộ sao theo trục dọc của video */
-        }
-
-        .v-video-wrap {
-            width: 100%;
-            height: 41.7vw; /* Tỉ lệ 9:16 chuẩn */
-            position: relative;
-            overflow: hidden;
-            background: transparent;
-            /* Không viền, không nền đúng yêu cầu */
-        }
-
-        .v-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .v-controls {
-            display: flex;
-            justify-content: center;
-            gap: 1.5vw; /* Khoảng cách giữa các ngôi sao */
-            margin-top: 1vw; /* Khoảng cách từ đáy video xuống hàng sao - Giống khung Air */
-            width: 100%;
-        }
-
-        .v-controls span {
-            font-size: 1.2vw; /* Kích thước ngôi sao hài hòa với 1vw chữ trong khung */
-            cursor: pointer;
-            user-select: none;
-            line-height: 1; /* Đảm bảo không bị lệch dòng */
-        }
-
-        /* Style cho slider trong Voyage - Đồng bộ với Air */
-        .v-volume-slider {
-            display: none;      /* Giống hệt Air: Mặc định ẩn */
-            width: 6vw;         /* Giống hệt Air: Độ rộng 6vw */
-            margin: 0.4vw auto; /* Giống hệt Air: Căn giữa và tạo khoảng cách */
-        }
         
     </style>
 </head>
@@ -849,44 +777,6 @@
                 </div>
 
                 <div class="passport-total">199</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="voyage-section">
-        <h2 class="voyage-title">voyage</h2>
-        <div class="voyage-container">
-            <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls">
-                    <span class="v-mute">⭐</span>
-                    <span class="v-play">⭐</span>
-                    <span class="v-volume">⭐</span> </div>
-                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
-            </div>
-            <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls">
-                    <span class="v-mute">⭐</span>
-                    <span class="v-play">⭐</span>
-                    <span class="v-volume">⭐</span> </div>
-                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
-            </div>
-            <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls">
-                    <span class="v-mute">⭐</span>
-                    <span class="v-play">⭐</span>
-                    <span class="v-volume">⭐</span> </div>
-                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
-            </div>
-            <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls">
-                    <span class="v-mute">⭐</span>
-                    <span class="v-play">⭐</span>
-                    <span class="v-volume">⭐</span> </div>
-                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
         </div>
     </div>
@@ -1260,76 +1150,6 @@
         }
 
         loadThankfulness();
-
-        /* --- 7. VOYAGE LOGIC --- */
-        function initVoyage() {
-            fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-                const columns = document.querySelectorAll('.voyage-column');
-        
-                columns.forEach((col, idx) => {
-                    const video = col.querySelector('.v-video');
-                    const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
-            
-                    let playlist = [];
-                    let currentIdx = 0;
-
-                    const refreshPlaylist = () => {
-                        playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
-                        currentIdx = 0;
-                    };
-
-                    const playVideo = () => {
-                        if (currentIdx >= playlist.length) refreshPlaylist();
-                        video.src = playlist[currentIdx];
-                        video.play().catch(() => {});
-                        currentIdx++;
-                    };
-
-                    video.onended = playVideo; // Tự động phát tiếp liên tục
-
-                    // Ngôi sao 1: Mute/Unmute
-                    muteBtn.onclick = () => {
-                        video.muted = !video.muted;
-                        muteBtn.textContent = video.muted ? "⭐" : "🌟";
-                    };
-
-                    // Ngôi sao 2: Play/Pause
-                    playBtn.onclick = () => {
-                        if (video.paused) { video.play(); playBtn.textContent = "⭐"; }
-                        else { video.pause(); playBtn.textContent = "🌟"; }
-                    };
-
-                    // Ngôi sao 3: Next (Thay thế slider âm lượng của air để tối giản hơn)
-                    const volSlider = col.querySelector('.v-volume-slider');
-                    const volBtn = nextBtn; // Ngôi sao thứ 3
-
-                    // Tính chất 1: Nhấn ngôi sao để Ẩn/Hiện thanh trượt (Giống hệt Air)
-                    volBtn.onclick = () => {
-                        volSlider.style.display = (volSlider.style.display === "none") ? "block" : "none";
-                    };
-
-                    // Tính chất 2: Kéo thanh trượt để đổi âm lượng (Giống hệt Air)
-                    volSlider.oninput = (e) => {
-                        video.volume = e.target.value;
-                    };
-
-                    // Khởi chạy ngẫu nhiên ban đầu
-                    refreshPlaylist();
-                    setTimeout(playVideo, idx * 400); // Delay nhẹ giữa các khung để không bị trùng lặp giây đầu
-                });
-            });
-        }
-
-        // Hàm xáo trộn mảng
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        initVoyage();
         
     </script>
 </body>
