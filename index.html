@@ -1266,13 +1266,13 @@
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
 
-                const masterList = shuffleArray([...data]);
+                const masterData = shuffleArray([...data]);
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
                     const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
             
-                    let playlist = masterList;
+                    let playlist = masterData;
                     let currentIdx = idx % playlist.length;
 
                     const refreshPlaylist = () => {
