@@ -1265,27 +1265,24 @@
         function initVoyage() {
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
-
-                let masterPlaylist = shuffleArray([...data]);
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
-                    const muteBtn = col.querySelector('.v-mute');
-                    const playBtn = col.querySelector('.v-play');
-                    const volBtn = col.querySelector('.v-volume');
-                    const volSlider = col.querySelector('.v-volume-slider');
+                    const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
+            
+                    let playlist = [];
+                    let currentIdx = 0;
 
-                    let currentIdx = (idx * 2) % masterPlaylist.length;
+                    const refreshPlaylist = () => {
+                        playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
+                        currentIdx = 0;
+                    };
 
-                    const loadAndPlay = () => {
-                        if (masterPlaylist.length > 0) {
-                            video.src = masterPlaylist[currentIdx];
-                            video.load(); // Buộc trình duyệt nạp lại nguồn video mới
-                            video.play().catch(e => console.log("Chờ tương tác người dùng để phát bài tiếp theo"));
-                    
-                            // Tăng index cho lần kế tiếp
-                            currentIdx = (currentIdx + 1) % masterPlaylist.length;
-                        }
+                    const playVideo = () => {
+                        if (currentIdx >= playlist.length) refreshPlaylist();
+                        video.src = playlist[currentIdx];
+                        video.play().catch(() => {});
+                        currentIdx++;
                     };
 
                     video.onended = playVideo; // Tự động phát tiếp liên tục
