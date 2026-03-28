@@ -1265,24 +1265,21 @@
         function initVoyage() {
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
+
+                let masterPlaylist = shuffleArray([...data]);
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
-                    const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
-            
-                    let playlist = [];
-                    let currentIdx = 0;
+                    const [muteBtn, playBtn, volBtn] = col.querySelectorAll('.v-controls span');
+                    const volSlider = col.querySelector('.v-volume-slider');
 
-                    const refreshPlaylist = () => {
-                        playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
-                        currentIdx = 0;
-                    };
+                    let currentIdx = (idx * 2) % masterPlaylist.length; 
 
                     const playVideo = () => {
-                        if (currentIdx >= playlist.length) refreshPlaylist();
-                        video.src = playlist[currentIdx];
+                        video.src = masterPlaylist[currentIdx];
                         video.play().catch(() => {});
-                        currentIdx++;
+                
+                        currentIdx = (currentIdx + 1) % masterPlaylist.length;
                     };
 
                     video.onended = playVideo; // Tự động phát tiếp liên tục
