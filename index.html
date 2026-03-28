@@ -739,6 +739,23 @@
             user-select: none;
             line-height: 1; /* Đảm bảo không bị lệch dòng */
         }
+
+        .v-volume-slider {
+            position: absolute;
+            bottom: 2vw;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .v-volume-slider input {
+            width: 10vw;
+            cursor: pointer;
+            accent-color: #000; /* Màu đen tối giản */
+        }
         
     </style>
 </head>
@@ -850,20 +867,52 @@
         <h2 class="voyage-title">voyage</h2>
         <div class="voyage-container">
             <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-video-wrap">
+                    <video class="v-video" muted playsinline></video>
+                    <div class="v-volume-slider" style="display: none;">
+                        <input type="range" min="0" max="1" step="0.1" value="1">
+                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume-toggle">⭐</span> </div>
             </div>
             <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-video-wrap">
+                    <video class="v-video" muted playsinline></video>
+                    <div class="v-volume-slider" style="display: none;">
+                        <input type="range" min="0" max="1" step="0.1" value="1">
+                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume-toggle">⭐</span> </div>
             </div>
             <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-video-wrap">
+                    <video class="v-video" muted playsinline></video>
+                    <div class="v-volume-slider" style="display: none;">
+                        <input type="range" min="0" max="1" step="0.1" value="1">
+                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume-toggle">⭐</span> </div>
             </div>
             <div class="voyage-column">
-                <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <<div class="v-video-wrap">
+                    <video class="v-video" muted playsinline></video>
+                    <div class="v-volume-slider" style="display: none;">
+                        <input type="range" min="0" max="1" step="0.1" value="1">
+                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume-toggle">⭐</span> </div>
             </div>
         </div>
     </div>
@@ -1276,8 +1325,28 @@
                         else { video.pause(); playBtn.textContent = "🌟"; }
                     };
 
-                    // Ngôi sao 3: Next (Thay thế slider âm lượng của air để tối giản hơn)
-                    nextBtn.onclick = playVideo;
+                    // Ngôi sao 3: Hiện/Ẩn khung điều chỉnh âm lượng (Giống khung air)    
+                    volToggle.onclick = () => {
+                        if (volSliderDiv.style.display === "none") {
+                            volSliderDiv.style.display = "block";
+                            volToggle.textContent = "🌟";
+                        } else {
+                            volSliderDiv.style.display = "none";
+                            volToggle.textContent = "⭐";
+                        }
+                    };
+
+                    // Điều chỉnh âm lượng thực tế khi kéo thanh trượt
+                    volInput.oninput = (e) => {
+                        video.volume = e.target.value;
+                        if (video.volume > 0) {
+                            video.muted = false;
+                            muteBtn.textContent = "🌟";
+                        } else {
+                            video.muted = true;
+                            muteBtn.textContent = "⭐";
+                        }
+                    };
 
                     // Khởi chạy ngẫu nhiên ban đầu
                     refreshPlaylist();
