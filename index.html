@@ -1263,37 +1263,39 @@
 
         /* --- 7. VOYAGE LOGIC --- */
         function initVoyage() {
-            fetch("Voyagevideo.json").then(r => r.json()).then(data => {
+            fetch("Voyagevideo.json")
+            .then(response => response.json())
+            .then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
-
-                const globalPool = [
-                    shuffleArray([...data]),
-                    shuffleArray([...data]),
-                    shuffleArray([...data]),
-                    shuffleArray([...data])
-                ];
         
+                // 1. Tạo 4 playlist riêng biệt ngay từ đầu để 0% trùng lặp
+                let playlists = [];
+                for (let i = 0; i < 4; i++) {
+                    playlists.push(shuffleArray([...data]));
+                }
+
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
-                    const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
-            
-                    // Lấy đúng danh sách riêng từ kho Pool đã chuẩn bị
-                    let playlist = globalPool[idx]; 
+                    const muteBtn = col.querySelector('.v-mute');
+                    const playBtn = col.querySelector('.v-play');
+                    const volToggle = col.querySelector('.v-vol-toggle');
+                    const volSlider = col.querySelector('.v-volume-slider');
+
                     let currentIdx = 0;
+                    let currentPlaylist = playlists[idx];
 
-                    const refreshPlaylist = () => {
-                        playlist = shuffleArray([...data]);
-                        currentIdx = 0;
-                    };
-
-                    const playVideo = () => {
-                        if (currentIdx >= playlist.length) refreshPlaylist();
-                        video.src = playlist[currentIdx];
-                        video.play().catch(() => {});
+                    const playNext = () => {
+                        if (currentIdx >= currentPlaylist.length) {
+                            // Hết danh sách -> Tạo playlist mới ngẫu nhiên
+                            currentPlaylist = shuffleArray([...data]);
+                            currentIdx = 0;
+                        }
+                        video.src = currentPlaylist[currentIdx];
+                        video.play().catch(() => console.log("User interaction required"));
                         currentIdx++;
                     };
 
-                    video.onended = playVideo; // Tự động phát tiếp liên tục
+                    video.onended = playNext;
 
                     // Ngôi sao 1: Mute/Unmute
                     muteBtn.onclick = () => {
@@ -1321,11 +1323,19 @@
                         video.volume = e.target.value;
                     };
 
-                    // Khởi chạy ngẫu nhiên ban đầu
-                    refreshPlaylist();
-                    setTimeout(playVideo, idx * 400); // Delay nhẹ giữa các khung để không bị trùng lặp giây đầu
+                    // Khởi chạy video đầu tiên cho mỗi khung
+                    playNext();
                 });
             });
+        }
+
+        // Hàm xáo trộn mảng
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
         initVoyage();
