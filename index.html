@@ -1270,16 +1270,22 @@
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
-                    const [muteBtn, playBtn, volBtn] = col.querySelectorAll('.v-controls span');
+                    const muteBtn = col.querySelector('.v-mute');
+                    const playBtn = col.querySelector('.v-play');
+                    const volBtn = col.querySelector('.v-volume');
                     const volSlider = col.querySelector('.v-volume-slider');
 
-                    let currentIdx = (idx * 2) % masterPlaylist.length; 
+                    let currentIdx = (idx * 2) % masterPlaylist.length;
 
-                    const playVideo = () => {
-                        video.src = masterPlaylist[currentIdx];
-                        video.play().catch(() => {});
-                
-                        currentIdx = (currentIdx + 1) % masterPlaylist.length;
+                    const loadAndPlay = () => {
+                        if (masterPlaylist.length > 0) {
+                            video.src = masterPlaylist[currentIdx];
+                            video.load(); // Buộc trình duyệt nạp lại nguồn video mới
+                            video.play().catch(e => console.log("Chờ tương tác người dùng để phát bài tiếp theo"));
+                    
+                            // Tăng index cho lần kế tiếp
+                            currentIdx = (currentIdx + 1) % masterPlaylist.length;
+                        }
                     };
 
                     video.onended = playVideo; // Tự động phát tiếp liên tục
