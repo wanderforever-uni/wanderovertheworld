@@ -1265,13 +1265,15 @@
         function initVoyage() {
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
+
+                const masterList = shuffleArray([...data]);
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
                     const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
             
-                    let playlist = [];
-                    let currentIdx = 0;
+                    let playlist = masterList;
+                    let currentIdx = idx % playlist.length;
 
                     const refreshPlaylist = () => {
                         playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
