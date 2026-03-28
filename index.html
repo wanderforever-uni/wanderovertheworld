@@ -1265,29 +1265,28 @@
         function initVoyage() {
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
-
-                let playlist = shuffleArray([...data]); 
-                let currentIdx = 0;
-                
+        
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
                     const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
+            
+                    let playlist = [];
+                    let currentIdx = 0;
+
+                    const refreshPlaylist = () => {
+                        playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
+                        currentIdx = 0;
+                    };
 
                     const playVideo = () => {
-                        // Nếu dùng hết danh sách chung thì tráo lại
-                        if (currentIdx >= playlist.length) {
-                            playlist = shuffleArray([...data]);
-                            currentIdx = 0;
-                        }
-                
-                        // Lấy video và tăng biến đếm chung lên
+                        if (currentIdx >= playlist.length) refreshPlaylist();
                         video.src = playlist[currentIdx];
-                        currentIdx++; 
-                
                         video.play().catch(() => {});
+                        currentIdx++;
                     };
 
                     video.onended = playVideo; // Tự động phát tiếp liên tục
+
 
                     // Ngôi sao 1: Mute/Unmute
                     muteBtn.onclick = () => {
