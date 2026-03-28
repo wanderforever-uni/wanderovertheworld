@@ -739,6 +739,13 @@
             user-select: none;
             line-height: 1; /* Đảm bảo không bị lệch dòng */
         }
+
+        /* Style cho slider trong Voyage - Đồng bộ với Air */
+        .v-volume-slider {
+            display: none;      /* Giống hệt Air: Mặc định ẩn */
+            width: 6vw;         /* Giống hệt Air: Độ rộng 6vw */
+            margin: 0.4vw auto; /* Giống hệt Air: Căn giữa và tạo khoảng cách */
+        }
         
     </style>
 </head>
@@ -851,19 +858,35 @@
         <div class="voyage-container">
             <div class="voyage-column">
                 <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume">⭐</span> </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
             <div class="voyage-column">
                 <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume">⭐</span> </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
             <div class="voyage-column">
                 <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume">⭐</span> </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
             <div class="voyage-column">
                 <div class="v-video-wrap"><video class="v-video" muted playsinline></video></div>
-                <div class="v-controls"><span class="v-mute">⭐</span><span class="v-play">⭐</span><span class="v-next">⭐</span></div>
+                <div class="v-controls">
+                    <span class="v-mute">⭐</span>
+                    <span class="v-play">⭐</span>
+                    <span class="v-volume">⭐</span> </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
         </div>
     </div>
@@ -1277,7 +1300,18 @@
                     };
 
                     // Ngôi sao 3: Next (Thay thế slider âm lượng của air để tối giản hơn)
-                    nextBtn.onclick = playVideo;
+                    const volSlider = col.querySelector('.v-volume-slider');
+                    const volBtn = nextBtn; // Ngôi sao thứ 3
+
+                    // Tính chất 1: Nhấn ngôi sao để Ẩn/Hiện thanh trượt (Giống hệt Air)
+                    volBtn.onclick = () => {
+                        volSlider.style.display = (volSlider.style.display === "none") ? "block" : "none";
+                    };
+
+                    // Tính chất 2: Kéo thanh trượt để đổi âm lượng (Giống hệt Air)
+                    volSlider.oninput = (e) => {
+                        video.volume = e.target.value;
+                    };
 
                     // Khởi chạy ngẫu nhiên ban đầu
                     refreshPlaylist();
