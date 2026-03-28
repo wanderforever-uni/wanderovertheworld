@@ -1265,30 +1265,27 @@
         function initVoyage() {
             fetch("Voyagevideo.json").then(r => r.json()).then(data => {
                 const columns = document.querySelectorAll('.voyage-column');
-
-                let playlist = shuffleArray([...data]);
-                let currentIdx = 0;
-
-                const refreshPlaylist = () => {
-                    playlist = shuffleArray([...data]);
-                    currentIdx = 0;
-                };
         
                 columns.forEach((col, idx) => {
                     const video = col.querySelector('.v-video');
                     const [muteBtn, playBtn, nextBtn] = col.querySelectorAll('.v-controls span');
-                    const volSlider = col.querySelector('.v-volume-slider');
-                    const volBtn = nextBtn;
+            
+                    let playlist = [];
+                    let currentIdx = 0;
+
+                    const refreshPlaylist = () => {
+                        playlist = shuffleArray([...data]); // Xáo trộn danh sách từ Voyagevideo.json
+                        currentIdx = 0;
+                    };
 
                     const playVideo = () => {
                         if (currentIdx >= playlist.length) refreshPlaylist();
                         video.src = playlist[currentIdx];
-                        currentIdx++; // Tăng chỉ số chung, đảm bảo khung sau lấy video tiếp theo
                         video.play().catch(() => {});
+                        currentIdx++;
                     };
 
                     video.onended = playVideo; // Tự động phát tiếp liên tục
-
 
                     // Ngôi sao 1: Mute/Unmute
                     muteBtn.onclick = () => {
