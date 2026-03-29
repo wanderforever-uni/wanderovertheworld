@@ -1284,67 +1284,61 @@
         /* --- 7. VOYAGE LOGIC --- */
         const vVideos = document.querySelectorAll(".voyage-video");
         let vMasterList = [];
-        let vPlaylists = [[], [], [], []];
-        let vCurrentIdx = [0, 0, 0, 0];
-        let finishedCount = 0; // Đếm số khung đã hoàn thành lượt
+        let vPerFrameLists = [[], [], [], []];
+        let vPerFrameIndices = [0, 0, 0, 0];
+
+        // Hàm so sánh hai mảng để tránh trùng lặp thứ tự
+        function isSameOrder(a, b) {
+            if (a.length !== b.length) return false;
+            return a.every((val, index) => val === b[index]);
+        }
+
+        // Tạo 4 danh sách ngẫu nhiên độc bản
+        function generateFourUniqueLists(base) {
+            let lists = [];
+            while (lists.length < 4) {
+                let candidate = shuffleArray(base);
+                // Kiểm tra candidate không trùng với bất kỳ list nào đã có trong 'lists'
+                let duplicate = lists.some(existing => isSameOrder(existing, candidate));
+                if (!duplicate) {
+                    lists.push(candidate);
+                }
+            }
+            return lists;
+        }
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            if (data.length < 4) return console.error("Cần ít nhất 4 video.");
             vMasterList = data;
-            generateNewCycle(); 
+            const initialLists = generateFourUniqueLists(vMasterList);
+    
+            vVideos.forEach((video, i) => {
+                vPerFrameLists[i] = initialLists[i];
+                initVoyagePlayer(video, i);
+            });
         });
 
-        function generateNewCycle() {
-            finishedCount = 0;
-            // 1. Xáo trộn danh sách gốc để tạo sự khác biệt giữa các lần reload/lượt mới
-            let base = shuffleArray([...vMasterList]);
-
-            // 2. Tạo ma trận dịch chuyển (Latin Square)
-            // Đảm bảo tại mọi vị trí index 'j', video ở 4 khung là khác nhau hoàn toàn
-            let shiftOffsets = [0, 1, 2, 3]; 
-            // Nếu danh sách video nhiều hơn 4, ta lấy ngẫu nhiên 4 khoảng dịch chuyển khác nhau
-            if (vMasterList.length > 4) {
-                shiftOffsets = shuffleArray([...Array(vMasterList.length).keys()]).slice(0, 4);
-            } else {
-                shiftOffsets = shuffleArray([0, 1, 2, 3]);
-            }
-
-            for (let i = 0; i < 4; i++) {
-                let offset = shiftOffsets[i];
-                // Tạo playlist cho khung i bằng cách cắt và ghép mảng theo offset
-                vPlaylists[i] = [...base.slice(offset), ...base.slice(0, offset)];
-                vCurrentIdx[i] = 0;
-                playVideo(i);
-            }
-        }
-
-        function playVideo(frameIdx) {
-            const video = vVideos[frameIdx];
-            video.src = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
-    
-            // Mặc định luôn tắt tiếng theo yêu cầu
-            video.muted = true; 
-            video.play().catch(() => {});
+        function initVoyagePlayer(video, index) {
+            // Phát video đầu tiên của danh sách dành riêng cho khung này
+            video.src = vPerFrameLists[index][vPerFrameIndices[index]];
+            video.play().catch(()=>{});
 
             video.onended = () => {
-                vCurrentIdx[frameIdx]++;
-
-                // Nếu khung này vẫn còn video trong lượt
-                if (vCurrentIdx[frameIdx] < vPlaylists[frameIdx].length) {
-                    playVideo(frameIdx);
-                } else {
-                    // Khung này đã xong lượt, chờ các khung còn lại
-                    finishedCount++;
-                    if (finishedCount === 4) {
-                        // Khi cả 4 khung cùng xong (Tổng thời lượng bằng nhau), bắt đầu lượt mới
-                        generateNewCycle();
-                    }
+                vPerFrameIndices[index]++;
+        
+                // Nếu đã chiếu hết danh sách (Vòng lặp liên tục)
+                if (vPerFrameIndices[index] >= vPerFrameLists[index].length) {
+                    // Lấy một danh sách mới cho khung này, đảm bảo không trùng 3 khung còn lại
+                    // Để đơn giản và chính xác, ta tạo lại bộ 4 list mới cho lượt tiếp theo
+                    const nextCycleLists = generateFourUniqueLists(vMasterList);
+                    vPerFrameLists[index] = nextCycleLists[index];
+                    vPerFrameIndices[index] = 0;
                 }
+        
+                video.src = vPerFrameLists[index][vPerFrameIndices[index]];
+                video.play();
             };
-        }
 
-        // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
-        vVideos.forEach((video, i) => {
+            // Điều khiển Icon (Giống Air 100%)
             const parent = video.closest('.voyage-item');
             const mBtn = parent.querySelector(".v-mute-btn");
             const pBtn = parent.querySelector(".v-play-btn");
@@ -1362,13 +1356,14 @@
             };
 
             vBtn.onclick = () => {
-                sld.style.display = (sld.style.display === "none" || sld.style.display === "") ? "block" : "none";
+                sld.style.display = (sld.style.display === "none") ? "block" : "none";
             };
 
             sld.oninput = (e) => video.volume = e.target.value;
-        });
+        }
 
     </script>
 </body>
 </html>
+
 
