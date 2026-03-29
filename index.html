@@ -1262,69 +1262,55 @@
 
         loadThankfulness();
 
-        /* --- 7. VOYAGE LOGIC --- */
-        let voyageVideoList = [];
+        /* --- 7. VOYAGE LOGIC (0% TRÙNG LẶP TUYỆT ĐỐI) --- */
+        let allVoyageVideos = [];
+        let currentlyPlaying = [null, null, null, null]; // Lưu video đang phát của 4 khung
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            voyageVideoList = data;
-            const items = document.querySelectorAll('.voyage-item');
-    
-            // Đảm bảo xác suất trùng lặp thứ tự giữa các khung là 0%
-            let uniquePlaylists = [];
-            let history = new Set();
+            allVoyageVideos = data;
+            const vItems = document.querySelectorAll('.voyage-item');
 
-            while (uniquePlaylists.length < items.length) {
-                let trial = shuffleArray([...voyageVideoList]);
-                let key = trial.join('|');
-                if (!history.has(key)) {
-                    history.add(key);
-                    uniquePlaylists.push(trial);
-                }
-            }
-
-            items.forEach((item, i) => {
+            vItems.forEach((item, idx) => {
                 const v = item.querySelector('.v-video');
                 const muteBtn = item.querySelector('.v-mute-btn');
                 const playBtn = item.querySelector('.v-play-btn');
-        
-                let myPlaylist = uniquePlaylists[i];
-                let currentIdx = 0;
+                const volBtn = item.querySelector('.v-vol-btn');
 
-                const playCycle = () => {
-                    v.src = myPlaylist[currentIdx];
-                    v.play().catch(() => {});
-                    currentIdx++;
-
-                    if (currentIdx >= myPlaylist.length) {
-                        // Hết vòng: tạo thứ tự ngẫu nhiên mới không trùng lượt cũ
-                        let nextOrder;
-                        do {
-                            nextOrder = shuffleArray([...voyageVideoList]);
-                        } while (nextOrder.join('|') === myPlaylist.join('|'));
-                
-                        myPlaylist = nextOrder;
-                        currentIdx = 0;
-                    }
+                const getAvailableVideo = () => {
+                    // Lọc ra những video KHÔNG nằm trong danh sách đang phát của các khung khác
+                    let available = allVoyageVideos.filter(src => !currentlyPlaying.includes(src));
+            
+                    // Nếu không còn video nào (trường hợp file json có ít hơn 4 video), lấy đại 1 cái ngẫu nhiên
+                    if (available.length === 0) available = allVoyageVideos;
+            
+                    let chosen = available[Math.floor(Math.random() * available.length)];
+                    currentlyPlaying[idx] = chosen;
+                    return chosen;
                 };
 
-                v.addEventListener('ended', playCycle);
-                playCycle();
+                const playNext = () => {
+                    v.src = getAvailableVideo();
+                    v.play().catch(() => {});
+                };
 
-                // Mặc định tắt tiếng
+                v.addEventListener('ended', playNext);
+        
+                // Khởi tạo lần đầu
                 v.muted = true;
+                playNext();
 
+                // Control logic
                 muteBtn.onclick = () => {
                     v.muted = !v.muted;
                     muteBtn.textContent = v.muted ? "⭐" : "🌟";
                 };
-        
                 playBtn.onclick = () => {
                     if (v.paused) { v.play(); playBtn.textContent = "⭐"; }
                     else { v.pause(); playBtn.textContent = "🌟"; }
                 };
-
-                item.querySelector('.v-vol-btn').onclick = () => {
+                volBtn.onclick = () => {
                     v.volume = v.volume > 0 ? 0 : 1;
+                    volBtn.textContent = v.volume > 0 ? "🌟" : "⭐";
                 };
             });
         });
