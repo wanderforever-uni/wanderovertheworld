@@ -675,78 +675,6 @@
 
         #thank-info-frame::-webkit-scrollbar { display: none; }
 
-         /* --- 7. VOYAGE SECTION --- */
-         #voyage-section {
-             position: relative;
-             margin-left: 3.8vw;   
-             margin-right: 3.8vw;
-             margin-top: 0.26vw;    
-             margin-bottom: 1.56vw; 
-             padding: 0.26vw;       
-             width: auto;           
-             height: auto;          
-             overflow: hidden;      
-             display: block;
-             background: none; /* Không nền */
-             border: none;     /* Không viền */
-         }
-
-         .voyage-title {
-             font-family: 'Satisfy', cursive;
-             font-size: 3.9vw;
-             text-align: center;
-             width: 100%;
-             display: block;
-             margin-bottom: 1.5vw;
-             color: #000;
-         }
-
-         .voyage-container {
-             display: flex;
-             justify-content: space-between;
-             width: 100%;
-         }
-
-         .voyage-item {
-             width: 23.5%; /* Đảm bảo 4 khung dàn hàng ngang đều nhau */
-             background: none;
-             border: none;
-         }
-
-         .v-video-wrap {
-             width: 100%;
-             position: relative;
-             /* Tỷ lệ đứng 9:16 (1280 / 720) để hiển thị đầy đủ video */
-             padding-top: 177.77%; 
-         }
-
-         .v-video {
-             position: absolute;
-             top: 0;
-             left: 0;
-             width: 100%;
-             height: 100%;
-             object-fit: cover;
-         }
-
-         .v-controls {
-             margin-top: 2vw; 
-            display: flex;
-            justify-content: center;
-            gap: 1.5vw;
-            width: 100%;
-         }
-
-         .v-controls span {
-             cursor: pointer;
-             font-size: 1.5vw;
-             user-select: none;
-            transition: transform 0.2s ease;
-         }
-
-        .v-controls span:hover {
-            transform: scale(1.2);
-        }
     </style>
 </head>
 
@@ -849,52 +777,6 @@
                 </div>
 
                 <div class="passport-total">199</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="voyage-section">
-        <h2 class="voyage-title">voyage</h2> 
-        <div class="voyage-container">
-            <div class="voyage-item">
-                <div class="v-video-frame">
-                    <video class="v-video" autoplay muted playsinline></video>
-                </div>
-                <div class="v-controls">
-                    <span class="v-mute-btn">⭐</span>
-                    <span class="v-play-btn">⭐</span>
-                    <span class="v-vol-btn">⭐</span>
-                </div>
-            </div>
-            <div class="voyage-item">
-                <div class="v-video-frame">
-                    <video class="v-video" autoplay muted playsinline></video>
-                </div>
-                <div class="v-controls">
-                    <span class="v-mute-btn">⭐</span>
-                    <span class="v-play-btn">⭐</span>
-                    <span class="v-vol-btn">⭐</span>
-                </div>
-            </div>
-            <div class="voyage-item">
-                <div class="v-video-frame">
-                    <video class="v-video" autoplay muted playsinline></video>
-                </div>
-                <div class="v-controls">
-                    <span class="v-mute-btn">⭐</span>
-                    <span class="v-play-btn">⭐</span>
-                    <span class="v-vol-btn">⭐</span>
-                </div>
-            </div>
-            <div class="voyage-item">
-                <div class="v-video-frame">
-                    <video class="v-video" autoplay muted playsinline></video>
-                </div>
-                <div class="v-controls">
-                    <span class="v-mute-btn">⭐</span>
-                    <span class="v-play-btn">⭐</span>
-                    <span class="v-vol-btn">⭐</span>
-                </div>
             </div>
         </div>
     </div>
@@ -1269,59 +1151,6 @@
 
         loadThankfulness();
 
-        /* --- 7. VOYAGE LOGIC (0% TRÙNG LẶP TUYỆT ĐỐI) --- */
-        let allVoyageVideos = [];
-        let currentlyPlaying = [null, null, null, null]; // Lưu video đang phát của 4 khung
-
-        fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            allVoyageVideos = data;
-            const vItems = document.querySelectorAll('.voyage-item');
-
-            vItems.forEach((item, idx) => {
-                const v = item.querySelector('.v-video');
-                const muteBtn = item.querySelector('.v-mute-btn');
-                const playBtn = item.querySelector('.v-play-btn');
-                const volBtn = item.querySelector('.v-vol-btn');
-
-                const getAvailableVideo = () => {
-                    // Lọc ra những video KHÔNG nằm trong danh sách đang phát của các khung khác
-                    let available = allVoyageVideos.filter(src => !currentlyPlaying.includes(src));
-            
-                    // Nếu không còn video nào (trường hợp file json có ít hơn 4 video), lấy đại 1 cái ngẫu nhiên
-                    if (available.length === 0) available = allVoyageVideos;
-            
-                    let chosen = available[Math.floor(Math.random() * available.length)];
-                    currentlyPlaying[idx] = chosen;
-                    return chosen;
-                };
-
-                const playNext = () => {
-                    v.src = getAvailableVideo();
-                    v.play().catch(() => {});
-                };
-
-                v.addEventListener('ended', playNext);
-        
-                // Khởi tạo lần đầu
-                v.muted = true;
-                playNext();
-
-                // Control logic
-                muteBtn.onclick = () => {
-                    v.muted = !v.muted;
-                    muteBtn.textContent = v.muted ? "⭐" : "🌟";
-                };
-                playBtn.onclick = () => {
-                    if (v.paused) { v.play(); playBtn.textContent = "⭐"; }
-                    else { v.pause(); playBtn.textContent = "🌟"; }
-                };
-                volBtn.onclick = () => {
-                    v.volume = v.volume > 0 ? 0 : 1;
-                    volBtn.textContent = v.volume > 0 ? "🌟" : "⭐";
-                };
-            });
-        });
-        
     </script>
 </body>
 </html>
