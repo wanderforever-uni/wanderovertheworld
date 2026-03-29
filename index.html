@@ -1284,89 +1284,67 @@
         /* --- 7. VOYAGE LOGIC --- */
         const vVideos = document.querySelectorAll(".voyage-video");
         let vMasterList = [];
-        let vPerFrameLists = [[], [], [], []];
-        let vPerFrameIndices = [0, 0, 0, 0];
-
-        // Hàm kiểm tra sự khác biệt tuyệt đối theo cả hàng dọc (vị trí index)
-        function isValidLatinPattern(lists) {
-            const numVideos = lists[0].length;
-            const numFrames = lists.length;
-
-            for (let j = 0; j < numVideos; j++) {
-                let verticalSet = new Set();
-                for (let i = 0; i < numFrames; i++) {
-                    verticalSet.add(lists[i][j]);
-                }
-                // Nếu số lượng phần tử trong Set nhỏ hơn số khung, nghĩa là có trùng lặp ở cột dọc j
-                if (verticalSet.size < numFrames) return false;
-            }
-            return true;
-        }
-
-        function generateSuperUniqueLists(base) {
-            let attempts = 0;
-            while (attempts < 1000) {
-                let candidateLists = [];
-                // Tạo 4 danh sách ngẫu nhiên độc lập trước
-                for (let i = 0; i < 4; i++) {
-                    candidateLists.push(shuffleArray(base));
-                }
-
-                // Kiểm tra xem có trùng lặp theo hàng dọc không
-                if (isValidLatinPattern(candidateLists)) {
-                    // Kiểm tra thêm để không trùng với lượt cũ (nếu đã có vPerFrameLists)
-                    let isDuplicateOfOld = candidateLists.some((list, idx) => 
-                        vPerFrameLists[idx].length > 0 && JSON.stringify(list) === JSON.stringify(vPerFrameLists[idx])
-                    );
-
-                    if (!isDuplicateOfOld) return candidateLists;
-                }
-                attempts++;
-            }
-            // Nếu quá khó để tìm mẫu hoàn hảo (do danh sách video quá ít), trả về xáo trộn thường
-            return [shuffleArray(base), shuffleArray(base), shuffleArray(base), shuffleArray(base)];
-        }
+        let vPlaylists = [[], [], [], []];
+        let vCurrentIdx = [0, 0, 0, 0];
+        let finishedCount = 0; // Đếm số khung đã hoàn thành lượt
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
+            if (data.length < 4) return console.error("Cần ít nhất 4 video.");
             vMasterList = data;
-            // Đảm bảo số lượng video phải >= 4 để có thể khác nhau theo cột dọc
-            if (vMasterList.length < 4) {
-                console.warn("Cần ít nhất 4 video để đảm bảo không trùng lặp theo hàng dọc.");
-            }
-    
-            const initialLists = generateSuperUniqueLists(vMasterList);
-    
-            vVideos.forEach((video, i) => {
-                vPerFrameLists[i] = initialLists[i];
-                initVoyagePlayer(video, i);
-            });
+            generateNewCycle(); 
         });
 
-        function initVoyagePlayer(video, index) {
-            video.src = vPerFrameLists[index][vPerFrameIndices[index]];
-            video.play().catch(()=>{});
+        function generateNewCycle() {
+            finishedCount = 0;
+            // 1. Xáo trộn danh sách gốc để tạo sự khác biệt giữa các lần reload/lượt mới
+            let base = shuffleArray([...vMasterList]);
+
+            // 2. Tạo ma trận dịch chuyển (Latin Square)
+            // Đảm bảo tại mọi vị trí index 'j', video ở 4 khung là khác nhau hoàn toàn
+            let shiftOffsets = [0, 1, 2, 3]; 
+            // Nếu danh sách video nhiều hơn 4, ta lấy ngẫu nhiên 4 khoảng dịch chuyển khác nhau
+            if (vMasterList.length > 4) {
+                shiftOffsets = shuffleArray([...Array(vMasterList.length).keys()]).slice(0, 4);
+            } else {
+                shiftOffsets = shuffleArray([0, 1, 2, 3]);
+            }
+
+            for (let i = 0; i < 4; i++) {
+                let offset = shiftOffsets[i];
+                // Tạo playlist cho khung i bằng cách cắt và ghép mảng theo offset
+                vPlaylists[i] = [...base.slice(offset), ...base.slice(0, offset)];
+                vCurrentIdx[i] = 0;
+                playVideo(i);
+            }
+        }
+
+        function playVideo(frameIdx) {
+            const video = vVideos[frameIdx];
+            video.src = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+    
+            // Mặc định luôn tắt tiếng theo yêu cầu
+            video.muted = true; 
+            video.play().catch(() => {});
 
             video.onended = () => {
-                vPerFrameIndices[index]++;
-        
-                // Khi một khung kết thúc danh sách
-                if (vPerFrameIndices[index] >= vPerFrameLists[index].length) {
-                    // Thay vì đổi lẻ tẻ, ta nên tạo bộ 4 mới cho cả 4 khung để đảm bảo tính Latin Square cho lượt sau
-                    const nextCycle = generateSuperUniqueLists(vMasterList);
-            
-                    // Cập nhật lại toàn bộ danh sách cho cả 4 khung để bắt đầu lượt mới đồng bộ
-                    vVideos.forEach((v, i) => {
-                        vPerFrameLists[i] = nextCycle[i];
-                        vPerFrameIndices[i] = 0; 
-                        // Khung nào kết thúc thì chạy tiếp ngay, các khung khác sẽ cập nhật list cho lần 'ended' tới
-                    });
-                }
-        
-                video.src = vPerFrameLists[index][vPerFrameIndices[index]];
-                video.play();
-            };
+                vCurrentIdx[frameIdx]++;
 
-            // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
+                // Nếu khung này vẫn còn video trong lượt
+                if (vCurrentIdx[frameIdx] < vPlaylists[frameIdx].length) {
+                    playVideo(frameIdx);
+                } else {
+                    // Khung này đã xong lượt, chờ các khung còn lại
+                    finishedCount++;
+                    if (finishedCount === 4) {
+                        // Khi cả 4 khung cùng xong (Tổng thời lượng bằng nhau), bắt đầu lượt mới
+                        generateNewCycle();
+                    }
+                }
+            };
+        }
+
+        // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
+        vVideos.forEach((video, i) => {
             const parent = video.closest('.voyage-item');
             const mBtn = parent.querySelector(".v-mute-btn");
             const pBtn = parent.querySelector(".v-play-btn");
@@ -1388,7 +1366,7 @@
             };
 
             sld.oninput = (e) => video.volume = e.target.value;
-        }
+        });
 
     </script>
 </body>
