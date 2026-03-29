@@ -674,7 +674,72 @@
         }
 
         #thank-info-frame::-webkit-scrollbar { display: none; }
-        
+
+         /* --- 7. VOYAGE SECTION --- */
+         #voyage-section {
+             position: relative;
+             margin-left: 3.8vw;   
+             margin-right: 3.8vw;
+             margin-top: 0.26vw;    
+             margin-bottom: 1.56vw; 
+             padding: 0.26vw;       
+             width: auto;           
+             height: auto;          
+             overflow: hidden;      
+             display: block;
+             background: none; /* Không nền */
+             border: none;     /* Không viền */
+         }
+
+         .voyage-title {
+             font-family: 'Satisfy', cursive;
+             font-size: 3.9vw;
+             text-align: center;
+             width: 100%;
+             display: block;
+             margin-bottom: 1.5vw;
+             color: #000;
+         }
+
+         .voyage-container {
+             display: flex;
+             justify-content: space-between;
+             width: 100%;
+         }
+
+         .voyage-item {
+             width: 23.5%; /* Đảm bảo 4 khung dàn hàng ngang đều nhau */
+             background: none;
+             border: none;
+         }
+
+         .v-video-wrap {
+             width: 100%;
+             position: relative;
+             /* Tỷ lệ đứng 9:16 (1280 / 720) để hiển thị đầy đủ video */
+             padding-top: 177.77%; 
+         }
+
+         .v-video {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
+
+         .v-controls {
+             margin-top: 10px;
+             display: flex;
+             justify-content: center;
+             gap: 1.5vw;
+         }
+
+         .v-controls span {
+             cursor: pointer;
+             font-size: 1.5vw;
+         }
     </style>
 </head>
 
@@ -777,6 +842,52 @@
                 </div>
 
                 <div class="passport-total">199</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="voyage-section">
+        <h2 class="voyage-title">voyage</h2> 
+        <div class="voyage-container">
+            <div class="voyage-item">
+                <div class="v-video-wrap">
+                    <video class="v-video" autoplay muted playsinline></video>
+                    <div class="v-controls">
+                        <span class="v-mute-btn">⭐</span>
+                        <span class="v-play-btn">⭐</span>
+                        <span class="v-vol-btn">⭐</span>
+                    </div>
+                </div>
+            </div>
+            <div class="voyage-item">
+                <div class="v-video-wrap">
+                    <video class="v-video" autoplay muted playsinline></video>
+                    <div class="v-controls">
+                        <span class="v-mute-btn">⭐</span>
+                        <span class="v-play-btn">⭐</span>
+                        <span class="v-vol-btn">⭐</span>
+                    </div>
+                </div>
+            </div>
+            <div class="voyage-item">
+                <div class="v-video-wrap">
+                    <video class="v-video" autoplay muted playsinline></video>
+                    <div class="v-controls">
+                        <span class="v-mute-btn">⭐</span>
+                        <span class="v-play-btn">⭐</span>
+                        <span class="v-vol-btn">⭐</span>
+                    </div>
+                </div>
+            </div>
+            <div class="voyage-item">
+                <div class="v-video-wrap">
+                    <video class="v-video" autoplay muted playsinline></video>
+                    <div class="v-controls">
+                        <span class="v-mute-btn">⭐</span>
+                        <span class="v-play-btn">⭐</span>
+                        <span class="v-vol-btn">⭐</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1150,6 +1261,73 @@
         }
 
         loadThankfulness();
+
+        /* --- 7. VOYAGE LOGIC --- */
+        let voyageVideoList = [];
+
+        fetch("Voyagevideo.json").then(r => r.json()).then(data => {
+            voyageVideoList = data;
+            const items = document.querySelectorAll('.voyage-item');
+    
+            // Đảm bảo xác suất trùng lặp thứ tự giữa các khung là 0%
+            let uniquePlaylists = [];
+            let history = new Set();
+
+            while (uniquePlaylists.length < items.length) {
+                let trial = shuffleArray([...voyageVideoList]);
+                let key = trial.join('|');
+                if (!history.has(key)) {
+                    history.add(key);
+                    uniquePlaylists.push(trial);
+                }
+            }
+
+            items.forEach((item, i) => {
+                const v = item.querySelector('.v-video');
+                const muteBtn = item.querySelector('.v-mute-btn');
+                const playBtn = item.querySelector('.v-play-btn');
+        
+                let myPlaylist = uniquePlaylists[i];
+                let currentIdx = 0;
+
+                const playCycle = () => {
+                    v.src = myPlaylist[currentIdx];
+                    v.play().catch(() => {});
+                    currentIdx++;
+
+                    if (currentIdx >= myPlaylist.length) {
+                        // Hết vòng: tạo thứ tự ngẫu nhiên mới không trùng lượt cũ
+                        let nextOrder;
+                        do {
+                            nextOrder = shuffleArray([...voyageVideoList]);
+                        } while (nextOrder.join('|') === myPlaylist.join('|'));
+                
+                        myPlaylist = nextOrder;
+                        currentIdx = 0;
+                    }
+                };
+
+                v.addEventListener('ended', playCycle);
+                playCycle();
+
+                // Mặc định tắt tiếng
+                v.muted = true;
+
+                muteBtn.onclick = () => {
+                    v.muted = !v.muted;
+                    muteBtn.textContent = v.muted ? "⭐" : "🌟";
+                };
+        
+                playBtn.onclick = () => {
+                    if (v.paused) { v.play(); playBtn.textContent = "⭐"; }
+                    else { v.pause(); playBtn.textContent = "🌟"; }
+                };
+
+                item.querySelector('.v-vol-btn').onclick = () => {
+                    v.volume = v.volume > 0 ? 0 : 1;
+                };
+            });
+        });
         
     </script>
 </body>
