@@ -730,16 +730,23 @@
          }
 
          .v-controls {
-             margin-top: 10px;
-             display: flex;
-             justify-content: center;
-             gap: 1.5vw;
+             margin-top: 2vw; 
+            display: flex;
+            justify-content: center;
+            gap: 1.5vw;
+            width: 100%;
          }
 
          .v-controls span {
              cursor: pointer;
              font-size: 1.5vw;
+             user-select: none;
+            transition: transform 0.2s ease;
          }
+
+        .v-controls span:hover {
+            transform: scale(1.2);
+        }
     </style>
 </head>
 
@@ -850,43 +857,43 @@
         <h2 class="voyage-title">voyage</h2> 
         <div class="voyage-container">
             <div class="voyage-item">
-                <div class="v-video-wrap">
+                <div class="v-video-frame">
                     <video class="v-video" autoplay muted playsinline></video>
-                    <div class="v-controls">
-                        <span class="v-mute-btn">⭐</span>
-                        <span class="v-play-btn">⭐</span>
-                        <span class="v-vol-btn">⭐</span>
-                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-vol-btn">⭐</span>
                 </div>
             </div>
             <div class="voyage-item">
-                <div class="v-video-wrap">
+                <div class="v-video-frame">
                     <video class="v-video" autoplay muted playsinline></video>
-                    <div class="v-controls">
-                        <span class="v-mute-btn">⭐</span>
-                        <span class="v-play-btn">⭐</span>
-                        <span class="v-vol-btn">⭐</span>
-                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-vol-btn">⭐</span>
                 </div>
             </div>
             <div class="voyage-item">
-                <div class="v-video-wrap">
+                <div class="v-video-frame">
                     <video class="v-video" autoplay muted playsinline></video>
-                    <div class="v-controls">
-                        <span class="v-mute-btn">⭐</span>
-                        <span class="v-play-btn">⭐</span>
-                        <span class="v-vol-btn">⭐</span>
-                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-vol-btn">⭐</span>
                 </div>
             </div>
             <div class="voyage-item">
-                <div class="v-video-wrap">
+                <div class="v-video-frame">
                     <video class="v-video" autoplay muted playsinline></video>
-                    <div class="v-controls">
-                        <span class="v-mute-btn">⭐</span>
-                        <span class="v-play-btn">⭐</span>
-                        <span class="v-vol-btn">⭐</span>
-                    </div>
+                </div>
+                <div class="v-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-vol-btn">⭐</span>
                 </div>
             </div>
         </div>
