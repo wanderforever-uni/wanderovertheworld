@@ -675,6 +675,81 @@
 
         #thank-info-frame::-webkit-scrollbar { display: none; }
 
+        /* --- VOYAGE SECTION --- */
+        #voyage-section {
+            position: relative;
+            margin-left: 3.8vw;   
+            margin-right: 3.8vw;
+            margin-top: 2vw;       /* Khoảng cách với passport-section */
+            margin-bottom: 1.56vw; 
+            padding: 0.26vw;       
+            width: auto;           
+            height: auto;          
+            overflow: hidden;      
+            display: block;
+        }
+
+        .voyage-title {
+            font-family: 'Satisfy', cursive;
+            font-size: 3.9vw;    
+            text-align: center;  
+            width: 100%;
+            display: block;
+            margin-bottom: 1.5vw; 
+            color: #000;
+            text-transform: lowercase; /* Đảm bảo chữ voyage viết thường như air */
+        }
+
+        .voyage-container {
+            display: flex;
+            justify-content: space-between; /* Voyage 1 sát trái, Voyage 4 sát phải */
+            width: 100%;
+            background: none;
+        }
+
+        .voyage-item {
+            width: 23.5%; 
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .voyage-video-wrapper {
+            position: relative;
+            width: 100%;
+            /* Tỷ lệ chuẩn 720x1280 (1280/720 = 1.777) */
+            aspect-ratio: 720 / 1280; 
+            overflow: hidden;
+            background: none;
+        }
+
+        .voyage-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .v-video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5vw; /* Khoảng cách giữa các ngôi sao */
+            margin-top: 0.8vw;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .v-mute-btn, .v-play-btn, .v-volume-btn {
+            font-size: 1.5vw; /* Kích thước icon ngôi sao */
+        }
+
+        .v-volume-slider {
+            display: none;
+            width: 80%;
+            margin-top: 0.5vw;
+        }
+
     </style>
 </head>
 
@@ -777,6 +852,59 @@
                 </div>
 
                 <div class="passport-total">199</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="voyage-section">
+        <h2 class="voyage-title">voyage</h2>
+        <div class="voyage-container">
+            <div class="voyage-item">
+                <div class="voyage-video-wrapper">
+                    <video class="voyage-video" autoplay muted playsinline></video>
+                </div>
+                <div class="v-video-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-volume-btn">⭐</span>
+                </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
+            </div>
+
+            <div class="voyage-item">
+                <div class="voyage-video-wrapper">
+                    <video class="voyage-video" autoplay muted playsinline></video>
+                </div>
+                <div class="v-video-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-volume-btn">⭐</span>
+                </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
+            </div>
+
+            <div class="voyage-item">
+                <div class="voyage-video-wrapper">
+                    <video class="voyage-video" autoplay muted playsinline></video>
+                </div>
+                <div class="v-video-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-volume-btn">⭐</span>
+                </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
+            </div>
+
+            <div class="voyage-item">
+                <div class="voyage-video-wrapper">
+                    <video class="voyage-video" autoplay muted playsinline></video>
+                </div>
+                <div class="v-video-controls">
+                    <span class="v-mute-btn">⭐</span>
+                    <span class="v-play-btn">⭐</span>
+                    <span class="v-volume-btn">⭐</span>
+                </div>
+                <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
             </div>
         </div>
     </div>
@@ -1150,6 +1278,87 @@
         }
 
         loadThankfulness();
+
+        /* --- 7. VOYAGE LOGIC --- */
+        const vVideos = document.querySelectorAll(".voyage-video");
+        let vMasterList = [];
+        let vPerFrameLists = [[], [], [], []];
+        let vPerFrameIndices = [0, 0, 0, 0];
+
+        // Hàm so sánh hai mảng để tránh trùng lặp thứ tự
+        function isSameOrder(a, b) {
+            if (a.length !== b.length) return false;
+            return a.every((val, index) => val === b[index]);
+        }
+
+        // Tạo 4 danh sách ngẫu nhiên độc bản
+        function generateFourUniqueLists(base) {
+            let lists = [];
+            while (lists.length < 4) {
+                let candidate = shuffleArray(base);
+                // Kiểm tra candidate không trùng với bất kỳ list nào đã có trong 'lists'
+                let duplicate = lists.some(existing => isSameOrder(existing, candidate));
+                if (!duplicate) {
+                    lists.push(candidate);
+                }
+            }
+            return lists;
+        }
+
+        fetch("Voyagevideo.json").then(r => r.json()).then(data => {
+            vMasterList = data;
+            const initialLists = generateFourUniqueLists(vMasterList);
+    
+            vVideos.forEach((video, i) => {
+                vPerFrameLists[i] = initialLists[i];
+                initVoyagePlayer(video, i);
+            });
+        });
+
+        function initVoyagePlayer(video, index) {
+            // Phát video đầu tiên của danh sách dành riêng cho khung này
+            video.src = vPerFrameLists[index][vPerFrameIndices[index]];
+            video.play().catch(()=>{});
+
+            video.onended = () => {
+                vPerFrameIndices[index]++;
+        
+                // Nếu đã chiếu hết danh sách (Vòng lặp liên tục)
+                if (vPerFrameIndices[index] >= vPerFrameLists[index].length) {
+                    // Lấy một danh sách mới cho khung này, đảm bảo không trùng 3 khung còn lại
+                    // Để đơn giản và chính xác, ta tạo lại bộ 4 list mới cho lượt tiếp theo
+                    const nextCycleLists = generateFourUniqueLists(vMasterList);
+                    vPerFrameLists[index] = nextCycleLists[index];
+                    vPerFrameIndices[index] = 0;
+                }
+        
+                video.src = vPerFrameLists[index][vPerFrameIndices[index]];
+                video.play();
+            };
+
+            // Điều khiển Icon (Giống Air 100%)
+            const parent = video.closest('.voyage-item');
+            const mBtn = parent.querySelector(".v-mute-btn");
+            const pBtn = parent.querySelector(".v-play-btn");
+            const vBtn = parent.querySelector(".v-volume-btn");
+            const sld = parent.querySelector(".v-volume-slider");
+
+            mBtn.onclick = () => {
+                video.muted = !video.muted;
+                mBtn.textContent = video.muted ? "⭐" : "🌟";
+            };
+
+            pBtn.onclick = () => {
+                if (video.paused) { video.play(); pBtn.textContent = "⭐"; }
+                else { video.pause(); pBtn.textContent = "🌟"; }
+            };
+
+            vBtn.onclick = () => {
+                sld.style.display = (sld.style.display === "none") ? "block" : "none";
+            };
+
+            sld.oninput = (e) => video.volume = e.target.value;
+        }
 
     </script>
 </body>
