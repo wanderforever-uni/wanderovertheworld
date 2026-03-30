@@ -1348,34 +1348,60 @@
         /* --- 7. VOYAGE LOGIC --- */
         const vVideos = document.querySelectorAll(".voyage-video");
         let vMasterList = [];
-        let vPlaylists = [[], [], [], []]; // 4 bộ bài riêng cho 4 khung
-        let vCurrentIdx = [0, 0, 0, 0];    // 4 vị trí đọc bài riêng
+        let vPlaylists = [[], [], [], []]; 
+        let vCurrentIdx = [0, 0, 0, 0];
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
             vMasterList = data;
-            vVideos.forEach((_, i) => {
-                // Tạo 4 danh sách xáo trộn KHÁC NHAU hoàn toàn ngay từ đầu
-                vPlaylists[i] = [...vMasterList].sort(() => Math.random() - 0.5);
-                playVideo(i);
-            });
+            // Khởi tạo 4 playlist xáo trộn khác nhau hoàn toàn
+            for (let i = 0; i < 4; i++) {
+                vPlaylists[i] = shuffle([...vMasterList]);
+            }
+            vVideos.forEach((_, i) => playVideo(i));
         });
+
+        // Hàm xáo bài chuẩn (Fisher-Yates) để đảm bảo ngẫu nhiên tốt hơn sort()
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         function playVideo(frameIdx) {
             const video = vVideos[frameIdx];
-            const playlist = vPlaylists[frameIdx];
-            const idx = vCurrentIdx[frameIdx];
+    
+            // Tìm video tiếp theo trong playlist của khung này mà KHÔNG trùng với các khung khác đang chiếu
+            let nextVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+    
+            // Kiểm tra trùng lặp tức thời với 3 khung còn lại
+            let currentlyPlaying = Array.from(vVideos)
+                .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
+                .filter(src => src !== null);
 
-            // Đảm bảo chiếu đúng video trong bộ bài đã xáo của khung đó
-            video.src = playlist[idx];
+            // Nếu video định phát bị trùng với khung khác, tráo đổi nó với một video khác trong playlist của chính nó
+            if (currentlyPlaying.some(src => src && src.includes(nextVideo))) {
+                // Tìm vị trí tiếp theo trong playlist không bị trùng để đổi chỗ
+                for (let i = vCurrentIdx[frameIdx] + 1; i < vPlaylists[frameIdx].length; i++) {
+                    if (!currentlyPlaying.some(src => src && src.includes(vPlaylists[frameIdx][i]))) {
+                        // Tráo đổi vị trí hiện tại với vị trí i
+                        [vPlaylists[frameIdx][vCurrentIdx[frameIdx]], vPlaylists[frameIdx][i]] = 
+                        [vPlaylists[frameIdx][i], vPlaylists[frameIdx][vCurrentIdx[frameIdx]]];
+                        nextVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+                        break;
+                    }
+                }
+            }
+
+            video.src = nextVideo;
             video.muted = true;
             video.play().catch(() => {});
 
             video.onended = () => {
                 vCurrentIdx[frameIdx]++;
-                // Nếu đã chiếu hết bộ bài của khung này
-                if (vCurrentIdx[frameIdx] >= playlist.length) {
-                    // Xáo lại bộ bài mới cho lượt tiếp theo của riêng khung này
-                    vPlaylists[frameIdx] = [...vMasterList].sort(() => Math.random() - 0.5);
+                if (vCurrentIdx[frameIdx] >= vPlaylists[frameIdx].length) {
+                    vPlaylists[frameIdx] = shuffle([...vMasterList]);
                     vCurrentIdx[frameIdx] = 0;
                 }
                 playVideo(frameIdx);
