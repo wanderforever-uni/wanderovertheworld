@@ -1064,31 +1064,48 @@
         document.getElementById("volume-slider").addEventListener("input", (e) => videoEl.volume = e.target.value);
 
         /* --- 4. AIRLINE LOGO MARQUEE --- */
-        let airlineData = [];
-        fetch("airline.json").then(r => r.json()).then(data => {
-            airlineData = data;
-            const top = document.getElementById("row-top");
-            const bottom = document.getElementById("row-bottom");
-            
-            const build = (el, list, dir) => {
-                el.innerHTML = "";
-                const track = document.createElement("div");
-                track.className = "logo-track";
-                [...list, ...list].forEach(air => {
-                    const item = document.createElement("div");
-                    item.className = "logo-item";
-                    item.innerHTML = `<img src="${air.logo}" onerror="this.src='https://via.placeholder.com/100'">
-                                      <div class="logo-name">${air.name}</div>
-                                      <div class="logo-country">${air.country}</div>`;
-                    track.appendChild(item);
-                });
-                el.appendChild(track);
-                track.style.animation = `${dir === "left" ? "scroll-left" : "scroll-right"} 250s linear infinite`;
-            };
+        fetch("airline.json?v=" + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                const top = document.getElementById("row-top");
+                const bottom = document.getElementById("row-bottom");
 
-            build(top, shuffleArray(airlineData), "right");
-            build(bottom, shuffleArray(airlineData), "left");
-        });
+                const setupContinuousMarquee = (container, list, direction) => {
+                    let currentList = shuffleArray([...list]);
+            
+                    const createTrackContent = (items) => {
+                        // Nhân đôi danh sách để tạo hiệu ứng nối đuôi
+                        return [...items, ...items].map(air => `
+                            <div class="logo-item">
+                                <img src="${air.logo}" onerror="this.src='https://via.placeholder.com/100?text=Logo'">
+                                <div class="logo-name">${air.name}</div>
+                                <div class="logo-country">${air.country}</div>
+                            </div>
+                        `).join('');
+                    };
+
+                    container.innerHTML = `<div class="logo-track">${createTrackContent(currentList)}</div>`;
+                    const track = container.querySelector('.logo-track');
+
+                    // Thiết lập tốc độ dựa trên số lượng logo
+                    const duration = list.length * 8; 
+                    track.style.animation = `${direction === "left" ? "scroll-left" : "scroll-right"} ${duration}s linear infinite`;
+
+                    // LẮNG NGHE SỰ KIỆN: Mỗi khi animation lặp lại (hết 1 vòng)
+                    track.addEventListener('animationiteration', () => {
+                        // 1. Xáo trộn danh sách mới cho lượt tiếp theo
+                        const newList = shuffleArray([...list]);
+                
+                        // 2. Cập nhật nội dung mới vào track
+                        // Việc cập nhật này diễn ra ngay khi track nhảy về vị trí 0%, 
+                        // giúp lượt chạy tiếp theo có thứ tự khác hoàn toàn.
+                        track.innerHTML = createTrackContent(newList);
+                    });
+                };
+
+                setupContinuousMarquee(top, data, "right");
+                setupContinuousMarquee(bottom, data, "left");
+            });
 
         /* --- 5. PASSPORT LOGIC --- */
         let passports = [], passportInfo = {}, cycles = [], currentRound = 0;
