@@ -1009,25 +1009,44 @@
 
         /* --- 3. AIR VIDEO --- */
         const videoEl = document.getElementById("air-video");
-        let originalVideos = [], videoList = [], currentVideoIndex = 0;
+        let allAirVideos = []; // Kho lưu trữ gốc
+        let currentAirPlaylist = []; // Danh sách xáo trộn đang dùng
+        let airVideoIdx = 0;
 
-        fetch("planevideo.json").then(r => r.json()).then(data => {
-            originalVideos = data;
-            videoList = shuffleArray(originalVideos);
-            playNextVideo();
-        });
+        fetch("planevideo.json?v=" + Date.now()) // Thêm anti-cache để cập nhật file ngay lập tức
+            .then(r => r.json())
+            .then(data => {
+                allAirVideos = data;
+                startNewAirCycle(); // Tạo lượt chiếu đầu tiên
+            });
 
-        function playNextVideo() {
-            if (videoList.length === 0) return;
-            videoEl.src = videoList[currentVideoIndex];
-            videoEl.play().catch(()=>{});
-            currentVideoIndex++;
-            if (currentVideoIndex >= videoList.length) {
-                videoList = shuffleArray(originalVideos).slice(0, 10);
-                currentVideoIndex = 0;
-            }
+        function startNewAirCycle() {
+            // Xáo trộn toàn bộ danh sách gốc
+            currentAirPlaylist = shuffleArray(allAirVideos);
+            airVideoIdx = 0;
+            playAirVideo();
         }
-        videoEl.addEventListener("ended", playNextVideo);
+
+        function playAirVideo() {
+            if (currentAirPlaylist.length === 0) return;
+
+            videoEl.src = currentAirPlaylist[airVideoIdx];
+            videoEl.play().catch(() => {
+                console.log("Trình duyệt chặn tự động phát có âm thanh, đang phát ở chế độ tắt tiếng.");
+            });
+
+            // Lắng nghe sự kiện kết thúc video để chuyển bài
+            videoEl.onended = () => {
+                airVideoIdx++;
+        
+                // Kiểm tra nếu đã chiếu hết danh sách hiện tại
+                if (airVideoIdx >= currentAirPlaylist.length) {
+                    startNewAirCycle(); // Hết lượt thì xáo trộn lại từ đầu với thứ tự mới
+                } else {
+                    playAirVideo(); // Còn video thì chiếu tiếp
+                }
+            };
+        }
 
         // Controls
         document.getElementById("mute-btn").addEventListener("click", function() {
