@@ -1131,8 +1131,15 @@
                 cycles = [];
                 for (let i = 0; i < Math.ceil(passports.length / 10); i++) {
                     let slice = shuffled.slice(i * 10, (i + 1) * 10);
-                    while(slice.length < 10) slice.push(passports[Math.floor(Math.random()*passports.length)]);
-                    cycles.push(slice);
+                    // Thay vì bốc ngẫu nhiên từ file gốc, hãy bốc từ danh sách đã xáo trộn (shuffled) 
+                    // nhưng loại trừ những cái đã lấy (slice)
+                    while(slice.length < 10) {
+                        // Tìm một phần tử trong mảng shuffled mà chưa có trong slice
+                        let randomExtra = shuffled[Math.floor(Math.random() * shuffled.length)];
+                        if(!slice.includes(randomExtra)) {
+                            slice.push(randomExtra);
+                        }
+                    }
                 }
             };
 
