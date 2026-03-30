@@ -1348,47 +1348,38 @@
         /* --- 7. VOYAGE LOGIC --- */
         const vVideos = document.querySelectorAll(".voyage-video");
         let vMasterList = [];
+        let vPlaylists = [[], [], [], []]; // 4 bộ bài riêng cho 4 khung
+        let vCurrentIdx = [0, 0, 0, 0];    // 4 vị trí đọc bài riêng
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            if (data.length < 4) return console.error("Cần ít nhất 4 video.");
             vMasterList = data;
-            
-            // Khởi chạy độc lập cho từng khung hình ngay từ đầu
-            vVideos.forEach((_, i) => playVideo(i));
+            vVideos.forEach((_, i) => {
+                // Tạo 4 danh sách xáo trộn KHÁC NHAU hoàn toàn ngay từ đầu
+                vPlaylists[i] = [...vMasterList].sort(() => Math.random() - 0.5);
+                playVideo(i);
+            });
         });
 
         function playVideo(frameIdx) {
             const video = vVideos[frameIdx];
+            const playlist = vPlaylists[frameIdx];
+            const idx = vCurrentIdx[frameIdx];
 
-            // 1. Lấy danh sách các video ĐANG chiếu ở các khung khác để tránh trùng lặp hình ảnh
-            let currentlyPlaying = Array.from(vVideos)
-                .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
-                .filter(src => src !== null);
-
-            // 2. Lọc danh sách khả thi: 
-            // - Không trùng với khung khác
-            // - Không trùng với chính video vừa chiếu xong (tránh lặp lại ngay lập tức)
-            let availableVideos = vMasterList.filter(v => {
-                const isPlayingElsewhere = currentlyPlaying.some(src => src && src.includes(v));
-                const isJustFinished = video.src && video.src.includes(v);
-                return !isPlayingElsewhere && !isJustFinished;
-            });
-
-            // Nếu danh sách quá ít video, chỉ cần ưu tiên không trùng với khung khác là đủ
-            if (availableVideos.length === 0) {
-                availableVideos = vMasterList.filter(v => !currentlyPlaying.some(src => src && src.includes(v)));
-            }
-
-            // 3. Chọn ngẫu nhiên 1 video từ danh sách đã lọc
-            const nextVideo = availableVideos[Math.floor(Math.random() * availableVideos.length)];
-
-            // 4. Gán nguồn và phát (luôn tắt tiếng theo phong cách 'wander')
-            video.src = nextVideo;
+            // Đảm bảo chiếu đúng video trong bộ bài đã xáo của khung đó
+            video.src = playlist[idx];
             video.muted = true;
             video.play().catch(() => {});
 
-            // 5. Khi video kết thúc, khung này tự đi bốc thăm video mới mà không đợi ai
-            video.onended = () => playVideo(frameIdx);
+            video.onended = () => {
+                vCurrentIdx[frameIdx]++;
+                // Nếu đã chiếu hết bộ bài của khung này
+                if (vCurrentIdx[frameIdx] >= playlist.length) {
+                    // Xáo lại bộ bài mới cho lượt tiếp theo của riêng khung này
+                    vPlaylists[frameIdx] = [...vMasterList].sort(() => Math.random() - 0.5);
+                    vCurrentIdx[frameIdx] = 0;
+                }
+                playVideo(frameIdx);
+            };
         }
         
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
