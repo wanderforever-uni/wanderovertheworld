@@ -947,18 +947,37 @@
 
         /* --- 1. SLIDESHOW --- */
         let images = [], currentImg = 0;
-        fetch("images.json").then(r => r.json()).then(data => {
-            images = shuffleArray(data).slice(0, 10);
-            const slideImg = document.getElementById("slide");
-            const changeImage = () => {
-                if (images.length > 0) {
-                    slideImg.src = images[currentImg];
-                    currentImg = (currentImg + 1) % images.length;
-                }
-            };
-            changeImage();
-            setInterval(changeImage, 5000);
-        });
+
+        fetch("images.json")
+            .then(r => r.json())
+            .then(data => {
+                // Lưu toàn bộ danh sách gốc vào một biến để dùng lâu dài
+                const allImages = data; 
+        
+                // Tạo lượt chiếu đầu tiên: xáo trộn tất cả ảnh
+                images = shuffleArray(allImages);
+
+                const slideImg = document.getElementById("slide");
+
+                const changeImage = () => {
+                    if (images.length > 0) {
+                        slideImg.src = images[currentImg];
+                        currentImg++;
+
+                        // Kiểm tra nếu đã chiếu hết danh sách hiện tại
+                        if (currentImg >= images.length) {
+                            // Tạo một lượt mới: xáo trộn lại toàn bộ từ danh sách gốc
+                            images = shuffleArray(allImages);
+                            currentImg = 0; // Reset về hình đầu tiên của lượt mới
+                        }
+                    }
+                };
+
+                // Chạy hình đầu tiên ngay lập tức
+                changeImage();
+                // Cứ mỗi 5 giây chuyển hình một lần
+                setInterval(changeImage, 5000);
+            });
 
         /* --- 2. CLOCK & UI TOGGLE --- */
         const dateBox = document.getElementById("date-box");
