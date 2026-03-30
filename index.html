@@ -1359,35 +1359,47 @@
         let vCurrentIdx = [0, 0, 0, 0];
         let finishedCount = 0; // Đếm số khung đã hoàn thành lượt
 
-        fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            if (data.length < 4) return console.error("Cần ít nhất 4 video.");
-            vMasterList = data;
-            generateNewCycle(); 
-        });
+        fetch("voyage.json?v=" + Date.now())
+            .then(r => r.json())
+            .then(allVideos => {
+                // 1. Khai báo ID của 4 khung video (hãy đảm bảo ID này khớp với HTML)
+                const videoIds = ['voyage-v1', 'voyage-v2', 'voyage-v3', 'voyage-v4'];
 
-        function generateNewCycle() {
-            finishedCount = 0;
-            // 1. Xáo trộn danh sách gốc để tạo sự khác biệt giữa các lần reload/lượt mới
-            let base = shuffleArray([...vMasterList]);
+                // 2. Định nghĩa hàm khởi tạo ĐỘC LẬP cho từng khung
+                const initFrame = (id) => {
+                    const vEl = document.getElementById(id);
+                    if (!vEl) return;
 
-            // 2. Tạo ma trận dịch chuyển (Latin Square)
-            // Đảm bảo tại mọi vị trí index 'j', video ở 4 khung là khác nhau hoàn toàn
-            let shiftOffsets = [0, 1, 2, 3]; 
-            // Nếu danh sách video nhiều hơn 4, ta lấy ngẫu nhiên 4 khoảng dịch chuyển khác nhau
-            if (vMasterList.length > 4) {
-                shiftOffsets = shuffleArray([...Array(vMasterList.length).keys()]).slice(0, 4);
-            } else {
-                shiftOffsets = shuffleArray([0, 1, 2, 3]);
-            }
+                    // QUAN TRỌNG: Tạo bản sao và xáo trộn RIÊNG cho khung này ngay từ đầu
+                    let currentPlaylist = shuffleArray([...allVideos]);
+                    let videoIdx = 0;
 
-            for (let i = 0; i < 4; i++) {
-                let offset = shiftOffsets[i];
-                // Tạo playlist cho khung i bằng cách cắt và ghép mảng theo offset
-                vPlaylists[i] = [...base.slice(offset), ...base.slice(0, offset)];
-                vCurrentIdx[i] = 0;
-                playVideo(i);
-            }
-        }
+                    const playNext = () => {
+                        // Nếu đã phát hết danh sách riêng của khung này
+                        if (videoIdx >= currentPlaylist.length) {
+                            // Tự xáo trộn lại một trật tự mới hoàn toàn cho lượt tiếp theo
+                            currentPlaylist = shuffleArray([...allVideos]);
+                            videoIdx = 0;
+                        }
+
+                        // Gán video và phát
+                        vEl.src = currentPlaylist[videoIdx].src;
+                        vEl.load();
+                        vEl.play().catch(() => { /* Trình duyệt có thể chặn nếu chưa tương tác */ });
+
+                        videoIdx++;
+                    };
+
+                    // Lắng nghe sự kiện kết thúc của RIÊNG khung hình này
+                    vEl.onended = playNext;
+
+                    // Bắt đầu phát video đầu tiên cho khung này
+                    playNext();
+                };
+
+                // 3. Kích hoạt 4 khung chạy 4 hành trình khác nhau
+                videoIds.forEach(id => initFrame(id));
+            });
 
         function playVideo(frameIdx) {
             const video = vVideos[frameIdx];
