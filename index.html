@@ -1351,7 +1351,7 @@
         let vPlaylists = [[], [], [], []]; 
         let vCurrentIdx = [0, 0, 0, 0];
         let vRecentlyPlayed = []; 
-        const MAX_RECENT = 8;
+        const MAX_RECENT = 6;
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
             vMasterList = data;
