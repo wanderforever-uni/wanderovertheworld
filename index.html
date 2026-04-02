@@ -1351,7 +1351,7 @@
         let vPlaylists = [[], [], [], []]; 
         let vCurrentIdx = [0, 0, 0, 0];
         let vRecentlyPlayed = []; 
-        const MAX_RECENT = 6;
+        const MAX_RECENT = 4;
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
             vMasterList = data;
@@ -1373,52 +1373,62 @@
 
         function playVideo(frameIdx) {
             const video = vVideos[frameIdx];
+            if (!video) return;
 
+            // 1. Kiểm tra hết lượt chiếu -> Trộn lại lượt mới
             if (vCurrentIdx[frameIdx] >= vPlaylists[frameIdx].length) {
                 vPlaylists[frameIdx] = shuffle([...vMasterList]);
                 vCurrentIdx[frameIdx] = 0;
             }
 
-            // 2. Lấy danh sách đang chiếu (dùng getAttribute để chuẩn xác)
+            // 2. Lấy danh sách đang chiếu ở 3 khung khác
             let currentlyPlaying = Array.from(vVideos)
                 .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
                 .filter(src => src !== null);
 
             // 3. TÌM VIDEO TỐI ƯU
-            let bestVideo = null;
-            let fallbackVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
-
-            // Duyệt qua playlist để tìm cái nào không trùng đang chiếu và không vừa chiếu xong
+            let selectedVideo = null;
+            
+            // Duyệt qua playlist của khung này để tìm video "sạch"
             for (let i = vCurrentIdx[frameIdx]; i < vPlaylists[frameIdx].length; i++) {
                 let candidate = vPlaylists[frameIdx][i];
+                // Kiểm tra trùng đang phát hoặc vừa phát xong (MAX_RECENT nên để 2-3 cho 12 video)
                 const isPlaying = currentlyPlaying.some(src => src && src.includes(candidate));
                 const isRecent = vRecentlyPlayed.includes(candidate);
 
                 if (!isPlaying && !isRecent) {
-                    // Thấy video "sạch" hoàn toàn -> Chọn ngay
+                    // Nếu sạch, đưa lên vị trí hiện tại và chọn
                     [vPlaylists[frameIdx][vCurrentIdx[frameIdx]], vPlaylists[frameIdx][i]] = 
                     [vPlaylists[frameIdx][i], vPlaylists[frameIdx][vCurrentIdx[frameIdx]]];
-                    bestVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+                    selectedVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
                     break;
                 }
             }
 
-            // Nếu không tìm được video "sạch", dùng fallbackVideo (video tại vị trí index hiện tại)
-            // Điều này đảm bảo khung hình KHÔNG BAO GIỜ bị trắng.
-            let finalVideo = bestVideo || fallbackVideo;
+            // Fallback: Nếu không tìm được cái nào sạch, lấy cái tại Index hiện tại (Đảm bảo không trắng màn hình)
+            if (!selectedVideo) {
+                selectedVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+            }
 
-            // 4. Gán và phát (Tắt loop để onended hoạt động)
-            video.src = nextVideo;
+            // 4. Cập nhật và Phát (Sửa lỗi sai tên biến ở đây)
+            video.src = selectedVideo; 
             video.muted = true;
-            video.loop = false; 
-            video.play().catch(() => {});
+            video.loop = false; // Bắt buộc tắt để kích hoạt onended
+            
+            video.load(); // Buộc trình duyệt nạp lại source mới
+            video.play().catch(() => {
+                // Tự động thử lại nếu trình duyệt yêu cầu tương tác
+                video.muted = true;
+                video.play();
+            });
 
-            // 5. Khi chiếu xong: Lưu vào bộ nhớ đệm và chuyển video tiếp theo
+            // 5. Khi chiếu xong: Lưu bộ nhớ và chuyển tiếp
             video.onended = () => {
-                vRecentlyPlayed.push(finalVideo);
-                if (vRecentlyPlayed.length > MAX_RECENT) vRecentlyPlayed.shift(); 
+                vRecentlyPlayed.push(selectedVideo);
+                // Giảm MAX_RECENT xuống 3 để tránh cạn kiệt nguồn video khi có ít file
+                if (vRecentlyPlayed.length > 3) vRecentlyPlayed.shift(); 
 
-                vCurrentIdx[frameIdx]++; // Tiến tới video tiếp theo
+                vCurrentIdx[frameIdx]++; 
                 playVideo(frameIdx);
             };
         }
