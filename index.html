@@ -1374,45 +1374,38 @@
         function playVideo(frameIdx) {
             const video = vVideos[frameIdx];
 
-            // 1. Kiểm tra nếu hết danh sách 12 video (hoặc hơn) thì trộn lại lượt mới
             if (vCurrentIdx[frameIdx] >= vPlaylists[frameIdx].length) {
                 vPlaylists[frameIdx] = shuffle([...vMasterList]);
                 vCurrentIdx[frameIdx] = 0;
             }
 
-            // 2. Lấy danh sách video đang chiếu ở các khung khác
+            // 2. Lấy danh sách đang chiếu (dùng getAttribute để chuẩn xác)
             let currentlyPlaying = Array.from(vVideos)
                 .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
                 .filter(src => src !== null);
 
-            // 3. Logic tìm video "Sạch": Không trùng đang chiếu & Không trùng vừa chiếu xong
-            let foundValid = false;
-            let attempts = 0;
-            const maxAttempts = vPlaylists[frameIdx].length;
+            // 3. TÌM VIDEO TỐI ƯU
+            let bestVideo = null;
+            let fallbackVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
 
-            while (!foundValid && attempts < maxAttempts) {
-                let candidate = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
-        
-                // Kiểm tra xem video này có "sạch" không
+            // Duyệt qua playlist để tìm cái nào không trùng đang chiếu và không vừa chiếu xong
+            for (let i = vCurrentIdx[frameIdx]; i < vPlaylists[frameIdx].length; i++) {
+                let candidate = vPlaylists[frameIdx][i];
                 const isPlaying = currentlyPlaying.some(src => src && src.includes(candidate));
                 const isRecent = vRecentlyPlayed.includes(candidate);
 
                 if (!isPlaying && !isRecent) {
-                    foundValid = true;
-                } else {
-                    // Nếu không sạch, nhảy sang video kế tiếp trong playlist của khung này
-                    vCurrentIdx[frameIdx]++;
-                    attempts++;
-            
-                    // Nếu nhảy quá giới hạn playlist thì reset vòng lại đầu
-                    if (vCurrentIdx[frameIdx] >= vPlaylists[frameIdx].length) {
-                        vPlaylists[frameIdx] = shuffle([...vMasterList]);
-                        vCurrentIdx[frameIdx] = 0;
-                    }
+                    // Thấy video "sạch" hoàn toàn -> Chọn ngay
+                    [vPlaylists[frameIdx][vCurrentIdx[frameIdx]], vPlaylists[frameIdx][i]] = 
+                    [vPlaylists[frameIdx][i], vPlaylists[frameIdx][vCurrentIdx[frameIdx]]];
+                    bestVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+                    break;
                 }
             }
 
-            let finalVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
+            // Nếu không tìm được video "sạch", dùng fallbackVideo (video tại vị trí index hiện tại)
+            // Điều này đảm bảo khung hình KHÔNG BAO GIỜ bị trắng.
+            let finalVideo = bestVideo || fallbackVideo;
 
             // 4. Gán và phát (Tắt loop để onended hoạt động)
             video.src = nextVideo;
