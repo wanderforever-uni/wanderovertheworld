@@ -1346,80 +1346,63 @@
         loadThankfulness();
 
         /* --- 7. VOYAGE LOGIC --- */
-        const vVideos = document.querySelectorAll(".voyage-video");
-        let vMasterList = [];
-
-        // Lưu trữ danh sách video "CHƯA CHIẾU" riêng cho từng khung
+        let vMasterList = []; 
+        // Mỗi khung hình quản lý một danh sách "Chưa chiếu" riêng biệt
         let vPendingPlaylists = [[], [], [], []]; 
 
-        fetch("Voyagevideo.json").then(r => r.json()).then(data => {
-            vMasterList = data;
-            vVideos.forEach((_, i) => {
-                // Khởi tạo: Mỗi khung lấy 1 bản sao đầy đủ và xáo trộn
-                vPendingPlaylists[i] = shuffle([...vMasterList]);
-                playVideo(i);
+        // Chống cache để đảm bảo nhận video mới bạn vừa thêm vào file JSON
+        fetch("Voyagevideo.json?v=" + Date.now())
+            .then(r => r.json())
+            .then(data => {
+                vMasterList = data;
+                // Khởi tạo: Mỗi khung bốc một bộ bài đầy đủ và xáo trộn riêng
+                for (let i = 0; i < 4; i++) {
+                    vPendingPlaylists[i] = shuffle([...vMasterList]);
+                    playVoyageVideo(i);
+                }
             });
-        });
 
-        function playVideo(frameIdx) {
-            const video = vVideos[frameIdx];
-            if (!video) return;
+        function playVoyageVideo(frameIdx) {
+            const video = document.querySelectorAll(".voyage-video")[frameIdx];
 
-            // 1. KIỂM TRA: Nếu tập "Chưa chiếu" của khung này đã hết sạch
+            // 1. Nếu đã chiếu hết sạch túi bài của khung này -> Nạp lại 100% và xáo mới
             if (vPendingPlaylists[frameIdx].length === 0) {
-                // Nạp lại toàn bộ 100% danh sách mới để bắt đầu vòng đời mới
                 vPendingPlaylists[frameIdx] = shuffle([...vMasterList]);
+                console.log(`Khung ${frameIdx}: Đã hoàn thành 100% danh sách, bắt đầu lượt mới.`);
             }
 
-            // 2. LẤY VIDEO ĐANG PHÁT TẠI CÁC KHUNG KHÁC (Để tránh trùng tức thời)
-            let currentlyPlaying = Array.from(vVideos)
-                .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
-                .filter(src => src !== null);
+            // 2. Lấy danh sách video đang phát ở các khung khác
+            let othersPlaying = Array.from(document.querySelectorAll(".voyage-video"))
+                .filter((_, idx) => idx !== frameIdx)
+                .map(v => v.getAttribute('src'));
 
             let selectedVideo = null;
-            let foundIdx = -1;
 
-            // 3. TÌM TRONG DANH SÁCH "CHƯA CHIẾU" CỦA RIÊNG KHUNG NÀY
+            // 3. LOGIC QUAN TRỌNG: Tìm video không trùng
             for (let i = 0; i < vPendingPlaylists[frameIdx].length; i++) {
                 let candidate = vPendingPlaylists[frameIdx][i];
-        
-                // Kiểm tra xem video này có đang bị khung nào khác chiếm dụng không
-                const isBusy = currentlyPlaying.some(src => src && src.includes(candidate));
+                let isBusy = othersPlaying.some(src => src && src.includes(candidate));
 
                 if (!isBusy) {
-                    selectedVideo = candidate;
-                    foundIdx = i;
-                    break; 
+                    // Lấy video này ra khỏi danh sách chờ (Splice)
+                    selectedVideo = vPendingPlaylists[frameIdx].splice(i, 1)[0];
+                    break;
                 }
             }
 
-            // 4. XỬ LÝ KẾT QUẢ
-            if (selectedVideo) {
-                // QUAN TRỌNG: Xóa video này khỏi danh sách "Chờ" để không bao giờ gặp lại nó 
-                // cho đến khi khung này đã chiếu hết sạch các video còn lại.
-                vPendingPlaylists[frameIdx].splice(foundIdx, 1);
-            } else {
-                // Fallback: Nếu tất cả video chưa chiếu đều đang bị khung khác chiếm (hiếm gặp)
-                // Lấy đại cái đầu tiên để không đứng hình, nhưng không xóa khỏi danh sách chờ
+            // 4. XỬ LÝ TRƯỜNG HỢP ĐẶC BIỆT (Tất cả video còn lại đều đang bị khung khác chiếm)
+            if (!selectedVideo) {
+                // Lấy đại cái đầu tiên để không dừng hình, nhưng KHÔNG xóa nó khỏi túi bài
+                // Lượt sau khung này vẫn phải quay lại chiếu cái này cho đủ 100%
                 selectedVideo = vPendingPlaylists[frameIdx][0];
             }
 
-            // 5. PHÁT VIDEO
+            // 5. CẬP NHẬT VÀ PHÁT
             video.src = selectedVideo;
-            video.muted = true;
-            video.load();
-    
-            video.play().catch(() => {
-                video.muted = true;
-                video.play();
-            });
-
-            video.onended = () => {
-                playVideo(frameIdx);
-            };
+            video.onended = () => playVoyageVideo(frameIdx);
+            video.play().catch(() => {});
         }
 
-        // Giữ nguyên hàm shuffle Fisher-Yates của bạn
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
