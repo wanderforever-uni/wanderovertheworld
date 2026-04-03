@@ -1348,89 +1348,84 @@
         /* --- 7. VOYAGE LOGIC --- */
         const vVideos = document.querySelectorAll(".voyage-video");
         let vMasterList = [];
-        let vPlaylists = [[], [], [], []]; 
-        let vCurrentIdx = [0, 0, 0, 0];
-        let vRecentlyPlayed = []; 
-        const MAX_RECENT = 6;
+
+        // Lưu trữ danh sách video "CHƯA CHIẾU" riêng cho từng khung
+        let vPendingPlaylists = [[], [], [], []]; 
 
         fetch("Voyagevideo.json").then(r => r.json()).then(data => {
             vMasterList = data;
-            // Khởi tạo 4 playlist xáo trộn khác nhau hoàn toàn
-            for (let i = 0; i < 4; i++) {
-                vPlaylists[i] = shuffle([...vMasterList]);
-            }
-            vVideos.forEach((_, i) => playVideo(i));
+            vVideos.forEach((_, i) => {
+                // Khởi tạo: Mỗi khung lấy 1 bản sao đầy đủ và xáo trộn
+                vPendingPlaylists[i] = shuffle([...vMasterList]);
+                playVideo(i);
+            });
         });
 
-        // Hàm xáo bài chuẩn (Fisher-Yates) để đảm bảo ngẫu nhiên tốt hơn sort()
+        function playVideo(frameIdx) {
+            const video = vVideos[frameIdx];
+            if (!video) return;
+
+            // 1. KIỂM TRA: Nếu tập "Chưa chiếu" của khung này đã hết sạch
+            if (vPendingPlaylists[frameIdx].length === 0) {
+                // Nạp lại toàn bộ 100% danh sách mới để bắt đầu vòng đời mới
+                vPendingPlaylists[frameIdx] = shuffle([...vMasterList]);
+            }
+
+            // 2. LẤY VIDEO ĐANG PHÁT TẠI CÁC KHUNG KHÁC (Để tránh trùng tức thời)
+            let currentlyPlaying = Array.from(vVideos)
+                .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
+                .filter(src => src !== null);
+
+            let selectedVideo = null;
+            let foundIdx = -1;
+
+            // 3. TÌM TRONG DANH SÁCH "CHƯA CHIẾU" CỦA RIÊNG KHUNG NÀY
+            for (let i = 0; i < vPendingPlaylists[frameIdx].length; i++) {
+                let candidate = vPendingPlaylists[frameIdx][i];
+        
+                // Kiểm tra xem video này có đang bị khung nào khác chiếm dụng không
+                const isBusy = currentlyPlaying.some(src => src && src.includes(candidate));
+
+                if (!isBusy) {
+                    selectedVideo = candidate;
+                    foundIdx = i;
+                    break; 
+                }
+            }
+
+            // 4. XỬ LÝ KẾT QUẢ
+            if (selectedVideo) {
+                // QUAN TRỌNG: Xóa video này khỏi danh sách "Chờ" để không bao giờ gặp lại nó 
+                // cho đến khi khung này đã chiếu hết sạch các video còn lại.
+                vPendingPlaylists[frameIdx].splice(foundIdx, 1);
+            } else {
+                // Fallback: Nếu tất cả video chưa chiếu đều đang bị khung khác chiếm (hiếm gặp)
+                // Lấy đại cái đầu tiên để không đứng hình, nhưng không xóa khỏi danh sách chờ
+                selectedVideo = vPendingPlaylists[frameIdx][0];
+            }
+
+            // 5. PHÁT VIDEO
+            video.src = selectedVideo;
+            video.muted = true;
+            video.load();
+    
+            video.play().catch(() => {
+                video.muted = true;
+                video.play();
+            });
+
+            video.onended = () => {
+                playVideo(frameIdx);
+            };
+        }
+
+        // Giữ nguyên hàm shuffle Fisher-Yates của bạn
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
-        }
-
-        function playVideo(frameIdx) {
-            const video = vVideos[frameIdx];
-            if (!video) return;
-
-            // 1. Kiểm tra hết lượt chiếu -> Trộn lại lượt mới
-            if (vCurrentIdx[frameIdx] >= vPlaylists[frameIdx].length) {
-                vPlaylists[frameIdx] = shuffle([...vMasterList]);
-                vCurrentIdx[frameIdx] = 0;
-            }
-
-            // 2. Lấy danh sách đang chiếu ở 3 khung khác
-            let currentlyPlaying = Array.from(vVideos)
-                .map((v, idx) => idx !== frameIdx ? v.getAttribute('src') : null)
-                .filter(src => src !== null);
-
-            // 3. TÌM VIDEO TỐI ƯU
-            let selectedVideo = null;
-            
-            // Duyệt qua playlist của khung này để tìm video "sạch"
-            for (let i = vCurrentIdx[frameIdx]; i < vPlaylists[frameIdx].length; i++) {
-                let candidate = vPlaylists[frameIdx][i];
-                // Kiểm tra trùng đang phát hoặc vừa phát xong (MAX_RECENT nên để 2-3 cho 12 video)
-                const isPlaying = currentlyPlaying.some(src => src && src.includes(candidate));
-                const isRecent = vRecentlyPlayed.includes(candidate);
-
-                if (!isPlaying && !isRecent) {
-                    // Nếu sạch, đưa lên vị trí hiện tại và chọn
-                    [vPlaylists[frameIdx][vCurrentIdx[frameIdx]], vPlaylists[frameIdx][i]] = 
-                    [vPlaylists[frameIdx][i], vPlaylists[frameIdx][vCurrentIdx[frameIdx]]];
-                    selectedVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
-                    break;
-                }
-            }
-
-            // Fallback: Nếu không tìm được cái nào sạch, lấy cái tại Index hiện tại (Đảm bảo không trắng màn hình)
-            if (!selectedVideo) {
-                selectedVideo = vPlaylists[frameIdx][vCurrentIdx[frameIdx]];
-            }
-
-            // 4. Cập nhật và Phát (Sửa lỗi sai tên biến ở đây)
-            video.src = selectedVideo; 
-            video.muted = true;
-            video.loop = false; // Bắt buộc tắt để kích hoạt onended
-            
-            video.load(); // Buộc trình duyệt nạp lại source mới
-            video.play().catch(() => {
-                // Tự động thử lại nếu trình duyệt yêu cầu tương tác
-                video.muted = true;
-                video.play();
-            });
-
-            // 5. Khi chiếu xong: Lưu bộ nhớ và chuyển tiếp
-            video.onended = () => {
-                vRecentlyPlayed.push(selectedVideo);
-                // Giảm MAX_RECENT xuống 3 để tránh cạn kiệt nguồn video khi có ít file
-                if (vRecentlyPlayed.length > 3) vRecentlyPlayed.shift(); 
-
-                vCurrentIdx[frameIdx]++; 
-                playVideo(frameIdx);
-            };
         }
         
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
