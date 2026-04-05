@@ -1356,36 +1356,40 @@
                 const response = await fetch("Voyagevideo.json?v=" + Date.now());
                 vMasterList = await response.json();
         
-                if (vMasterList.length < 12) {
-                    console.error("Cần thêm video để tránh nghẽn thuật toán.");
+                if (vMasterList.length < 8) {
+                    console.error("Cần tối thiểu 8 video để logic vận hành ổn định.");
                     return;
                 }
         
-                generateCoordinatedRound(); 
+                // Khởi động lượt đầu tiên
+                generateNextRound();
                 for (let i = 0; i < 4; i++) playFrame(i);
             } catch (e) {
-                console.error("Lỗi:", e);
+                console.error("Lỗi khởi tạo Voyage:", e);
             }
         }
         
-        function isSequenceValid(candidate, references) {
+        /**
+         * BỘ KIỂM TRA RÀNG BUỘC (Constraints Validator)
+         */
+        function isValidSequence(candidate, allRefs) {
             const n = candidate.length;
-            for (let ref of references) {
+            for (let ref of allRefs) {
                 if (!ref || ref.length === 0) continue;
                 for (let x = 0; x < n; x++) {
-                    const video = candidate[x];
-                    const refIdx = ref.indexOf(video);
+                    const vid = candidate[x];
+                    const refIdx = ref.indexOf(vid);
                     if (refIdx === -1) continue;
         
-                    // Yêu cầu 1: Vị trí x, x-1, x+1
+                    // YÊU CẦU 1: Vị trí x không trùng x, x-1, x+1 (bao gồm biên 1,2,3)
                     if (refIdx === 0 && x <= 2) return false;
                     if (refIdx === n - 1 && x >= n - 3) return false;
                     if (Math.abs(x - refIdx) <= 1) return false;
         
-                    // Yêu cầu 2: Láng giềng thuận/đảo (1-2-3 -> không 1-2, 2-1, 2-3, 3-2)
+                    // YÊU CẦU 2: Phá vỡ láng giềng thuận/đảo
                     if (x < n - 1) {
                         const nextVid = candidate[x + 1];
-                        const r1 = ref.indexOf(video);
+                        const r1 = ref.indexOf(vid);
                         const r2 = ref.indexOf(nextVid);
                         if (r1 !== -1 && r2 !== -1 && Math.abs(r1 - r2) === 1) return false;
                     }
@@ -1394,25 +1398,28 @@
             return true;
         }
         
-        function generateCoordinatedRound() {
+        function generateNextRound() {
             const n = vMasterList.length;
             let currentRound = [];
-        
+            
             for (let i = 0; i < 4; i++) {
-                let candidate;
-                let success = false;
                 let attempts = 0;
-                const maxAttempts = 3000; // Giới hạn để không làm sập trình duyệt
-        
-                while (!success && attempts < maxAttempts) {
+                let success = false;
+                let candidate;
+                
+                // Giới hạn 5000 lần thử để bảo vệ CPU
+                while (!success && attempts < 5000) {
                     attempts++;
+                    // Tiến hóa kế thừa: Khung sau xáo trộn từ khung trước
                     let base = (i === 0) ? [...vMasterList] : [...currentRound[i - 1]];
                     candidate = shuffle([...base]);
         
-                    let allRefs = [...currentRound]; 
+                    // Tham chiếu chéo: Các khung đã xong trong lượt + lượt trước đó
+                    let allRefs = [...currentRound];
                     if (vHistory.length > 0) allRefs = [...allRefs, ...vHistory[vHistory.length - 1]];
         
-                    if (isSequenceValid(candidate, allRefs)) {
+                    if (isValidSequence(candidate, allRefs)) {
+                        // Điều kiện lượt mới: Video đầu né Đầu/Cuối lượt cũ
                         if (vHistory.length > 0) {
                             const lastRound = vHistory[vHistory.length - 1];
                             if (lastRound.some(p => candidate[0] === p[0] || candidate[0] === p[n-1])) continue;
@@ -1420,30 +1427,30 @@
                         success = true;
                     }
                 }
-                
-                // Nếu sau 3000 lần không tìm được chuỗi hoàn hảo, chấp nhận chuỗi tốt nhất có thể
+                // Fallback: Nếu quá khó, dùng bản shuffle ngẫu nhiên để web không sập
                 currentRound.push(success ? candidate : shuffle([...vMasterList]));
             }
         
             vHistory.push(currentRound);
-            if (vHistory.length > 10) vHistory.shift(); // Giải phóng bộ nhớ
+            if (vHistory.length > 5) vHistory.shift(); 
             vPlaylists = currentRound.map(p => [...p]);
         }
         
         function playFrame(frameIdx) {
             const video = vVideos[frameIdx];
             if (vPlaylists[frameIdx].length === 0) {
+                // Đồng bộ hóa khi cả 4 khung cùng chạy hết
                 if (vPlaylists.every(p => p.length === 0)) {
-                    generateCoordinatedRound();
+                    generateNextRound();
                 } else {
-                    // Khung xong trước lấy tạm 1 chuỗi né lượt vừa xong
+                    // Chống đứng hình cho khung xong trước
                     vPlaylists[frameIdx] = shuffle([...vMasterList]);
                 }
             }
         
-            const src = vPlaylists[frameIdx].shift();
-            if (src) {
-                video.src = src;
+            const nextSrc = vPlaylists[frameIdx].shift();
+            if (nextSrc) {
+                video.src = nextSrc;
                 video.onended = () => playFrame(frameIdx);
                 video.play().catch(() => playFrame(frameIdx));
             }
