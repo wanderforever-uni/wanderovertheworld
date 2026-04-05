@@ -1347,72 +1347,37 @@
 
         /* --- 7. VOYAGE LOGIC --- */
         let vMasterList = []; 
-        let vActiveHistory = []; // Lưu trữ 4 chuỗi gần nhất đã được tạo (bất kể khung nào tạo ra)
-        const vVideos = document.querySelectorAll(".voyage-video");
+        let vActiveHistory = []; // Lưu tối đa 8 chuỗi gần nhất (4 đang chiếu, 4 vừa tạo)
         let vPlaylists = [[], [], [], []];
+        const vVideos = document.querySelectorAll(".voyage-video");
         
         async function initVoyage() {
             try {
                 const response = await fetch("Voyagevideo.json?v=" + Date.now());
-                vMasterList = await response.json();
-                if (vMasterList.length < 12) return;
+                const data = await response.json();
+                
+                // Đảm bảo lấy đúng mảng đường dẫn video
+                vMasterList = Array.isArray(data) ? data : data.videos;
         
-                // LẦN ĐẦU TIÊN: Mặc định trái qua phải là 1, 2, 3, 4
+                if (!vMasterList || vMasterList.length < 10) {
+                    console.error("Dữ liệu video không hợp lệ hoặc quá ít.");
+                    return;
+                }
+        
+                // LẦN ĐẦU: Khởi tạo 1-2-3-4 từ trái qua phải
                 for (let i = 0; i < 4; i++) {
-                    const newSeq = generateSequenceForArrival(i);
-                    vPlaylists[i] = newSeq;
+                    vPlaylists[i] = generateSequenceForArrival();
                     playNext(i);
                 }
             } catch (e) {
-                console.error(e);
+                console.error("Không thể load Voyagevideo.json:", e);
             }
-        }
-        
-        /**
-         * THUẬT TOÁN SINH CHUỖI DỰA TRÊN THỨ TỰ VỀ ĐÍCH
-         * @param {number} currentArrivalIndex - Thứ tự khung vừa kết thúc (0, 1, 2 hoặc 3 trong cụm 4 mới)
-         */
-        function generateSequenceForArrival(currentArrivalIndex) {
-            const n = vMasterList.length;
-            let attempts = 0;
-            let success = false;
-            let candidate;
-        
-            // Nguồn kế thừa (Base): 
-            // Nếu là người về đích đầu tiên (Khung 1 mới), lấy khung vừa về đích cuối cùng của lượt trước làm gốc.
-            // Nếu là người về đích thứ 2, 3, 4, lấy khung vừa được tạo ngay trước đó trong vActiveHistory làm gốc.
-            let baseSource = (vActiveHistory.length > 0) 
-                             ? vActiveHistory[vActiveHistory.length - 1] 
-                             : [...vMasterList];
-        
-            while (!success && attempts < 5000) {
-                attempts++;
-                candidate = shuffle([...baseSource]);
-        
-                // SO SÁNH CHÉO:
-                // So với tất cả các khung đang còn trong danh sách Active (tối đa 7 khung: 4 cũ + các khung mới vừa tạo)
-                if (isPerfect(candidate, vActiveHistory)) {
-                    // Điều kiện video đầu: Né Đầu/Cuối của 4 khung gần nhất trong lịch sử
-                    if (vActiveHistory.length >= 4) {
-                        const recent4 = vActiveHistory.slice(-4);
-                        if (recent4.some(ref => candidate[0] === ref[0] || candidate[0] === ref[n-1])) continue;
-                    }
-                    success = true;
-                }
-            }
-        
-            const finalSeq = success ? candidate : shuffle([...vMasterList]);
-            
-            // Cập nhật Nhật ký: Luôn giữ tối đa 8 chuỗi gần nhất để so sánh chéo (4 đang chiếu + 4 vừa tạo)
-            vActiveHistory.push(finalSeq);
-            if (vActiveHistory.length > 8) vActiveHistory.shift();
-        
-            return [...finalSeq];
         }
         
         function isPerfect(candidate, history) {
             const n = candidate.length;
             for (let ref of history) {
+                if (!ref) continue;
                 for (let x = 0; x < n; x++) {
                     const vid = candidate[x];
                     const refIdx = ref.indexOf(vid);
@@ -1435,26 +1400,68 @@
             return true;
         }
         
+        function generateSequenceForArrival() {
+            const n = vMasterList.length;
+            let attempts = 0;
+            let success = false;
+            let candidate;
+        
+            // Kế thừa: Lấy chuỗi vừa được tạo gần nhất trong lịch sử làm gốc xáo trộn
+            let baseSource = (vActiveHistory.length > 0) 
+                             ? vActiveHistory[vActiveHistory.length - 1] 
+                             : [...vMasterList];
+        
+            while (!success && attempts < 3000) {
+                attempts++;
+                candidate = shuffle([...baseSource]);
+        
+                // So sánh chéo với các chuỗi đang hiện hữu (tối đa 7 chuỗi gần nhất)
+                if (isPerfect(candidate, vActiveHistory)) {
+                    // Điều kiện lượt mới: Video đầu né đầu/cuối của 4 khung gần nhất
+                    if (vActiveHistory.length >= 4) {
+                        const recent4 = vActiveHistory.slice(-4);
+                        if (recent4.some(ref => candidate[0] === ref[0] || candidate[0] === ref[n-1])) continue;
+                    }
+                    success = true;
+                }
+            }
+        
+            const finalSeq = success ? candidate : shuffle([...vMasterList]);
+            
+            vActiveHistory.push(finalSeq);
+            if (vActiveHistory.length > 8) vActiveHistory.shift();
+        
+            return [...finalSeq];
+        }
+        
         function playNext(frameIdx) {
             const video = vVideos[frameIdx];
         
-            if (vPlaylists[frameIdx].length === 0) {
-                // XÁC ĐỊNH THỨ TỰ VỀ ĐÍCH:
-                // Khi hàm này được gọi, nghĩa là Khung frameIdx vừa kết thúc lượt chiếu.
-                // Ta tính toán thứ tự của nó dựa trên số lượng playlist hiện đang trống.
-                let arrivalOrder = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (vPlaylists[i].length === 0) arrivalOrder++;
-                }
-                // arrivalOrder = 1 nghĩa là Khung này về nhất, = 4 nghĩa là về cuối.
-                
-                vPlaylists[frameIdx] = generateSequenceForArrival(arrivalOrder - 1);
+            // Kiểm tra nếu hết lượt chiếu, sinh chuỗi mới ngay lập tức
+            if (!vPlaylists[frameIdx] || vPlaylists[frameIdx].length === 0) {
+                // Khung này vừa kết thúc -> Nó nghiễm nhiên trở thành "Khung tiếp theo" trong hàng đợi tính toán
+                vPlaylists[frameIdx] = generateSequenceForArrival();
             }
         
-            const src = vPlaylists[frameIdx].shift();
-            video.src = src;
-            video.onended = () => playNext(frameIdx);
-            video.play().catch(() => playNext(frameIdx));
+            const nextSrc = vPlaylists[frameIdx].shift();
+            
+            if (nextSrc) {
+                // Cập nhật nguồn và chạy video
+                video.src = nextSrc;
+                video.load(); // Đảm bảo video được nạp lại nguồn mới
+                
+                video.onended = () => playNext(frameIdx);
+                
+                // Xử lý lỗi autoplay của trình duyệt
+                video.play().catch(e => {
+                    console.warn("Autoplay bị chặn, đang thử lại...", e);
+                    video.muted = true; // Mute để trình duyệt cho phép phát tự động
+                    video.play();
+                });
+            } else {
+                // Trường hợp khẩn cấp nếu không lấy được src, chạy lại hàm sau 100ms
+                setTimeout(() => playNext(frameIdx), 100);
+            }
         }
         
         function shuffle(array) {
@@ -1466,6 +1473,7 @@
             return array;
         }
         
+        // Khởi chạy hệ thống
         initVoyage();
         
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
