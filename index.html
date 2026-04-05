@@ -1347,60 +1347,117 @@
 
         /* --- 7. VOYAGE LOGIC --- */
         let vMasterList = []; 
-        // Mỗi khung hình quản lý một danh sách "Chưa chiếu" riêng biệt
-        let vPendingPlaylists = [[], [], [], []]; 
+        let vPlaylists = [[], [], [], []]; 
+        let vHistory = []; // Lưu trữ các chuỗi (mảng) đã hoàn thành của mỗi khung
+        const vVideos = document.querySelectorAll(".voyage-video");
 
-        // Chống cache để đảm bảo nhận video mới bạn vừa thêm vào file JSON
-        fetch("Voyagevideo.json?v=" + Date.now())
-            .then(r => r.json())
-            .then(data => {
-                vMasterList = data;
-                // Khởi tạo: Mỗi khung bốc một bộ bài đầy đủ và xáo trộn riêng
+        async function initVoyage() {
+            try {
+                const response = await fetch("Voyagevideo.json?v=" + Date.now());
+                vMasterList = await response.json();
+        
+                if (vMasterList.length < 5) {
+                    console.error("Cần tối thiểu 5 video để thỏa mãn các ràng buộc vị trí [x-1, x, x+1].");
+                    return;
+                }
+
+                // Khởi tạo lượt đầu tiên cho cả 4 khung
                 for (let i = 0; i < 4; i++) {
-                    vPendingPlaylists[i] = shuffle([...vMasterList]);
-                    playVoyageVideo(i);
+                    vPlaylists[i] = generateValidPlaylist(i);
+                    playNextInFrame(i);
                 }
+            } catch (e) {
+                console.error("Lỗi khởi tạo Voyage:", e);
+            }
+        }
+
+        // Hàm cốt lõi: Tạo chuỗi mới cho 1 khung khi nó vừa chạy hết chuỗi cũ
+        function generateValidPlaylist(frameIdx) {
+            const n = vMasterList.length;
+            let attempts = 0;
+            let candidate;
+
+            while (attempts < 5000) {
+                candidate = shuffle([...vMasterList]);
+                if (checkAllConstraints(candidate, frameIdx)) {
+                    vHistory.push([...candidate]); // Lưu vào lịch sử chung
+                    return candidate;
+                }
+                attempts++;
+            }
+    
+            // Fallback: Nếu quá khó tìm, xáo trộn cơ bản để tránh treo trình duyệt
+            return shuffle([...vMasterList]);
+        }
+
+        function checkAllConstraints(candidate, frameIdx) {
+            const n = candidate.length;
+
+            // 1. So sánh với CÁC KHUNG KHÁC đang chạy (vPlaylists hiện tại)
+            for (let i = 0; i < 4; i++) {
+                if (i === frameIdx || vPlaylists[i].length === 0) continue;
+                if (!isCompatible(candidate, vPlaylists[i], n)) return false;
+            }
+
+            // 2. So sánh với LỊCH SỬ (Điều kiện 1 & 2 của bạn)
+            // Lấy 8 chuỗi gần nhất trong lịch sử để so sánh diện rộng
+            const recentHistory = vHistory.slice(-8); 
+            for (let oldSeq of recentHistory) {
+                // Điều kiện 1: Thứ tự không được trùng hoàn toàn
+                if (JSON.stringify(candidate) === JSON.stringify(oldSeq)) return false;
+        
+                // Điều kiện 2: Video đầu lượt mới không trùng đầu/cuối lượt cũ (tất cả các khung)
+                if (candidate[0] === oldSeq[0] || candidate[0] === oldSeq[n-1]) return false;
+
+                // Kiểm tra ràng buộc vị trí x-1, x, x+1 với các chuỗi cũ để đảm bảo tính đổi mới
+                if (!isCompatible(candidate, oldSeq, n)) return false;
+            }
+
+            return true;
+        }
+
+        // Hàm kiểm tra logic x-1, x, x+1 và láng giềng giữa 2 chuỗi bất kỳ
+        function isCompatible(seqA, seqB, n) {
+            for (let i = 0; i < n; i++) {
+                const video = seqA[i];
+                const idxInB = seqB.indexOf(video);
+
+                // Yêu cầu 1: Vị trí x không nằm trong [x-1, x, x+1] của chuỗi so sánh
+                if (idxInB === 0 && i <= 2) return false;
+                if (idxInB === n - 1 && i >= n - 3) return false;
+                if (Math.abs(i - idxInB) <= 1) return false;
+
+                // Yêu cầu 2: Quan hệ láng giềng (Neighboring) thuận/đảo
+                if (i < n - 1) {
+                    const nextVideo = seqA[i + 1];
+                    const posInB = seqB.indexOf(video);
+                    const nextPosInB = seqB.indexOf(nextVideo);
+                    if (Math.abs(posInB - nextPosInB) === 1) return false;
+                }
+            }
+            return true;
+        }
+
+        function playNextInFrame(frameIdx) {
+            const videoElement = vVideos[frameIdx];
+    
+            // Nếu hết chuỗi hiện tại, nạp chuỗi mới ngay lập tức (không chờ khung khác)
+            if (vPlaylists[frameIdx].length === 0) {
+                vPlaylists[frameIdx] = generateValidPlaylist(frameIdx);
+            }
+
+            const currentVideoSrc = vPlaylists[frameIdx].shift();
+            videoElement.src = currentVideoSrc;
+    
+            videoElement.onended = () => {
+                playNextInFrame(frameIdx);
+            };
+
+            videoElement.play().catch(e => {
+                console.warn("Autoplay bị chặn hoặc lỗi file:", currentVideoSrc);
+                // Nếu lỗi file, nhảy sang video tiếp theo luôn
+                playNextInFrame(frameIdx);
             });
-
-        function playVoyageVideo(frameIdx) {
-            const video = document.querySelectorAll(".voyage-video")[frameIdx];
-
-            // 1. Nếu đã chiếu hết sạch túi bài của khung này -> Nạp lại 100% và xáo mới
-            if (vPendingPlaylists[frameIdx].length === 0) {
-                vPendingPlaylists[frameIdx] = shuffle([...vMasterList]);
-                console.log(`Khung ${frameIdx}: Đã hoàn thành 100% danh sách, bắt đầu lượt mới.`);
-            }
-
-            // 2. Lấy danh sách video đang phát ở các khung khác
-            let othersPlaying = Array.from(document.querySelectorAll(".voyage-video"))
-                .filter((_, idx) => idx !== frameIdx)
-                .map(v => v.getAttribute('src'));
-
-            let selectedVideo = null;
-
-            // 3. LOGIC QUAN TRỌNG: Tìm video không trùng
-            for (let i = 0; i < vPendingPlaylists[frameIdx].length; i++) {
-                let candidate = vPendingPlaylists[frameIdx][i];
-                let isBusy = othersPlaying.some(src => src && src.includes(candidate));
-
-                if (!isBusy) {
-                    // Lấy video này ra khỏi danh sách chờ (Splice)
-                    selectedVideo = vPendingPlaylists[frameIdx].splice(i, 1)[0];
-                    break;
-                }
-            }
-
-            // 4. XỬ LÝ TRƯỜNG HỢP ĐẶC BIỆT (Tất cả video còn lại đều đang bị khung khác chiếm)
-            if (!selectedVideo) {
-                // Lấy đại cái đầu tiên để không dừng hình, nhưng KHÔNG xóa nó khỏi túi bài
-                // Lượt sau khung này vẫn phải quay lại chiếu cái này cho đủ 100%
-                selectedVideo = vPendingPlaylists[frameIdx][0];
-            }
-
-            // 5. CẬP NHẬT VÀ PHÁT
-            video.src = selectedVideo;
-            video.onended = () => playVoyageVideo(frameIdx);
-            video.play().catch(() => {});
         }
 
         function shuffle(array) {
@@ -1410,6 +1467,9 @@
             }
             return array;
         }
+
+        // Kích hoạt hệ thống
+        initVoyage();
         
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
         vVideos.forEach((video, i) => {
