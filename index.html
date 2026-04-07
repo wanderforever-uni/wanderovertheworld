@@ -1346,157 +1346,160 @@
         loadThankfulness();
 
         /* --- 7. VOYAGE LOGIC --- */
-        let vMasterList = []; 
-        let vGlobalHistory = []; // Lưu tất cả các chuỗi thứ tự đã từng được tạo ra (Registry)
-        let vLastRoundEnds = []; // Lưu video cuối của các khung ở lượt trước
-        let vLastRoundStarts = []; // Lưu video đầu của các khung ở lượt trước
-        
-        // Quản lý thứ tự ưu tiên khung (Khung nào xong trước thành Khung 1 của lượt mới)
-        let framePriorityQueue = [0, 1, 2, 3]; 
-        let activePlaylists = { 0: [], 1: [], 2: [], 3: [] };
-        const vVideos = document.querySelectorAll(".voyage-video");
-        
-        async function initVoyage() {
-            try {
-                const response = await fetch("Voyagevideo.json?v=" + Date.now());
-                vMasterList = await response.json();
-                
-                if (vMasterList.length < 15) {
-                    console.warn("Cảnh báo: Danh sách video quá ít sẽ khiến thuật toán khó tìm ra bộ thỏa mãn ràng buộc.");
-                }
-        
-                // Khởi tạo lượt đầu tiên cho cả 4 khung theo thứ tự 0, 1, 2, 3
-                for (let i = 0; i < 4; i++) {
-                    await generateAndPlay(i);
-                }
-            } catch (e) { console.error("Lỗi khởi tạo Voyage:", e); }
+        async function loadVideos() {
+          const response = await fetch('Voyagevideo.json');
+          const videos = await response.json();
+          return videos;
         }
         
-        async function generateAndPlay(frameIdx) {
-            // Xác định vị trí "ưu tiên" của khung này trong lượt hiện tại
-            // Khung gọi hàm này sớm nhất sẽ được tính là "Khung 1" của lượt mới
-            let currentPriority = framePriorityQueue.indexOf(frameIdx);
-            
-            // Thu thập các chuỗi đang được phát ở các khung khác để so sánh chéo (Ràng buộc chung)
-            let otherActivePlaylists = [];
-            for (let i = 0; i < 4; i++) {
-                if (i !== frameIdx && activePlaylists[i].length > 0) {
-                    // Lấy chuỗi gốc (đã bao gồm các video đã phát) để so sánh vị trí
-                    otherActivePlaylists.push(getCurrentFullSequence(i)); 
-                }
-            }
-        
-            const n = vMasterList.length;
-            let found = false;
-            let attempts = 0;
-            let newSequence = [];
-        
-            while (!found && attempts < 10000) {
-                attempts++;
-                let candidate = shuffle([...vMasterList]);
-                
-                // 1. Kiểm tra không trùng lặp hoàn toàn với bất kỳ chuỗi nào trong lịch sử (Điều kiện 1)
-                if (vGlobalHistory.some(hist => JSON.stringify(hist) === JSON.stringify(candidate))) continue;
-        
-                // 2. Điều kiện về Video Đầu và Cuối (Điều kiện 2)
-                // Video đầu không trùng đầu/cuối của TẤT CẢ các khung lượt trước
-                if (vLastRoundStarts.includes(candidate[0]) || vLastRoundEnds.includes(candidate[0])) continue;
-        
-                // 3. Yêu cầu 1 & Điều kiện chung (Vị trí x, x-1, x+1...)
-                if (!checkPositionSafety(candidate, otherActivePlaylists, n)) continue;
-        
-                // 4. Yêu cầu 2 (Láng giềng liền kề - thuận và đảo)
-                if (!checkNeighborSafety(candidate, otherActivePlaylists)) continue;
-        
-                newSequence = candidate;
-                found = true;
-            }
-        
-            if (!found) newSequence = shuffle([...vMasterList]); // Fallback nếu quá khó
-        
-            // Cập nhật Registry và Lịch sử
-            vGlobalHistory.push([...newSequence]);
-            vLastRoundStarts[frameIdx] = newSequence[0];
-            vLastRoundEnds[frameIdx] = newSequence[n-1];
-            activePlaylists[frameIdx] = newSequence;
-        
-            // Đẩy khung này xuống cuối hàng đợi ưu tiên cho lượt sau
-            framePriorityQueue.splice(currentPriority, 1);
-            framePriorityQueue.push(frameIdx);
-        
-            executePlay(frameIdx);
-        }
-        
-        function checkPositionSafety(candidate, others, n) {
-            // So sánh với từng khung "đối thủ" đang chạy
-            for (let other of others) {
-                for (let x = 0; x < n; x++) {
-                    let video = candidate[x];
-                    let otherIdx = other.indexOf(video);
-                    if (otherIdx === -1) continue;
-        
-                    // Ràng buộc vị trí x, x-1, x+1 (và mở rộng x-2, x+2 nếu cần)
-                    if (Math.abs(x - otherIdx) <= 1) return false;
-                    
-                    // Biên đầu: vị trí 1 không nằm ở 1, 2, 3
-                    if (x === 0 && otherIdx <= 2) return false;
-                    if (otherIdx === 0 && x <= 2) return false;
-        
-                    // Biên cuối: vị trí n không nằm ở n, n-1, n-2
-                    if (x === n - 1 && otherIdx >= n - 3) return false;
-                    if (otherIdx === n - 1 && x >= n - 3) return false;
-                }
-            }
-            return true;
-        }
-        
-        function checkNeighborSafety(candidate, others) {
-            for (let other of others) {
-                for (let i = 0; i < candidate.length - 1; i++) {
-                    let a = candidate[i];
-                    let b = candidate[i+1];
-                    
-                    let idxA = other.indexOf(a);
-                    let idxB = other.indexOf(b);
-                    
-                    // Nếu trong khung khác, A và B cũng đứng cạnh nhau (bất kể thứ tự) -> Loại
-                    if (Math.abs(idxA - idxB) === 1) return false;
-                }
-            }
-            return true;
-        }
-        
-        // Hàm giả lập lấy lại chuỗi đầy đủ để tính toán vị trí
-        function getCurrentFullSequence(frameIdx) {
-            // Trong thực tế, cần lưu lại chuỗi gốc trước khi shift()
-            return vGlobalHistory.filter(h => h[0] === vLastRoundStarts[frameIdx]).pop() || [];
-        }
-        
-        function executePlay(idx) {
-            const video = vVideos[idx];
-            const playlist = activePlaylists[idx];
-            
-            if (playlist.length === 0) {
-                generateAndPlay(idx); // Hết lượt, tự động tái tạo theo vị trí ưu tiên mới
-                return;
-            }
-        
-            const src = playlist.shift();
-            video.src = src;
-            video.onended = () => executePlay(idx);
-            video.load();
-            video.play().catch(() => { video.muted = true; video.play(); });
-        }
-        
+        // Hàm shuffle mảng
         function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+          let arr = array.slice();
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
         }
         
-        initVoyage();
+        // Check adjacency rule
+        function violatesAdjacency(prevFrames, newFrame) {
+          const n = newFrame.length;
+          for (let f = 0; f < prevFrames.length; f++) {
+            const prev = prevFrames[f];
+            for (let i = 0; i < n - 1; i++) {
+              const a = prev[i];
+              const b = prev[i + 1];
+              for (let j = 0; j < n - 1; j++) {
+                const x = newFrame[j];
+                const y = newFrame[j + 1];
+                if ((a === x && b === y) || (a === y && b === x)) return true;
+              }
+            }
+          }
+          return false;
+        }
+        
+        // Check position constraints
+        function violatesPosition(prevFrames, newFrame) {
+          const n = newFrame.length;
+          for (let f = 0; f < prevFrames.length; f++) {
+            const prev = prevFrames[f];
+            for (let i = 0; i < n; i++) {
+              const vid = prev[i];
+              let forbidden = [];
+              if (i === 0) forbidden = [0, 1, 2];
+              else if (i === n - 1) forbidden = [n - 1, n - 2, n - 3];
+              else forbidden = [i - 1, i, i + 1];
+              if (forbidden.some(pos => newFrame[pos] === vid)) return true;
+            }
+          }
+          return false;
+        }
+        
+        // Kiểm tra trùng thứ tự với khung trước
+        function violatesOrder(prevFrames, newFrame) {
+          for (let f = 0; f < prevFrames.length; f++) {
+            const prev = prevFrames[f];
+            let match = true;
+            for (let i = 0; i < prev.length; i++) {
+              if (prev[i] !== newFrame[i]) {
+                match = false;
+                break;
+              }
+            }
+            if (match) return true;
+          }
+          return false;
+        }
+        
+        // Sinh khung mới dựa trên các khung trước
+        function generateFrame(prevFrames, videoList) {
+          let attempts = 0;
+          while (attempts < 10000) {
+            let candidate = shuffle(videoList);
+            if (
+              !violatesAdjacency(prevFrames, candidate) &&
+              !violatesPosition(prevFrames, candidate) &&
+              !violatesOrder(prevFrames, candidate)
+            ) return candidate;
+            attempts++;
+          }
+          throw new Error('Không tìm được thứ tự thỏa mãn các ràng buộc.');
+        }
+        
+        // Sinh 4 khung cho 1 lượt chiếu
+        function generateFourFrames(videoList, historyFrames = []) {
+          const frames = [];
+          // Khung 1: random
+          frames.push(shuffle(videoList));
+        
+          // Khung 2: dựa vào khung 1
+          frames.push(generateFrame([frames[0]], videoList));
+        
+          // Khung 3: dựa vào khung 1 + 2
+          frames.push(generateFrame([frames[0], frames[1]], videoList));
+        
+          // Khung 4: dựa vào khung 1 + 2 + 3
+          frames.push(generateFrame([frames[0], frames[1], frames[2]], videoList));
+        
+          return frames;
+        }
+        
+        // Kiểm tra điều kiện lượt chiếu tiếp theo
+        function checkHistory(frames, history) {
+          for (let h = 0; h < history.length; h++) {
+            const prev = history[h];
+            for (let k = 0; k < 4; k++) {
+              // Check trùng thứ tự
+              if (frames[k].every((v, i) => v === prev[k][i])) return false;
+              // Check video đầu/cuối
+              const first = frames[k][0];
+              const last = frames[k][frames[k].length - 1];
+              for (let x = 0; x < 4; x++) {
+                const prevFirst = prev[x][0];
+                const prevLast = prev[x][prev[x].length - 1];
+                if (first === prevFirst || first === prevLast) return false;
+              }
+            }
+          }
+          return true;
+        }
+        
+        // Sinh lượt chiếu mới, đảm bảo lịch sử
+        function generateNextRound(videoList, history) {
+          let attempts = 0;
+          while (attempts < 10000) {
+            const frames = generateFourFrames(videoList, []);
+            if (checkHistory(frames, history)) return frames;
+            attempts++;
+          }
+          throw new Error('Không tìm được lượt chiếu mới thỏa mãn lịch sử.');
+        }
+        
+        // ============================
+        // Ví dụ sử dụng
+        // ============================
+        
+        (async () => {
+          const videoList = await loadVideos(); // ['vid1','vid2',...]
+          const history = [];
+        
+          // Lượt chiếu 1
+          let round1 = generateFourFrames(videoList, []);
+          console.log('Lượt chiếu 1:', round1);
+          history.push(round1);
+        
+          // Lượt chiếu 2
+          let round2 = generateNextRound(videoList, history);
+          console.log('Lượt chiếu 2:', round2);
+          history.push(round2);
+        
+          // Lượt chiếu 3
+          let round3 = generateNextRound(videoList, history);
+          console.log('Lượt chiếu 3:', round3);
+          history.push(round3);
+        })();
         
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
         vVideos.forEach((video, i) => {
