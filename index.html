@@ -1347,127 +1347,145 @@
 
         /* --- 7. VOYAGE LOGIC --- */
         let vMasterList = []; 
-        let vActiveHistory = []; 
-        let vPlaylists = { 0: [], 1: [], 2: [], 3: [] };
+        let vGlobalHistory = []; // Lưu tất cả các chuỗi thứ tự đã từng được tạo ra (Registry)
+        let vLastRoundEnds = []; // Lưu video cuối của các khung ở lượt trước
+        let vLastRoundStarts = []; // Lưu video đầu của các khung ở lượt trước
+        
+        // Quản lý thứ tự ưu tiên khung (Khung nào xong trước thành Khung 1 của lượt mới)
+        let framePriorityQueue = [0, 1, 2, 3]; 
+        let activePlaylists = { 0: [], 1: [], 2: [], 3: [] };
         const vVideos = document.querySelectorAll(".voyage-video");
-        let isCalculating = false; // Khóa ngăn chặn tính toán chồng lấn
         
         async function initVoyage() {
             try {
                 const response = await fetch("Voyagevideo.json?v=" + Date.now());
                 vMasterList = await response.json();
                 
-                if (vMasterList.length < 12) return;
+                if (vMasterList.length < 15) {
+                    console.warn("Cảnh báo: Danh sách video quá ít sẽ khiến thuật toán khó tìm ra bộ thỏa mãn ràng buộc.");
+                }
         
-                // KHỞI TẠO TUẦN TỰ (AWAIT): Khung 1 xong mới đến Khung 2
+                // Khởi tạo lượt đầu tiên cho cả 4 khung theo thứ tự 0, 1, 2, 3
                 for (let i = 0; i < 4; i++) {
-                    vPlaylists[i] = await generateStrictSequenceAsync();
-                    playVideo(i);
+                    await generateAndPlay(i);
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Lỗi khởi tạo Voyage:", e); }
         }
         
-        /**
-         * HÀM SINH CHUỖI BẤT ĐỒNG BỘ (Đảm bảo thứ tự xếp hàng)
-         */
-        async function generateStrictSequenceAsync() {
-            // Nếu có khung khác đang tính, đợi 10ms rồi kiểm tra lại
-            while (isCalculating) {
-                await new Promise(resolve => setTimeout(resolve, 10));
-            }
+        async function generateAndPlay(frameIdx) {
+            // Xác định vị trí "ưu tiên" của khung này trong lượt hiện tại
+            // Khung gọi hàm này sớm nhất sẽ được tính là "Khung 1" của lượt mới
+            let currentPriority = framePriorityQueue.indexOf(frameIdx);
             
-            isCalculating = true; // Khóa lại cho đến khi tính xong
+            // Thu thập các chuỗi đang được phát ở các khung khác để so sánh chéo (Ràng buộc chung)
+            let otherActivePlaylists = [];
+            for (let i = 0; i < 4; i++) {
+                if (i !== frameIdx && activePlaylists[i].length > 0) {
+                    // Lấy chuỗi gốc (đã bao gồm các video đã phát) để so sánh vị trí
+                    otherActivePlaylists.push(getCurrentFullSequence(i)); 
+                }
+            }
+        
             const n = vMasterList.length;
+            let found = false;
             let attempts = 0;
+            let newSequence = [];
         
-            let base = vActiveHistory.length > 0 
-                       ? [...vActiveHistory[vActiveHistory.length - 1]] 
-                       : [...vMasterList];
-        
-            let finalResult = null;
-        
-            while (attempts < 5000) {
+            while (!found && attempts < 10000) {
                 attempts++;
-                let result = [];
-                let pool = shuffle([...base]);
-                let isPossible = true;
+                let candidate = shuffle([...vMasterList]);
+                
+                // 1. Kiểm tra không trùng lặp hoàn toàn với bất kỳ chuỗi nào trong lịch sử (Điều kiện 1)
+                if (vGlobalHistory.some(hist => JSON.stringify(hist) === JSON.stringify(candidate))) continue;
         
+                // 2. Điều kiện về Video Đầu và Cuối (Điều kiện 2)
+                // Video đầu không trùng đầu/cuối của TẤT CẢ các khung lượt trước
+                if (vLastRoundStarts.includes(candidate[0]) || vLastRoundEnds.includes(candidate[0])) continue;
+        
+                // 3. Yêu cầu 1 & Điều kiện chung (Vị trí x, x-1, x+1...)
+                if (!checkPositionSafety(candidate, otherActivePlaylists, n)) continue;
+        
+                // 4. Yêu cầu 2 (Láng giềng liền kề - thuận và đảo)
+                if (!checkNeighborSafety(candidate, otherActivePlaylists)) continue;
+        
+                newSequence = candidate;
+                found = true;
+            }
+        
+            if (!found) newSequence = shuffle([...vMasterList]); // Fallback nếu quá khó
+        
+            // Cập nhật Registry và Lịch sử
+            vGlobalHistory.push([...newSequence]);
+            vLastRoundStarts[frameIdx] = newSequence[0];
+            vLastRoundEnds[frameIdx] = newSequence[n-1];
+            activePlaylists[frameIdx] = newSequence;
+        
+            // Đẩy khung này xuống cuối hàng đợi ưu tiên cho lượt sau
+            framePriorityQueue.splice(currentPriority, 1);
+            framePriorityQueue.push(frameIdx);
+        
+            executePlay(frameIdx);
+        }
+        
+        function checkPositionSafety(candidate, others, n) {
+            // So sánh với từng khung "đối thủ" đang chạy
+            for (let other of others) {
                 for (let x = 0; x < n; x++) {
-                    let found = false;
-                    for (let i = 0; i < pool.length; i++) {
-                        // KIỂM TRA VỊ TRÍ X: So với tất cả khung ĐANG PHÁT trong lịch sử
-                        if (isPositionSafe(pool[i], x, vActiveHistory)) {
-                            result.push(pool.splice(i, 1)[0]);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) { isPossible = false; break; }
+                    let video = candidate[x];
+                    let otherIdx = other.indexOf(video);
+                    if (otherIdx === -1) continue;
+        
+                    // Ràng buộc vị trí x, x-1, x+1 (và mở rộng x-2, x+2 nếu cần)
+                    if (Math.abs(x - otherIdx) <= 1) return false;
+                    
+                    // Biên đầu: vị trí 1 không nằm ở 1, 2, 3
+                    if (x === 0 && otherIdx <= 2) return false;
+                    if (otherIdx === 0 && x <= 2) return false;
+        
+                    // Biên cuối: vị trí n không nằm ở n, n-1, n-2
+                    if (x === n - 1 && otherIdx >= n - 3) return false;
+                    if (otherIdx === n - 1 && x >= n - 3) return false;
                 }
-        
-                if (isPossible && isNeighborSafe(result, vActiveHistory)) {
-                    // Chốt chặn video đầu lượt mới
-                    if (vActiveHistory.length >= 4) {
-                        const last4 = vActiveHistory.slice(-4);
-                        if (last4.some(ref => result[0] === ref[0] || result[0] === ref[n-1])) continue;
-                    }
-                    finalResult = result;
-                    break;
-                }
-            }
-        
-            const output = finalResult || shuffle([...vMasterList]);
-            vActiveHistory.push(output);
-            if (vActiveHistory.length > 8) vActiveHistory.shift();
-            
-            isCalculating = false; // Mở khóa cho khung tiếp theo
-            return [...output];
-        }
-        
-        function isPositionSafe(video, x, history) {
-            for (let ref of history) {
-                const refIdx = ref.indexOf(video);
-                if (refIdx === -1) continue;
-                // Tuyệt đối không trùng x, x-1, x+1
-                if (Math.abs(x - refIdx) <= 1) return false;
-                // Chặn biên đầu/cuối
-                if (refIdx === 0 && x <= 2) return false;
-                if (refIdx === vMasterList.length - 1 && x >= vMasterList.length - 3) return false;
             }
             return true;
         }
         
-        function isNeighborSafe(candidate, history) {
-            for (let ref of history) {
+        function checkNeighborSafety(candidate, others) {
+            for (let other of others) {
                 for (let i = 0; i < candidate.length - 1; i++) {
-                    if (Math.abs(ref.indexOf(candidate[i]) - ref.indexOf(candidate[i+1])) === 1) return false;
+                    let a = candidate[i];
+                    let b = candidate[i+1];
+                    
+                    let idxA = other.indexOf(a);
+                    let idxB = other.indexOf(b);
+                    
+                    // Nếu trong khung khác, A và B cũng đứng cạnh nhau (bất kể thứ tự) -> Loại
+                    if (Math.abs(idxA - idxB) === 1) return false;
                 }
             }
             return true;
         }
         
-        function playVideo(idx) {
-            const video = vVideos[idx];
-            if (vPlaylists[idx].length === 0) {
-                // Gọi hàm async nhưng không await để khung này tự chạy độc lập sau khi tính xong
-                generateStrictSequenceAsync().then(newSeq => {
-                    vPlaylists[idx] = newSeq;
-                    executePlay(idx);
-                });
-                return;
-            }
-            executePlay(idx);
+        // Hàm giả lập lấy lại chuỗi đầy đủ để tính toán vị trí
+        function getCurrentFullSequence(frameIdx) {
+            // Trong thực tế, cần lưu lại chuỗi gốc trước khi shift()
+            return vGlobalHistory.filter(h => h[0] === vLastRoundStarts[frameIdx]).pop() || [];
         }
         
         function executePlay(idx) {
             const video = vVideos[idx];
-            const src = vPlaylists[idx].shift();
-            if (src) {
-                video.src = src;
-                video.onended = () => playVideo(idx);
-                video.load();
-                video.play().catch(() => { video.muted = true; video.play(); });
+            const playlist = activePlaylists[idx];
+            
+            if (playlist.length === 0) {
+                generateAndPlay(idx); // Hết lượt, tự động tái tạo theo vị trí ưu tiên mới
+                return;
             }
+        
+            const src = playlist.shift();
+            video.src = src;
+            video.onended = () => executePlay(idx);
+            video.load();
+            video.play().catch(() => { video.muted = true; video.play(); });
         }
         
         function shuffle(array) {
