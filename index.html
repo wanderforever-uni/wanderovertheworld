@@ -1348,7 +1348,7 @@
         /* --- 7. VOYAGE LOGIC --- */
         let vMasterList = [];
         let vPlaylists = { 0: [], 1: [], 2: [], 3: [] };
-        let vActiveHistory = []; // Lưu các chuỗi đã phát để đối chiếu
+        let vActiveHistory = []; 
         const vVideos = document.querySelectorAll(".voyage-video");
         let isCalculating = false;
         
@@ -1356,34 +1356,26 @@
             try {
                 const response = await fetch("Voyagevideo.json?v=" + Date.now());
                 vMasterList = await response.json();
-                
-                // Cần tối thiểu số lượng video đủ lớn để thỏa mãn các ràng buộc (thường n > 10)
                 if (vMasterList.length < 12) return;
         
-                // Khởi tạo lượt đầu tiên cho 4 khung
                 for (let i = 0; i < 4; i++) {
                     await startNewSequence(i);
                 }
             } catch (e) { console.error(e); }
         }
         
-        /**
-         * Hàm khởi tạo chuỗi mới cho một khung
-         * Khung gọi hàm này sớm nhất sẽ đóng vai trò "Khung 1" trong lượt tính toán đó
-         */
         async function startNewSequence(idx) {
             while (isCalculating) {
                 await new Promise(r => setTimeout(r, 10));
             }
-            
             isCalculating = true;
-            
-            // Thuật toán Backtracking tìm chuỗi thỏa mãn tất cả điều kiện
+        
+            // Tạo playlist mới bằng Backtracking để đảm bảo KHÔNG trùng ID trong cùng 1 khung
             const newSeq = generateBacktrackingSequence(idx);
             
-            vPlaylists[idx] = newSeq;
-            vActiveHistory.push([...newSeq]); // Lưu vào lịch sử để các khung sau đối chiếu
-            if (vActiveHistory.length > 12) vActiveHistory.shift(); // Giữ lịch sử đủ rộng để so sánh lượt cũ/mới
+            vPlaylists[idx] = [...newSeq]; 
+            vActiveHistory.push([...newSeq]); 
+            if (vActiveHistory.length > 8) vActiveHistory.shift(); 
         
             isCalculating = false;
             executePlay(idx);
@@ -1392,82 +1384,70 @@
         function generateBacktrackingSequence(frameIdx) {
             const n = vMasterList.length;
             let result = [];
-            let used = new Set();
+            let usedIds = new Set(); // Đảm bảo 1 video chỉ xuất hiện 1 lần trong 1 playlist
             
-            // Lấy danh sách các chuỗi đang phát của các khung khác (trừ chính nó)
-            // Để thực hiện yêu cầu so sánh chéo vị trí x, x-1, x+1
             let otherSeqs = Object.keys(vPlaylists)
-                .filter(key => parseInt(key) !== frameIdx && vPlaylists[key].length > 0)
-                .map(key => vPlaylists[key]);
+                .filter(k => parseInt(k) !== frameIdx && vPlaylists[k] && vPlaylists[k].length > 0)
+                .map(k => [...vPlaylists[k]]);
         
             function solve(pos) {
                 if (pos === n) return true;
         
-                // Xáo trộn ứng viên để đảm bảo tính ngẫu nhiên mỗi lần reload/truy cập
                 let candidates = shuffle([...vMasterList]);
         
                 for (let video of candidates) {
-                    if (used.has(video)) continue;
+                    if (usedIds.has(video.id)) continue; // Chặn lặp video trong cùng khung
         
                     if (isStrictSafe(video, pos, result, otherSeqs)) {
-                        used.add(video);
+                        usedIds.add(video.id);
                         result.push(video);
-                        
                         if (solve(pos + 1)) return true;
-        
-                        // Backtrack
                         result.pop();
-                        used.delete(video);
+                        usedIds.delete(video.id);
                     }
                 }
                 return false;
             }
         
             if (solve(0)) return result;
-            
-            // Fallback: Nếu logic quá ngặt nghèo không tìm được chuỗi hoàn hảo
-            return shuffle([...vMasterList]);
+            return shuffle([...vMasterList]); 
         }
         
-        /**
-         * Kiểm tra tất cả ràng buộc khắt khe
-         */
         function isStrictSafe(video, x, currentSeq, otherSeqs) {
             const n = vMasterList.length;
         
-            // --- KIỂM TRA VỊ TRÍ (Yêu cầu 1 & Nhấn mạnh điều kiện chung) ---
-            // So sánh với các khung khác đang chạy và lịch sử lượt trước
+            // So sánh với các khung khác (Đang chạy hoặc lượt trước)
             for (let ref of [...otherSeqs, ...vActiveHistory]) {
-                const refIdx = ref.indexOf(video);
+                const refIdx = ref.findIndex(v => v.id === video.id);
                 if (refIdx === -1) continue;
         
-                // Không trùng x, x-1, x+1
+                // 1. Chặn trùng vị trí x và lân cận x-1, x+1
                 if (Math.abs(x - refIdx) <= 1) return false;
-                // Video thứ 1 khung này không nằm ở 1, 2, 3 khung khác
-                if (x === 0 && refIdx <= 2) return false;
-                // Video cuối khung này không nằm ở n, n-1, n-2 khung khác
-                if (x === n - 1 && refIdx >= n - 3) return false;
+                
+                // 2. Chặn BIÊN ĐẦU: Nếu video gốc ở 1,2,3 (0,1,2) thì video mới không được ở 1,2,3
+                if (refIdx <= 2 && x <= 2) return false;
+        
+                // 3. Chặn BIÊN ĐUÔI: Nếu video gốc ở n, n-1, n-2 thì video mới không được ở n, n-1, n-2
+                // (Chỉ số: n-1, n-2, n-3)
+                if (refIdx >= n - 3 && x >= n - 3) return false;
             }
         
-            // --- KIỂM TRA CẶP LIỀN KỀ (Yêu cầu 2) ---
+            // 4. Chặn cặp liền kề AB/BA
             if (x > 0) {
                 const prevVideo = currentSeq[x - 1];
                 for (let ref of [...otherSeqs, ...vActiveHistory]) {
-                    const pIdx = ref.indexOf(prevVideo);
-                    const cIdx = ref.indexOf(video);
+                    const pIdx = ref.findIndex(v => v.id === prevVideo.id);
+                    const cIdx = ref.findIndex(v => v.id === video.id);
                     if (pIdx !== -1 && cIdx !== -1) {
-                        // Không được xuất hiện liền kề (bất kể thuận hay đảo AB/BA)
                         if (Math.abs(pIdx - cIdx) === 1) return false;
                     }
                 }
             }
         
-            // --- ĐIỀU KIỆN LƯỢT MỚI (Boundary) ---
+            // 5. Video đầu lượt mới không trùng đầu/cuối của bất kỳ khung nào trước đó
             if (x === 0 && vActiveHistory.length > 0) {
-                // Video đầu không trùng với video đầu hoặc cuối của bất kỳ khung nào lượt trước
-                for (let old of vActiveHistory.slice(-4)) {
-                    if (video === old[0] || video === old[n-1]) return false;
-                }
+                const lastRound = vActiveHistory.slice(-4);
+                if (lastRound.some(ref => video.id === ref[0].id || video.id === ref[n-1].id)) return false;
             }
         
             return true;
@@ -1475,26 +1455,20 @@
         
         function executePlay(idx) {
             const video = vVideos[idx];
-            const src = vPlaylists[idx].shift();
-            
-            if (src) {
-                video.src = src;
-                video.classList.add("fading"); // Hiệu ứng chuyển cảnh nếu bạn có CSS
-                
+            if (vPlaylists[idx].length === 0) return;
+        
+            const currentVideoObject = vPlaylists[idx].shift();
+            if (currentVideoObject) {
+                video.src = currentVideoObject.url;
                 video.onended = () => {
                     if (vPlaylists[idx].length === 0) {
-                        // Khi hết chuỗi, tính toán lượt mới
                         startNewSequence(idx);
                     } else {
                         executePlay(idx);
                     }
                 };
-        
                 video.load();
-                video.play().catch(() => { 
-                    video.muted = true; 
-                    video.play(); 
-                });
+                video.play().catch(() => { video.muted = true; video.play(); });
             }
         }
         
@@ -1507,7 +1481,7 @@
         }
         
         initVoyage();
-
+        
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
         vVideos.forEach((video, i) => {
             const parent = video.closest('.voyage-item');
