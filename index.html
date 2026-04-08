@@ -1346,127 +1346,155 @@
         loadThankfulness();
 
         /* --- 7. VOYAGE LOGIC --- */
-        let vMasterList = []; 
-        let vActiveHistory = []; 
+        let vMasterList = [];
         let vPlaylists = { 0: [], 1: [], 2: [], 3: [] };
+        let vActiveHistory = []; // Lưu các chuỗi đã phát để đối chiếu
         const vVideos = document.querySelectorAll(".voyage-video");
-        let isCalculating = false; // Khóa ngăn chặn tính toán chồng lấn
+        let isCalculating = false;
         
         async function initVoyage() {
             try {
                 const response = await fetch("Voyagevideo.json?v=" + Date.now());
                 vMasterList = await response.json();
                 
+                // Cần tối thiểu số lượng video đủ lớn để thỏa mãn các ràng buộc (thường n > 10)
                 if (vMasterList.length < 12) return;
         
-                // KHỞI TẠO TUẦN TỰ (AWAIT): Khung 1 xong mới đến Khung 2
+                // Khởi tạo lượt đầu tiên cho 4 khung
                 for (let i = 0; i < 4; i++) {
-                    vPlaylists[i] = await generateStrictSequenceAsync();
-                    playVideo(i);
+                    await startNewSequence(i);
                 }
             } catch (e) { console.error(e); }
         }
         
         /**
-         * HÀM SINH CHUỖI BẤT ĐỒNG BỘ (Đảm bảo thứ tự xếp hàng)
+         * Hàm khởi tạo chuỗi mới cho một khung
+         * Khung gọi hàm này sớm nhất sẽ đóng vai trò "Khung 1" trong lượt tính toán đó
          */
-        async function generateStrictSequenceAsync() {
-            // Nếu có khung khác đang tính, đợi 10ms rồi kiểm tra lại
+        async function startNewSequence(idx) {
             while (isCalculating) {
-                await new Promise(resolve => setTimeout(resolve, 10));
+                await new Promise(r => setTimeout(r, 10));
             }
             
-            isCalculating = true; // Khóa lại cho đến khi tính xong
-            const n = vMasterList.length;
-            let attempts = 0;
-        
-            let base = vActiveHistory.length > 0 
-                       ? [...vActiveHistory[vActiveHistory.length - 1]] 
-                       : [...vMasterList];
-        
-            let finalResult = null;
-        
-            while (attempts < 5000) {
-                attempts++;
-                let result = [];
-                let pool = shuffle([...base]);
-                let isPossible = true;
-        
-                for (let x = 0; x < n; x++) {
-                    let found = false;
-                    for (let i = 0; i < pool.length; i++) {
-                        // KIỂM TRA VỊ TRÍ X: So với tất cả khung ĐANG PHÁT trong lịch sử
-                        if (isPositionSafe(pool[i], x, vActiveHistory)) {
-                            result.push(pool.splice(i, 1)[0]);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) { isPossible = false; break; }
-                }
-        
-                if (isPossible && isNeighborSafe(result, vActiveHistory)) {
-                    // Chốt chặn video đầu lượt mới
-                    if (vActiveHistory.length >= 4) {
-                        const last4 = vActiveHistory.slice(-4);
-                        if (last4.some(ref => result[0] === ref[0] || result[0] === ref[n-1])) continue;
-                    }
-                    finalResult = result;
-                    break;
-                }
-            }
-        
-            const output = finalResult || shuffle([...vMasterList]);
-            vActiveHistory.push(output);
-            if (vActiveHistory.length > 8) vActiveHistory.shift();
+            isCalculating = true;
             
-            isCalculating = false; // Mở khóa cho khung tiếp theo
-            return [...output];
+            // Thuật toán Backtracking tìm chuỗi thỏa mãn tất cả điều kiện
+            const newSeq = generateBacktrackingSequence(idx);
+            
+            vPlaylists[idx] = newSeq;
+            vActiveHistory.push([...newSeq]); // Lưu vào lịch sử để các khung sau đối chiếu
+            if (vActiveHistory.length > 12) vActiveHistory.shift(); // Giữ lịch sử đủ rộng để so sánh lượt cũ/mới
+        
+            isCalculating = false;
+            executePlay(idx);
         }
         
-        function isPositionSafe(video, x, history) {
-            for (let ref of history) {
+        function generateBacktrackingSequence(frameIdx) {
+            const n = vMasterList.length;
+            let result = [];
+            let used = new Set();
+            
+            // Lấy danh sách các chuỗi đang phát của các khung khác (trừ chính nó)
+            // Để thực hiện yêu cầu so sánh chéo vị trí x, x-1, x+1
+            let otherSeqs = Object.keys(vPlaylists)
+                .filter(key => parseInt(key) !== frameIdx && vPlaylists[key].length > 0)
+                .map(key => vPlaylists[key]);
+        
+            function solve(pos) {
+                if (pos === n) return true;
+        
+                // Xáo trộn ứng viên để đảm bảo tính ngẫu nhiên mỗi lần reload/truy cập
+                let candidates = shuffle([...vMasterList]);
+        
+                for (let video of candidates) {
+                    if (used.has(video)) continue;
+        
+                    if (isStrictSafe(video, pos, result, otherSeqs)) {
+                        used.add(video);
+                        result.push(video);
+                        
+                        if (solve(pos + 1)) return true;
+        
+                        // Backtrack
+                        result.pop();
+                        used.delete(video);
+                    }
+                }
+                return false;
+            }
+        
+            if (solve(0)) return result;
+            
+            // Fallback: Nếu logic quá ngặt nghèo không tìm được chuỗi hoàn hảo
+            return shuffle([...vMasterList]);
+        }
+        
+        /**
+         * Kiểm tra tất cả ràng buộc khắt khe
+         */
+        function isStrictSafe(video, x, currentSeq, otherSeqs) {
+            const n = vMasterList.length;
+        
+            // --- KIỂM TRA VỊ TRÍ (Yêu cầu 1 & Nhấn mạnh điều kiện chung) ---
+            // So sánh với các khung khác đang chạy và lịch sử lượt trước
+            for (let ref of [...otherSeqs, ...vActiveHistory]) {
                 const refIdx = ref.indexOf(video);
                 if (refIdx === -1) continue;
-                // Tuyệt đối không trùng x, x-1, x+1
-                if (Math.abs(x - refIdx) <= 1) return false;
-                // Chặn biên đầu/cuối
-                if (refIdx === 0 && x <= 2) return false;
-                if (refIdx === vMasterList.length - 1 && x >= vMasterList.length - 3) return false;
-            }
-            return true;
-        }
         
-        function isNeighborSafe(candidate, history) {
-            for (let ref of history) {
-                for (let i = 0; i < candidate.length - 1; i++) {
-                    if (Math.abs(ref.indexOf(candidate[i]) - ref.indexOf(candidate[i+1])) === 1) return false;
+                // Không trùng x, x-1, x+1
+                if (Math.abs(x - refIdx) <= 1) return false;
+                // Video thứ 1 khung này không nằm ở 1, 2, 3 khung khác
+                if (x === 0 && refIdx <= 2) return false;
+                // Video cuối khung này không nằm ở n, n-1, n-2 khung khác
+                if (x === n - 1 && refIdx >= n - 3) return false;
+            }
+        
+            // --- KIỂM TRA CẶP LIỀN KỀ (Yêu cầu 2) ---
+            if (x > 0) {
+                const prevVideo = currentSeq[x - 1];
+                for (let ref of [...otherSeqs, ...vActiveHistory]) {
+                    const pIdx = ref.indexOf(prevVideo);
+                    const cIdx = ref.indexOf(video);
+                    if (pIdx !== -1 && cIdx !== -1) {
+                        // Không được xuất hiện liền kề (bất kể thuận hay đảo AB/BA)
+                        if (Math.abs(pIdx - cIdx) === 1) return false;
+                    }
                 }
             }
-            return true;
-        }
         
-        function playVideo(idx) {
-            const video = vVideos[idx];
-            if (vPlaylists[idx].length === 0) {
-                // Gọi hàm async nhưng không await để khung này tự chạy độc lập sau khi tính xong
-                generateStrictSequenceAsync().then(newSeq => {
-                    vPlaylists[idx] = newSeq;
-                    executePlay(idx);
-                });
-                return;
+            // --- ĐIỀU KIỆN LƯỢT MỚI (Boundary) ---
+            if (x === 0 && vActiveHistory.length > 0) {
+                // Video đầu không trùng với video đầu hoặc cuối của bất kỳ khung nào lượt trước
+                for (let old of vActiveHistory.slice(-4)) {
+                    if (video === old[0] || video === old[n-1]) return false;
+                }
             }
-            executePlay(idx);
+        
+            return true;
         }
         
         function executePlay(idx) {
             const video = vVideos[idx];
             const src = vPlaylists[idx].shift();
+            
             if (src) {
                 video.src = src;
-                video.onended = () => playVideo(idx);
+                video.classList.add("fading"); // Hiệu ứng chuyển cảnh nếu bạn có CSS
+                
+                video.onended = () => {
+                    if (vPlaylists[idx].length === 0) {
+                        // Khi hết chuỗi, tính toán lượt mới
+                        startNewSequence(idx);
+                    } else {
+                        executePlay(idx);
+                    }
+                };
+        
                 video.load();
-                video.play().catch(() => { video.muted = true; video.play(); });
+                video.play().catch(() => { 
+                    video.muted = true; 
+                    video.play(); 
+                });
             }
         }
         
@@ -1480,8 +1508,6 @@
         
         initVoyage();
 
-
-        
         // --- Giữ nguyên logic điều khiển Icon (Mute, Play, Volume) như cũ ---
         vVideos.forEach((video, i) => {
             const parent = video.closest('.voyage-item');
