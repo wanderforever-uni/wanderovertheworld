@@ -71,6 +71,7 @@
   ["Font", "https://www.fontspace.com/super-adorable-font-f147900"],
   ["Font", "https://www.fontspace.com/typographica-font-f23015"],
   ["Icon", "https://www.flaticon.com/free-icon/airplane_7893979"],
+  ["Icon", "https://www.flaticon.com/free-icon/convert_8970989"],
   ["Video", "https://www.instagram.com/reel/DVI3LqrCOAF/"],
   ["Video", "https://www.instagram.com/reel/DV643PeiHzn/"],
   ["Video", "https://www.instagram.com/reel/DMQDj7yBdbk/"],
@@ -107,5 +108,7 @@
   ["Video", "https://x.com/airlinerslive/status/2041437160956477475"],
   ["Video", "https://x.com/TravelBucketX/status/2041346569413566495"],
   ["Video", "https://x.com/naturalbeautyi7/status/2041607121457021030"],
+  ["Currency", "https://wise.com"],
+  ["Flag", "https://www.countryflags.com"],
   ["Other", "created by system"]
 ]
