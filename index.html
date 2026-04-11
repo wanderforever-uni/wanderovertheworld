@@ -1712,54 +1712,63 @@
         });
 
         /* --- 8. CURRENCY LOGIC --- */
-        // Tỷ giá giả định theo Wise (USD-EUR)
-        async function startCurrencyLogic() {
+        async function initCurrency() {
             try {
                 const response = await fetch('https://open.er-api.com/v6/latest/USD');
                 const data = await response.json();
-                const rateUSDtoEUR = data.rates.EUR; 
+                const rateUSDToEUR = data.rates.EUR;
         
+                // Tìm tất cả các box để xử lý riêng lẻ
                 document.querySelectorAll('.currency-main-box').forEach(box => {
-                    const inputField = box.querySelector('.curr-input');
-                    const resultText = box.querySelector('.result-val');
+                    const input = box.querySelector('.curr-input');
+                    const result = box.querySelector('.curr-result');
                     const swapBtn = box.querySelector('.convert-btn');
         
-                    const updateResult = () => {
-                        const amount = parseFloat(inputField.value) || 0;
-                        const currentUnit = box.querySelector('.curr-part-5 .p-right').textContent;
+                    const calculate = () => {
+                        const amount = parseFloat(input.value) || 0;
+                        // Lấy đơn vị hiện tại ở phần 5 của CHÍNH BOX NÀY
+                        const unitP5 = box.querySelector('.p5-right').textContent.trim();
                         
-                        // Tính toán dựa trên đơn vị hiện tại ở Phần 5
-                        const rate = (currentUnit === "USD") ? rateUSDtoEUR : (1 / rateUSDtoEUR);
-                        resultText.textContent = (amount * rate).toFixed(4);
+                        const currentRate = (unitP5 === "USD") ? rateUSDToEUR : (1 / rateUSDToEUR);
+                        result.textContent = (amount * currentRate).toFixed(4);
                     };
         
-                    inputField.addEventListener('input', updateResult);
+                    // Sự kiện nhập liệu
+                    input.addEventListener('input', calculate);
         
+                    // Sự kiện Swap
                     swapBtn.addEventListener('click', () => {
                         const p5 = box.querySelector('.curr-part-5');
                         const p6 = box.querySelector('.curr-part-6');
         
-                        // Swap thông tin cờ và mã tiền
-                        const img5 = p5.querySelector('img').src, txt5 = p5.querySelector('.p-right').textContent;
-                        const img6 = p6.querySelector('img').src, txt6 = p6.querySelector('.p-right').textContent;
+                        // Lấy dữ liệu hiện tại
+                        const img5 = p5.querySelector('img').src;
+                        const txt5 = p5.querySelector('.p5-right').textContent;
+                        const img6 = p6.querySelector('img').src;
+                        const txt6 = p6.querySelector('.p6-right').textContent;
         
+                        // Hoán đổi hình ảnh và chữ
                         p5.querySelector('img').src = img6;
-                        p5.querySelector('.p-right').textContent = txt6;
+                        p5.querySelector('.p5-right').textContent = txt6;
                         p6.querySelector('img').src = img5;
-                        p6.querySelector('.p-right').textContent = txt5;
+                        p6.querySelector('.p6-right').textContent = txt5;
         
-                        // GIỮ NGUYÊN GIÁ TRỊ NHẬP VÀ CẬP NHẬT KẾT QUẢ P6
-                        updateResult();
+                        // Tính toán lại ngay lập tức (vẫn giữ nguyên giá trị input)
+                        calculate();
+                        
+                        // Hiệu ứng xoay icon
+                        swapBtn.style.transform = (swapBtn.style.transform === 'rotate(180deg)') ? 'rotate(0deg)' : 'rotate(180deg)';
                     });
         
-                    updateResult(); // Chạy lần đầu
+                    // Chạy lần đầu để hiển thị con số mặc định
+                    calculate();
                 });
             } catch (e) {
-                console.error("Lỗi lấy tỉ giá Wise.");
+                console.error("Lỗi API:", e);
             }
         }
         
-        startCurrencyLogic();
+        initCurrency();
         
     </script>
 </body>
