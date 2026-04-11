@@ -1710,7 +1710,21 @@
 
         /* --- 8. CURRENCY LOGIC --- */
         // Tỷ giá giả định theo Wise (USD-EUR)
-        const EXCHANGE_RATE = 0.9412;
+        const API_URL = "https://open.er-api.com/v6/latest/USD";
+
+        async function getLiveRate() {
+            try {
+                // Gọi API lấy tỉ giá mới nhất với USD là gốc
+                const response = await fetch('https://open.er-api.com/v6/latest/USD');
+                const data = await response.json();
+                const rate = data.rates.EUR; // Trình duyệt sẽ nhận về ~0.85 tùy thời điểm
+        
+                setupCurrency(rate);
+            } catch (error) {
+                console.error("Lỗi cập nhật tỉ giá:", error);
+                setupCurrency(0.85); // Nếu lỗi mạng, dùng con số 0.85 làm dự phòng
+            }
+        }
         
         document.querySelectorAll('.currency-main-box').forEach(box => {
             const input = box.querySelector('.curr-input');
