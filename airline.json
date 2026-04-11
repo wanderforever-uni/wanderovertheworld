@@ -34,5 +34,10 @@
   {"name":"Ethiopian Airlines","country":"Ethiopia","logo":"https://www.logo.wine/a/logo/Ethiopian_Airlines/Ethiopian_Airlines-Logo.wine.svg"},
   {"name":"Air Canada","country":"Canada","logo":"https://www.logo.wine/a/logo/Air_Canada/Air_Canada-Logo.wine.svg"},
   {"name":"Air New Zealand","country":"New Zealand","logo":"https://www.logo.wine/a/logo/Air_New_Zealand/Air_New_Zealand-Logo.wine.svg"},
-  {"name":"Scoot","country":"Singapore","logo":"https://www.logo.wine/a/logo/Scoot/Scoot-Logo.wine.svg"}
+  {"name":"Scoot","country":"Singapore","logo":"https://www.logo.wine/a/logo/Scoot/Scoot-Logo.wine.svg"},
+  {"name":"Cebu Pacific","country":"Philippines","logo":"https://www.logo.wine/a/logo/Cebu_Pacific/Cebu_Pacific-Logo.wine.svg"},
+  {"name":"Jetstar Asia Airways","country":"Singapore","logo":"https://www.logo.wine/a/logo/Jetstar_Asia_Airways/Jetstar_Asia_Airways-Logo.wine.svg"},
+  {"name":"Philippine Airlines","country":"Philippines","logo":"https://www.logo.wine/a/logo/Philippine_Airlines/Philippine_Airlines-Logo.wine.svg"},
+  {"name":"Royal Brunei Airlines","country":"Brunei","logo":"https://www.logo.wine/a/logo/Royal_Brunei_Airlines/Royal_Brunei_Airlines-Logo.wine.svg"},
+  {"name":"Nok Air","country":"Thailand","logo":"https://www.logo.wine/a/logo/Nok_Air/Nok_Air-Logo.wine.svg"}
 ]
