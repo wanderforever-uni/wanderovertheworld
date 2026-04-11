@@ -791,46 +791,69 @@
             display: flex;
             justify-content: center;
             gap: 10vw;
+            width: 100%;
         }
         
-        /* Ép 2 ô bằng nhau tuyệt đối */
         .currency-main-box {
-            flex: 0 0 25vw;
+            flex: 0 0 25vw; /* Đảm bảo 2 cột chủ rộng bằng nhau */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
-        /* PHẦN 2: Ép khung vuông để 2 bên bằng nhau chằn chặn */
+        /* PHẦN 2: ÉP CỜ LỚN VỀ CÙNG KÍCH THƯỚC */
         .curr-part-2 {
-            width: 100%;
-            aspect-ratio: 1 / 1; 
+            width: 22vw;         /* Chiều rộng cố định */
+            height: 15vw;        /* Chiều cao cố định - Giúp 2 bên cao bằng nhau chằn chặn */
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
             margin-bottom: 1.5vw;
         }
         
         .curr-part-2 img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;   /* Ép ảnh lấp đầy khung 22x15, cắt bỏ phần thừa để bằng nhau */
+            object-position: center;
         }
         
-        /* Các thành phần con dùng vw */
+        /* PHẦN 5 & 6: ĐỒNG NHẤT CỜ NHỎ */
+        .mini-flag {
+            width: 2.8vw;        /* Rộng cố định */
+            height: 1.8vw;       /* Cao cố định */
+            object-fit: cover;   /* Ép bằng nhau tuyệt đối */
+            display: block;
+        }
+        
+        /* Typography & Layout con */
         .curr-part-1 { font-weight: bold; font-size: 1.1vw; margin-bottom: 1vw; text-transform: uppercase; }
         .curr-part-3 { font-weight: bold; font-size: 1.1vw; }
-        .curr-part-4 { font-size: 0.9vw; margin-bottom: 2vw; }
+        .curr-part-4 { font-size: 0.9vw; color: #666; margin-bottom: 2vw; }
         
+        .curr-exchange-area { width: 100%; }
         .curr-part-5, .curr-part-6 { display: flex; align-items: center; width: 100%; margin: 0.8vw 0; }
+        
         .p-left { flex: 0 0 20%; display: flex; justify-content: center; }
         .p-mid { flex: 0 0 60%; text-align: center; }
         .p-right { flex: 0 0 20%; font-weight: bold; text-align: center; font-size: 1vw; }
         
-        .mini-flag { width: 2.2vw; height: auto; }
-        .curr-input { width: 85%; border: none; border-bottom: 0.1vw solid #000; text-align: center; font-size: 1.2vw; outline: none; background: transparent; }
-        .convert-btn { width: 2.5vw; cursor: pointer; margin: 1vw 0; }
+        .curr-input {
+            width: 85%;
+            border: none;
+            border-bottom: 0.1vw solid #000;
+            text-align: center;
+            font-size: 1.2vw;
+            outline: none;
+            background: transparent;
+        }
+        
+        .convert-btn {
+            width: 2.2vw;
+            cursor: pointer;
+            margin: 0.5vw 0;
+        }
         
         .convert-btn:hover { transform: rotate(180deg); }
 
