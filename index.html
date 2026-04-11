@@ -1712,63 +1712,72 @@
         // Tỷ giá giả định theo Wise (USD-EUR)
         const API_URL = "https://open.er-api.com/v6/latest/USD";
 
-        async function getLiveRate() {
+        async function initCurrencyConverter() {
             try {
-                // Gọi API lấy tỉ giá mới nhất với USD là gốc
+                // Lấy tỉ giá thực tế từ Wise (qua API trung gian)
                 const response = await fetch('https://open.er-api.com/v6/latest/USD');
                 const data = await response.json();
-                const rate = data.rates.EUR; // Trình duyệt sẽ nhận về ~0.85 tùy thời điểm
+                const usdToEurRate = data.rates.EUR; // Ví dụ: 0.85
         
-                setupCurrency(rate);
-            } catch (error) {
-                console.error("Lỗi cập nhật tỉ giá:", error);
-                setupCurrency(0.85); // Nếu lỗi mạng, dùng con số 0.85 làm dự phòng
+                document.querySelectorAll('.currency-main-box').forEach(box => {
+                    const input = box.querySelector('.curr-input');
+                    const result = box.querySelector('.result-val');
+                    const rateDisplay = box.querySelector('.curr-part-4');
+                    const swapBtn = box.querySelector('.convert-btn');
+        
+                    // Hàm thực hiện quy đổi từ Phần 5 sang Phần 6
+                    const performConversion = () => {
+                        const val = parseFloat(input.value) || 0;
+                        const currentP5Unit = box.querySelector('.p5-right').textContent;
+                        
+                        let currentRate;
+                        if (currentP5Unit === "USD") {
+                            currentRate = usdToEurRate;
+                        } else {
+                            currentRate = 1 / usdToEurRate;
+                        }
+        
+                        // Cập nhật số tỉ giá hiển thị ở Phần 4
+                        rateDisplay.textContent = currentRate.toFixed(4);
+                        // Cập nhật kết quả ở Phần 6
+                        result.textContent = (val * currentRate).toFixed(4);
+                    };
+        
+                    // Sự kiện nhập liệu
+                    input.addEventListener('input', performConversion);
+        
+                    // Sự kiện Swap
+                    swapBtn.addEventListener('click', () => {
+                        const p5 = box.querySelector('.curr-part-5');
+                        const p6 = box.querySelector('.curr-part-6');
+        
+                        // Lấy thông tin hiện tại
+                        const p5Img = p5.querySelector('img').src;
+                        const p5Txt = p5.querySelector('.p5-right').textContent;
+                        const p6Img = p6.querySelector('img').src;
+                        const p6Txt = p6.querySelector('.p6-right').textContent;
+        
+                        // Hoán đổi
+                        p5.querySelector('img').src = p6Img;
+                        p5.querySelector('.p5-right').textContent = p6Txt;
+                        p6.querySelector('img').src = p5Img;
+                        p6.querySelector('.p6-right').textContent = p5Txt;
+        
+                        // Reset giá trị và tính toán lại
+                        input.value = "1";
+                        performConversion();
+                    });
+        
+                    // Khởi chạy lần đầu
+                    performConversion();
+                });
+            } catch (err) {
+                console.error("Lỗi cập nhật dữ liệu Wise:", err);
             }
         }
         
-        document.querySelectorAll('.currency-main-box').forEach(box => {
-            const input = box.querySelector('.curr-input');
-            const result = box.querySelector('.p6-mid');
-            const convertBtn = box.querySelector('.convert-btn');
-            
-            // 1. Logic quy đổi
-            const updateConversion = () => {
-                const val = parseFloat(input.value) || 0;
-                const isUSDToEUR = box.querySelector('.p5-right').textContent === "USD";
-                
-                if (isUSDToEUR) {
-                    result.textContent = (val * EXCHANGE_RATE).toFixed(2);
-                } else {
-                    result.textContent = (val / EXCHANGE_RATE).toFixed(2);
-                }
-            };
-        
-            input.addEventListener('input', updateConversion);
-        
-            // 2. Logic đảo chiều (Swap Phần 5 và Phần 6)
-            convertBtn.addEventListener('click', () => {
-                const p5 = box.querySelector('.curr-part-5');
-                const p6 = box.querySelector('.curr-part-6');
-                
-                // Lấy thông tin hiện tại
-                const p5_img = p5.querySelector('img').src;
-                const p5_txt = p5.querySelector('.p5-right').textContent;
-                
-                const p6_img = p6.querySelector('img').src;
-                const p6_txt = p6.querySelector('.p6-right').textContent;
-        
-                // Hoán đổi nội dung
-                p5.querySelector('img').src = p6_img;
-                p5.querySelector('.p5-right').textContent = p6_txt;
-                
-                p6.querySelector('img').src = p5_img;
-                p6.querySelector('.p6-right').textContent = p5_txt;
-        
-                // Reset về mặc định = 1
-                input.value = "1";
-                updateConversion();
-            });
-        });
+        // Chạy ứng dụng
+        initCurrencyConverter();
 
     </script>
 </body>
