@@ -793,85 +793,44 @@
             gap: 10vw;
         }
         
-        .currency-container {
-            display: flex;
-            justify-content: center; /* Đưa cả 2 ô vào chính giữa khung */
-            gap: 10vw;               /* Khoảng cách hài hòa giữa 2 ô (tùy chỉnh số này) */
-            width: 100%;
-        }
-        
+        /* Ép 2 ô bằng nhau tuyệt đối */
         .currency-main-box {
-            flex: 1;
-            max-width: 400px; /* Độ rộng hài hòa */
+            flex: 0 0 25vw;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
-        .curr-part-1 { font-weight: bold; text-align: center; margin-bottom: 10px; text-transform: uppercase; }
-        
+        /* PHẦN 2: Ép khung vuông để 2 bên bằng nhau chằn chặn */
         .curr-part-2 {
-            width: 100%;        /* Buộc khung phải rộng bằng 100% ô chủ */
-            aspect-ratio: 1 / 1; /* Tạo khung vuông 1500x1500 giả lập */
+            width: 100%;
+            aspect-ratio: 1 / 1; 
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            margin-bottom: 1vw;
-            background-color: transparent; /* Đảm bảo khung luôn tồn tại dù ảnh nhỏ */
+            margin-bottom: 1.5vw;
         }
         
         .curr-part-2 img {
-            /* Hình ảnh không được phép đẩy chiều rộng của khung */
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Căn đều hình theo chiều lớn hơn mà không làm biến dạng khung */
-        }
-        
-        .curr-part-3 { font-weight: bold; text-align: center; margin-bottom: 5px; }
-        .curr-part-4 { text-align: center; margin-bottom: 20px; color: #666; }
-        
-        .curr-exchange-area { width: 100%; }
-        
-        .curr-part-5, .curr-part-6 {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin: 10px 0;
-        }
-        
-        /* Tỉ lệ 2-6-2 */
-        .p5-left, .p6-left { flex: 2; display: flex; justify-content: center; }
-        .p5-mid, .p6-mid { flex: 6; text-align: center; font-size: 1.2rem; }
-        .p5-right, .p6-right { flex: 2; font-weight: bold; text-align: center; }
-        
-        .p5-left img, .p6-left img {
-            width: 30px; /* Kích thước icon cờ nhỏ */
-            height: auto;
             object-fit: contain;
         }
         
-        .curr-input {
-            width: 80%;
-            border: none;
-            border-bottom: 1px solid #ccc;
-            text-align: center;
-            font-size: 1.2rem;
-            outline: none;
-            background: transparent;
-        }
+        /* Các thành phần con dùng vw */
+        .curr-part-1 { font-weight: bold; font-size: 1.1vw; margin-bottom: 1vw; text-transform: uppercase; }
+        .curr-part-3 { font-weight: bold; font-size: 1.1vw; }
+        .curr-part-4 { font-size: 0.9vw; margin-bottom: 2vw; }
         
-        .curr-convert-icon {
-            display: flex;
-            justify-content: center;
-            margin: 10px 0;
-        }
+        .curr-part-5, .curr-part-6 { display: flex; align-items: center; width: 100%; margin: 0.8vw 0; }
+        .p-left { flex: 0 0 20%; display: flex; justify-content: center; }
+        .p-mid { flex: 0 0 60%; text-align: center; }
+        .p-right { flex: 0 0 20%; font-weight: bold; text-align: center; font-size: 1vw; }
         
-        .convert-btn {
-            width: 30px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
+        .mini-flag { width: 2.2vw; height: auto; }
+        .curr-input { width: 85%; border: none; border-bottom: 0.1vw solid #000; text-align: center; font-size: 1.2vw; outline: none; background: transparent; }
+        .convert-btn { width: 2.5vw; cursor: pointer; margin: 1vw 0; }
         
         .convert-btn:hover { transform: rotate(180deg); }
 
