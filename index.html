@@ -1713,76 +1713,53 @@
 
         /* --- 8. CURRENCY LOGIC --- */
         // Tỷ giá giả định theo Wise (USD-EUR)
-        const API_URL = "https://open.er-api.com/v6/latest/USD";
-
-        async function initCurrencyConverter() {
+        async function startCurrencyLogic() {
             try {
-                // Lấy tỉ giá thực tế (Tương đương Wise)
                 const response = await fetch('https://open.er-api.com/v6/latest/USD');
                 const data = await response.json();
-                const usdToEurRate = data.rates.EUR; // Ví dụ: ~0.85
+                const rateUSDtoEUR = data.rates.EUR; 
         
                 document.querySelectorAll('.currency-main-box').forEach(box => {
-                    const input = box.querySelector('.curr-input');
-                    const result = box.querySelector('.result-val');
-                    const rateDisplay = box.querySelector('.curr-part-4');
+                    const inputField = box.querySelector('.curr-input');
+                    const resultText = box.querySelector('.result-val');
                     const swapBtn = box.querySelector('.convert-btn');
         
-                    // CỐ ĐỊNH PHẦN 4 LUÔN LÀ 1
-                    rateDisplay.textContent = "1";
-        
-                    const performConversion = () => {
-                        const val = parseFloat(input.value) || 0;
-                        const currentP5Unit = box.querySelector('.p5-right').textContent;
+                    const updateResult = () => {
+                        const amount = parseFloat(inputField.value) || 0;
+                        const currentUnit = box.querySelector('.curr-part-5 .p-right').textContent;
                         
-                        let rate;
-                        // Xác định tỉ giá dựa trên đơn vị hiện tại ở Phần 5
-                        if (currentP5Unit === "USD") {
-                            rate = usdToEurRate;
-                        } else {
-                            rate = 1 / usdToEurRate;
-                        }
-        
-                        // CHỈ CẬP NHẬT KẾT QUẢ Ở PHẦN 6
-                        result.textContent = (val * rate).toFixed(4);
+                        // Tính toán dựa trên đơn vị hiện tại ở Phần 5
+                        const rate = (currentUnit === "USD") ? rateUSDtoEUR : (1 / rateUSDtoEUR);
+                        resultText.textContent = (amount * rate).toFixed(4);
                     };
         
-                    // Sự kiện nhập liệu (Phần 5 nhập, Phần 6 nhảy)
-                    input.addEventListener('input', performConversion);
+                    inputField.addEventListener('input', updateResult);
         
-                    // Sự kiện Swap
                     swapBtn.addEventListener('click', () => {
                         const p5 = box.querySelector('.curr-part-5');
                         const p6 = box.querySelector('.curr-part-6');
         
-                        // 1. Lấy thông tin hiện tại để hoán đổi
-                        const p5Img = p5.querySelector('img').src;
-                        const p5Txt = p5.querySelector('.p5-right').textContent;
-                        const p6Img = p6.querySelector('img').src;
-                        const p6Txt = p6.querySelector('.p6-right').textContent;
+                        // Swap thông tin cờ và mã tiền
+                        const img5 = p5.querySelector('img').src, txt5 = p5.querySelector('.p-right').textContent;
+                        const img6 = p6.querySelector('img').src, txt6 = p6.querySelector('.p-right').textContent;
         
-                        // 2. Hoán đổi ảnh và đơn vị tiền tệ
-                        p5.querySelector('img').src = p6Img;
-                        p5.querySelector('.p5-right').textContent = p6Txt;
-                        p6.querySelector('img').src = p5Img;
-                        p6.querySelector('.p6-right').textContent = p5Txt;
+                        p5.querySelector('img').src = img6;
+                        p5.querySelector('.p-right').textContent = txt6;
+                        p6.querySelector('img').src = img5;
+                        p6.querySelector('.p-right').textContent = txt5;
         
-                        // 3. GIỮ NGUYÊN GIÁ TRỊ NHẬP LIỆU (Nếu là 1 thì vẫn là 1, nếu đã nhập số khác thì giữ số đó)
-                        // Không reset input.value về "1" ở đây nữa.
-                        
-                        // 4. Tính toán lại kết quả ở Phần 6 theo vị trí mới
-                        performConversion();
+                        // GIỮ NGUYÊN GIÁ TRỊ NHẬP VÀ CẬP NHẬT KẾT QUẢ P6
+                        updateResult();
                     });
         
-                    // Khởi chạy lần đầu
-                    performConversion();
+                    updateResult(); // Chạy lần đầu
                 });
-            } catch (err) {
-                console.error("Lỗi lấy dữ liệu tỉ giá:", err);
+            } catch (e) {
+                console.error("Lỗi lấy tỉ giá Wise.");
             }
         }
         
-        initCurrencyConverter();
+        startCurrencyLogic();
         
     </script>
 </body>
