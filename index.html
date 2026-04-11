@@ -811,19 +811,21 @@
         .curr-part-1 { font-weight: bold; text-align: center; margin-bottom: 10px; text-transform: uppercase; }
         
         .curr-part-2 {
-            width: 100%;
-            aspect-ratio: 1/1; /* Chứa hình 1500x1500 */
+            width: 100%;        /* Buộc khung phải rộng bằng 100% ô chủ */
+            aspect-ratio: 1 / 1; /* Tạo khung vuông 1500x1500 giả lập */
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 1vw;
+            background-color: transparent; /* Đảm bảo khung luôn tồn tại dù ảnh nhỏ */
         }
         
         .curr-part-2 img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; /* Căn đều theo chiều lớn nhất */
+            /* Hình ảnh không được phép đẩy chiều rộng của khung */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Căn đều hình theo chiều lớn hơn mà không làm biến dạng khung */
         }
         
         .curr-part-3 { font-weight: bold; text-align: center; margin-bottom: 5px; }
