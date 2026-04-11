@@ -761,6 +761,108 @@
             height: 1vw;
         }
 
+        /* --- 8. CURRENCY SECTION --- */
+        #currency-section {
+            position: relative;
+            margin-left: 3.8vw;   
+            margin-right: 3.8vw;
+            margin-top: 0.26vw;    
+            margin-bottom: 1.56vw; 
+            padding: 0.26vw;       
+            width: auto;           
+            height: auto;          
+            overflow: hidden;      
+            display: block;
+        }
+        
+        /* Container chứa 2 ô chủ */
+        .currency-container {
+            display: flex;
+            justify-content: space-around; /* Cách nhau hài hòa */
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .currency-container {
+            display: flex;
+            justify-content: center;
+            gap: 10vw; /* Khoảng cách hài hòa giữa 2 ô chủ */
+            width: 100%;
+        }
+        
+        .currency-main-box {
+            flex: 1;
+            max-width: 400px; /* Độ rộng hài hòa */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .curr-part-1 { font-weight: bold; text-align: center; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .curr-part-2 {
+            width: 100%;
+            aspect-ratio: 1/1; /* Chứa hình 1500x1500 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .curr-part-2 img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Căn đều theo chiều lớn nhất */
+        }
+        
+        .curr-part-3 { font-weight: bold; text-align: center; margin-bottom: 5px; }
+        .curr-part-4 { text-align: center; margin-bottom: 20px; color: #666; }
+        
+        .curr-exchange-area { width: 100%; }
+        
+        .curr-part-5, .curr-part-6 {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        /* Tỉ lệ 2-6-2 */
+        .p5-left, .p6-left { flex: 2; display: flex; justify-content: center; }
+        .p5-mid, .p6-mid { flex: 6; text-align: center; font-size: 1.2rem; }
+        .p5-right, .p6-right { flex: 2; font-weight: bold; text-align: center; }
+        
+        .p5-left img, .p6-left img {
+            width: 30px; /* Kích thước icon cờ nhỏ */
+            height: auto;
+            object-fit: contain;
+        }
+        
+        .curr-input {
+            width: 80%;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+            font-size: 1.2rem;
+            outline: none;
+            background: transparent;
+        }
+        
+        .curr-convert-icon {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        
+        .convert-btn {
+            width: 30px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .convert-btn:hover { transform: rotate(180deg); }
+
     </style>
 </head>
 
@@ -916,6 +1018,65 @@
                     <span class="v-volume-btn">⭐</span>
                 </div>
                 <input type="range" class="v-volume-slider" min="0" max="1" step="0.01">
+            </div>
+        </div>
+    </div>
+
+    <div id="currency-section">
+        <h2 class="currency-title">currency</h2>
+        <div class="currency-container">
+            <div class="currency-main-box" id="box-left">
+                <div class="curr-part-1">UNITED STATES</div>
+                <div class="curr-part-2">
+                    <img src="https://www.countryflags.com/wp-content/uploads/united-states-of-america-flag-png-large.png" alt="USA">
+                </div>
+                <div class="curr-part-3">USD</div>
+                <div class="curr-part-4">1</div>
+                
+                <div class="curr-exchange-area">
+                    <div class="curr-part-5">
+                        <div class="p5-left"><img src="https://www.countryflags.com/wp-content/uploads/united-states-of-america-flag-png-large.png"></div>
+                        <div class="p5-mid"><input type="number" value="1" class="curr-input"></div>
+                        <div class="p5-right">USD</div>
+                    </div>
+    
+                    <div class="curr-convert-icon">
+                        <img src="https://www.iconpacks.net/free-icon/convert-3216.html" style="display:none;"> <img src="https://cdn-icons-png.flaticon.com/512/3584/3584511.png" class="convert-btn" alt="convert">
+                    </div>
+    
+                    <div class="curr-part-6">
+                        <div class="p6-left"><img src="https://www.countryflags.com/wp-content/uploads/europe-flag-jpg-xl-1536x1024.jpg"></div>
+                        <div class="p6-mid" class="curr-result">0.92</div>
+                        <div class="p6-right">EUR</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="currency-main-box" id="box-right">
+                <div class="curr-part-1">EUROPEAN UNION</div>
+                <div class="curr-part-2">
+                    <img src="https://www.countryflags.com/wp-content/uploads/europe-flag-jpg-xl-1536x1024.jpg" alt="EU">
+                </div>
+                <div class="curr-part-3">EUR</div>
+                <div class="curr-part-4">1</div>
+    
+                <div class="curr-exchange-area">
+                    <div class="curr-part-5">
+                        <div class="p5-left"><img src="https://www.countryflags.com/wp-content/uploads/europe-flag-jpg-xl-1536x1024.jpg"></div>
+                        <div class="p5-mid"><input type="number" value="1" class="curr-input"></div>
+                        <div class="p5-right">EUR</div>
+                    </div>
+    
+                    <div class="curr-convert-icon">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3584/3584511.png" class="convert-btn" alt="convert">
+                    </div>
+    
+                    <div class="curr-part-6">
+                        <div class="p6-left"><img src="https://www.countryflags.com/wp-content/uploads/united-states-of-america-flag-png-large.png"></div>
+                        <div class="p6-mid" class="curr-result">1.08</div>
+                        <div class="p6-right">USD</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1504,6 +1665,54 @@
             };
 
             sld.oninput = (e) => video.volume = e.target.value;
+        });
+
+        /* --- 8. CURRENCY LOGIC --- */
+        // Tỷ giá giả định theo Wise (USD-EUR)
+        const EXCHANGE_RATE = 0.92; 
+        
+        document.querySelectorAll('.currency-main-box').forEach(box => {
+            const input = box.querySelector('.curr-input');
+            const result = box.querySelector('.p6-mid');
+            const convertBtn = box.querySelector('.convert-btn');
+            
+            // 1. Logic quy đổi
+            const updateConversion = () => {
+                const val = parseFloat(input.value) || 0;
+                const isUSDToEUR = box.querySelector('.p5-right').textContent === "USD";
+                
+                if (isUSDToEUR) {
+                    result.textContent = (val * EXCHANGE_RATE).toFixed(2);
+                } else {
+                    result.textContent = (val / EXCHANGE_RATE).toFixed(2);
+                }
+            };
+        
+            input.addEventListener('input', updateConversion);
+        
+            // 2. Logic đảo chiều (Swap Phần 5 và Phần 6)
+            convertBtn.addEventListener('click', () => {
+                const p5 = box.querySelector('.curr-part-5');
+                const p6 = box.querySelector('.curr-part-6');
+                
+                // Lấy thông tin hiện tại
+                const p5_img = p5.querySelector('img').src;
+                const p5_txt = p5.querySelector('.p5-right').textContent;
+                
+                const p6_img = p6.querySelector('img').src;
+                const p6_txt = p6.querySelector('.p6-right').textContent;
+        
+                // Hoán đổi nội dung
+                p5.querySelector('img').src = p6_img;
+                p5.querySelector('.p5-right').textContent = p6_txt;
+                
+                p6.querySelector('img').src = p5_img;
+                p6.querySelector('.p6-right').textContent = p5_txt;
+        
+                // Reset về mặc định = 1
+                input.value = "1";
+                updateConversion();
+            });
         });
 
     </script>
