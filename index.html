@@ -932,8 +932,8 @@
         /* Container chính cho 12 dòng x 4 ô */
         .currency-grid-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4vw 2.5vw;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4vw 1.2vw;
             margin: 5vw 0;
             width: 100%;
         }
@@ -964,7 +964,7 @@
         .card-part-2 {
             font-weight: bold;
             text-align: center;
-            font-size: 1.1vw;
+            font-size: 0.8vw;
             text-transform: uppercase;
             min-height: 2.8em;
             display: flex;
@@ -974,8 +974,8 @@
         }
         
         /* Phần 3, 4: Đơn vị & Ký hiệu */
-        .card-part-3 { text-align: center; font-size: 0.9vw; opacity: 0.8; }
-        .card-part-4 { text-align: center; font-size: 1.3vw; font-weight: bold; margin-bottom: 0.8vw; }
+        .card-part-3 { text-align: center; font-size: 0.7vw; opacity: 0.8; }
+        .card-part-4 { text-align: center; font-size: 1.0vw; font-weight: bold; margin-bottom: 0.8vw; }
         
         /* Phần 5: Ô nhập liệu số */
         .card-input {
@@ -984,7 +984,7 @@
             border: none;
             border-bottom: 1px solid #000;
             text-align: center;
-            font-size: 1.2vw;
+            font-size: 1vw;
             background: transparent;
             outline: none;
             margin-bottom: 1.2vw;
@@ -992,8 +992,8 @@
         
         /* Phần 6 & 7: Quy đổi (Tỉ lệ 1.5 - 7 - 1.5) */
         .conv-row { display: flex; align-items: center; width: 100%; margin-bottom: 0.4vw; }
-        .conv-left, .conv-right { flex: 1.5; text-align: center; font-weight: bold; font-size: 0.85vw; }
-        .conv-mid { flex: 7; text-align: center; font-size: 1.1vw; border-bottom: 1px dashed #bbb; }
+        .conv-left, .conv-right { flex: 1.5; text-align: center; font-weight: bold; font-size: 0.7vw; }
+        .conv-mid { flex: 7; text-align: center; font-size: 0.9vw; border-bottom: 1px dashed #bbb; }
         
         /* Bộ 3 dòng chân trang */
         .grid-footer {
@@ -1834,9 +1834,8 @@
             "China", "Macau", "Hong Kong", "Taiwan", "Japan", "South Korea", "Thailand", "Singapore",
             "United Kingdom", "Canada", "Australia", "New Zealand", "Russia", "India", "Brazil", "South Africa",
             "Qatar", "United Arab Emirates", "Kuwait", "Turkey", "France", "Germany", "Switzerland", "Sweden",
-            "Portugal", "Spain", "Italy", "Greece", "Madagascar", "Maldives", "Morocco", "Egypt",
-            "Peru", "Chile", "Argentina", "Mexico", "Ethiopia", "Norway", "Finland", "Denmark",
-            "Mongolia", "Laos", "Cambodia", "Myanmar", "Indonesia", "Malaysia", "Philippines", "Kazakhstan"
+            "Madagascar", "Maldives", "Morocco", "Egypt", "Peru", "Chile", "Argentina", "Mexico", 
+            "Ethiopia", "Norway", "Denmark", "Mongolia", "Indonesia", "Malaysia", "Philippines", "Kazakhstan"
         ];
         
         let liveRates = {};
