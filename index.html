@@ -929,6 +929,103 @@
             color: #000000; 
         }
 
+        /* Container chính cho 48 ô */
+        .currency-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 cột đều nhau */
+            gap: 2vw; /* Khoảng cách giữa các ô */
+            margin-top: 5vw; /* Khoảng cách phù hợp với 2 ô chủ phía trên */
+            width: 100%;
+        }
+        
+        /* Cấu trúc từng ô quốc gia */
+        .country-card {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            background: transparent;
+        }
+        
+        /* Phần 1: Khung vuông chứa hình */
+        .card-part-1 {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 0.8vw;
+        }
+        .card-part-1 img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Cạnh lớn nhất fit trước, cạnh nhỏ tự nhảy */
+        }
+        
+        /* Phần 2: Tên quốc gia */
+        .card-part-2 {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1vw;
+            line-height: 1.2;
+            min-height: 2.4em; /* Dự phòng cho 2 dòng tên dài */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.4vw;
+        }
+        
+        /* Phần 3 & 4: Đơn vị và Ký hiệu */
+        .card-part-3, .card-part-4 {
+            text-align: center;
+            font-size: 0.9vw;
+            margin-bottom: 0.2vw;
+        }
+        
+        /* Phần 5: Ô nhập liệu */
+        .card-part-5 {
+            display: flex;
+            justify-content: center;
+            margin: 0.8vw 0;
+        }
+        .card-input {
+            width: 90%;
+            border: none;
+            border-bottom: 0.05vw solid #ccc;
+            text-align: center;
+            font-size: 1.1vw;
+            outline: none;
+            background: transparent;
+        }
+        
+        /* Phần 6 & 7: Quy đổi sang USD và EUR (Tỉ lệ 1.5-7-1.5) */
+        .conversion-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            font-size: 0.85vw;
+            margin-bottom: 0.4vw;
+        }
+        .conv-left, .conv-right {
+            flex: 1.5;
+            text-align: center;
+            font-weight: bold;
+        }
+        .conv-mid {
+            flex: 7;
+            text-align: center;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        /* Bộ 3 dòng Last Updated ở cuối */
+        .grid-footer {
+            margin-top: 5vw;
+            text-align: center;
+            width: 100%;
+        }
+        .footer-label { font-weight: bold; font-size: 1vw; margin-bottom: 0.3vw; }
+        .footer-date, .footer-time { font-family: 'Casio-font', monospace; font-size: 1.2vw; color: #000; }
+
     </style>
 </head>
 
@@ -1156,6 +1253,35 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="country-card">
+            <div class="card-part-1">
+                <img src="URL_FLAG_FROM_JSON" alt="Flag">
+            </div>
+            
+            <div class="card-part-2">CHINA</div>
+            
+            <div class="card-part-3">CNY</div>
+            <div class="card-part-4">¥</div>
+            
+            <div class="card-part-5">
+                <input type="number" class="card-input" value="1">
+            </div>
+            
+            <div class="conv-row">
+                <div class="conv-left">$</div>
+                <div class="conv-mid">0.14</div> <div class="conv-right">USD</div>
+            </div>
+            
+            <div class="conv-row">
+                <div class="conv-left">€</div>
+                <div class="conv-mid">0.13</div> <div class="conv-right">EUR</div>
+            </div>
+        </div>
+        <div class="grid-footer">
+            <div class="footer-label">LAST UPDATED</div>
+            <div class="footer-casio" id="update-date">0000/00/00</div>
+            <div class="footer-casio" id="update-time">00:00:00</div>
         </div>
     </div>
     
@@ -1821,6 +1947,58 @@
         }
         
         initCurrency();
+
+        // Giả sử hàm này được gọi mỗi khi bạn lấy dữ liệu tỉ giá mới từ Wise
+        async function updateFullSystem(apiData) {
+            // 1. Cập nhật ngày/giờ dựa trên dữ liệu thực tế nhận được
+            const now = new Date(apiData.timestamp); // Hoặc lấy trực tiếp từ API
+            
+            const dateStr = now.getFullYear() + '/' + 
+                            String(now.getMonth() + 1).padStart(2, '0') + '/' + 
+                            String(now.getDate()).padStart(2, '0');
+            
+            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + 
+                            String(now.getMinutes()).padStart(2, '0') + ':' + 
+                            String(now.getSeconds()).padStart(2, '0');
+        
+            // Cập nhật cho phần Footer bên dưới 48 ô
+            document.getElementById('grid-update-date').innerText = dateStr;
+            document.getElementById('grid-update-time').innerText = timeStr;
+        
+            // 2. Logic cập nhật giá trị quy đổi cho 48 ô
+            // (Lặp qua các ô và update giá trị dựa trên tỉ giá thực)
+        }
+        
+        // Hàm khởi tạo ban đầu (Chỉ chạy 1 lần khi load trang)
+        async function initWanderGrid() {
+            const response = await fetch('flag.json');
+            const flagData = await response.json();
+            const container = document.querySelector('.currency-grid-container');
+        
+            countryOrder.flat().forEach(name => {
+                const data = flagData[name];
+                const card = document.createElement('div');
+                card.className = 'country-card';
+                card.innerHTML = `
+                    <div class="card-part-1"><img src="${data.flag}"></div>
+                    <div class="card-part-2">${name}</div>
+                    <div class="card-part-3">${data.currency}</div>
+                    <div class="card-part-4">${data.symbol}</div>
+                    <input type="number" class="card-input" value="1" id="input-${data.currency}">
+                    <div class="conv-row">
+                        <div class="conv-left">$</div>
+                        <div class="conv-mid" id="${data.currency}-to-usd">0.00</div>
+                        <div class="conv-right">USD</div>
+                    </div>
+                    <div class="conv-row">
+                        <div class="conv-left">€</div>
+                        <div class="conv-mid" id="${data.currency}-to-eur">0.00</div>
+                        <div class="conv-right">EUR</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
         
     </script>
 </body>
