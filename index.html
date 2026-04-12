@@ -854,10 +854,14 @@
         
         /* Tỉ lệ 2-6-2 chuyển sang vw */
         .p5-left, .p6-left { 
-            flex: 2; 
-            display: flex; 
-            justify-content: center; 
-            height: 2vw; /* Khống chế chiều cao dòng cờ nhỏ */
+            flex: 2; /* Chiếm đúng tỉ lệ 2 phần */
+            display: flex;
+            justify-content: center; /* Căn giữa ngang cho cờ Nepal */
+            align-items: center;     /* Căn giữa dọc cho cờ Mỹ/EU */
+            
+            /* ĐÂY LÀ ĐIỂM QUAN TRỌNG NHẤT */
+            aspect-ratio: 1 / 1;     /* Ép khung luôn là hình vuông dựa trên độ rộng flex: 2 */
+            width: 100%;             /* Đảm bảo khung dãn hết diện tích được phân bổ */
         }
         
         .p5-mid, .p6-mid { 
