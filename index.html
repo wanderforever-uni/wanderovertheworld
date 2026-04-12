@@ -928,6 +928,83 @@
             /* Đảm bảo label cũng là màu đen */
             color: #000000; 
         }
+
+        /* Container chính cho 12 dòng x 4 ô */
+        .currency-grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4vw 2.5vw;
+            margin: 5vw 0;
+            width: 100%;
+        }
+        
+        .country-card {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        /* Phần 1: Ô vuông chứa hình (ngang = dọc) */
+        .card-part-1 {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: #fdfdfd;
+        }
+        .card-part-1 img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Đảm bảo cờ không bị méo */
+        }
+        
+        /* Phần 2: Tên quốc gia (2 dòng dự phòng) */
+        .card-part-2 {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1vw;
+            text-transform: uppercase;
+            min-height: 2.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5vw 0;
+        }
+        
+        /* Phần 3, 4: Đơn vị & Ký hiệu */
+        .card-part-3 { text-align: center; font-size: 0.9vw; opacity: 0.8; }
+        .card-part-4 { text-align: center; font-size: 1.3vw; font-weight: bold; margin-bottom: 0.8vw; }
+        
+        /* Phần 5: Ô nhập liệu số */
+        .card-input {
+            width: 85%;
+            align-self: center;
+            border: none;
+            border-bottom: 1px solid #000;
+            text-align: center;
+            font-size: 1.2vw;
+            background: transparent;
+            outline: none;
+            margin-bottom: 1.2vw;
+        }
+        
+        /* Phần 6 & 7: Quy đổi (Tỉ lệ 1.5 - 7 - 1.5) */
+        .conv-row { display: flex; align-items: center; width: 100%; margin-bottom: 0.4vw; }
+        .conv-left, .conv-right { flex: 1.5; text-align: center; font-weight: bold; font-size: 0.85vw; }
+        .conv-mid { flex: 7; text-align: center; font-size: 1.1vw; border-bottom: 1px dashed #bbb; }
+        
+        /* Bộ 3 dòng chân trang */
+        .grid-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 5vw;
+        }
+        .footer-bold { font-weight: bold; font-size: 1.2vw; margin-bottom: 0.3vw; }
+        .footer-casio { font-family: 'Courier New', monospace; font-size: 1.5vw; }
         
     </style>
 </head>
@@ -1155,6 +1232,13 @@
                         <div class="update-time">00:00:00</div>
                     </div>
                 </div>
+            </div>
+            <div class="currency-grid-container" id="currencyGrid"></div>
+
+            <div class="grid-footer">
+                <div class="footer-bold">LAST UPDATED</div>
+                <div class="footer-casio" id="last-date">----/--/--</div>
+                <div class="footer-casio" id="last-time">--:--:--</div>
             </div>
         </div>
     </div>
@@ -1821,6 +1905,74 @@
         }
         
         initCurrency();
+
+        const countryList = [
+            "China", "Macau", "Hong Kong", "Taiwan", "Japan", "South Korea", "Thailand", "Singapore",
+            "United Kingdom", "Canada", "Australia", "New Zealand", "Russia", "India", "Brazil", "South Africa",
+            "Qatar", "United Arab Emirates", "Kuwait", "Turkey", "France", "Germany", "Switzerland", "Sweden",
+            "Portugal", "Spain", "Italy", "Greece", "Madagascar", "Maldives", "Morocco", "Egypt",
+            "Peru", "Chile", "Argentina", "Mexico", "Ethiopia", "Norway", "Finland", "Denmark",
+            "Mongolia", "Laos", "Cambodia", "Myanmar", "Indonesia", "Malaysia", "Philippines", "Kazakhstan"
+        ];
+        
+        let liveRates = {};
+        
+        async function startWanderCurrency() {
+            // 1. Tải flag.json
+            const flagRes = await fetch('flag.json');
+            const flagData = await flagRes.json();
+            const container = document.getElementById('currencyGrid');
+        
+            // 2. Render cấu trúc 48 ô
+            countryList.forEach(name => {
+                const d = flagData[name];
+                if (!d) return;
+                const card = document.createElement('div');
+                card.className = 'country-card';
+                card.innerHTML = `
+                    <div class="card-part-1"><img src="${d.flag}"></div>
+                    <div class="card-part-2">${name}</div>
+                    <div class="card-part-3">${d.currency}</div>
+                    <div class="card-part-4">${d.symbol}</div>
+                    <input type="number" class="card-input" value="1" id="in-${d.currency}" oninput="syncCalculations()">
+                    <div class="conv-row"><div class="conv-left">$</div><div id="${d.currency}-usd" class="conv-mid">-</div><div class="conv-right">USD</div></div>
+                    <div class="conv-row"><div class="conv-left">€</div><div id="${d.currency}-eur" class="conv-mid">-</div><div class="conv-right">EUR</div></div>
+                `;
+                container.appendChild(card);
+            });
+        
+            // 3. Lấy tỷ giá và thời gian thực
+            updateFromWiseAPI();
+        }
+        
+        async function updateFromWiseAPI() {
+            const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+            const data = await res.json();
+            liveRates = data.rates;
+        
+            // Cập nhật bộ 3 dòng chân trang từ thời gian thực của API
+            const dateObj = new Date(data.time_last_updated * 1000);
+            document.getElementById('last-date').innerText = dateObj.toISOString().split('T')[0].replace(/-/g, '/');
+            document.getElementById('last-time').innerText = dateObj.toTimeString().split(' ')[0];
+        
+            syncCalculations();
+        }
+        
+        function syncCalculations() {
+            countryList.forEach(name => {
+                // Tìm input và update giá trị theo tỉ giá hiện tại
+                const allInputs = document.querySelectorAll('.card-input');
+                allInputs.forEach(input => {
+                    const code = input.id.split('-')[1];
+                    const val = input.value || 0;
+                    // Quy đổi sang USD và EUR dựa trên USD gốc của API
+                    document.getElementById(`${code}-usd`).innerText = (val * (1 / liveRates[code])).toFixed(4);
+                    document.getElementById(`${code}-eur`).innerText = (val * (liveRates['EUR'] / liveRates[code])).toFixed(4);
+                });
+            });
+        }
+        
+        startWanderCurrency();
         
     </script>
 </body>
