@@ -1927,6 +1927,10 @@
             countryList.forEach(name => {
                 const d = flagData[name];
                 if (!d) return;
+        
+                // TẠO BIẾN safeName ĐỂ LÀM ID DUY NHẤT (Ví dụ: "South Korea" -> "SouthKorea")
+                const safeName = name.replace(/\s+/g, '');
+        
                 const card = document.createElement('div');
                 card.className = 'country-card';
                 card.innerHTML = `
@@ -1934,9 +1938,20 @@
                     <div class="card-part-2">${name}</div>
                     <div class="card-part-3">${d.currency}</div>
                     <div class="card-part-4">${d.symbol}</div>
-                    <input type="number" class="card-input" value="1" id="in-${d.currency}" oninput="syncCalculations()">
-                    <div class="conv-row"><div class="conv-left">$</div><div id="${d.currency}-usd" class="conv-mid">-</div><div class="conv-right">USD</div></div>
-                    <div class="conv-row"><div class="conv-left">€</div><div id="${d.currency}-eur" class="conv-mid">-</div><div class="conv-right">EUR</div></div>
+                    <input type="number" class="card-input" value="1" 
+                           id="in-${safeName}" 
+                           data-curr="${d.currency}" 
+                           oninput="syncCalculations()">
+                    <div class="conv-row">
+                        <div class="conv-left">$</div>
+                        <div id="${safeName}-usd" class="conv-mid">-</div>
+                        <div class="conv-right">USD</div>
+                    </div>
+                    <div class="conv-row">
+                        <div class="conv-left">€</div>
+                        <div id="${safeName}-eur" class="conv-mid">-</div>
+                        <div class="conv-right">EUR</div>
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -1950,7 +1965,7 @@
             const data = await res.json();
             liveRates = data.rates;
         
-            // Cập nhật bộ 3 dòng chân trang từ thời gian thực của API
+            // Cập nhật bộ 3 dòng chân trang
             const dateObj = new Date(data.time_last_updated * 1000);
             document.getElementById('last-date').innerText = dateObj.toISOString().split('T')[0].replace(/-/g, '/');
             document.getElementById('last-time').innerText = dateObj.toTimeString().split(' ')[0];
@@ -1959,16 +1974,23 @@
         }
         
         function syncCalculations() {
+            // Duyệt qua danh sách quốc gia để đảm bảo cập nhật đúng từng ô theo safeName
             countryList.forEach(name => {
-                // Tìm input và update giá trị theo tỉ giá hiện tại
-                const allInputs = document.querySelectorAll('.card-input');
-                allInputs.forEach(input => {
-                    const code = input.id.split('-')[1];
-                    const val = input.value || 0;
-                    // Quy đổi sang USD và EUR dựa trên USD gốc của API
-                    document.getElementById(`${code}-usd`).innerText = (val * (1 / liveRates[code])).toFixed(4);
-                    document.getElementById(`${code}-eur`).innerText = (val * (liveRates['EUR'] / liveRates[code])).toFixed(4);
-                });
+                const safeName = name.replace(/\s+/g, '');
+                const input = document.getElementById(`in-${safeName}`);
+                
+                if (input) {
+                    const code = input.getAttribute('data-curr'); // Lấy mã tiền tệ (EUR, JPY...)
+                    const val = parseFloat(input.value) || 0;
+                    const usdDisplay = document.getElementById(`${safeName}-usd`);
+                    const eurDisplay = document.getElementById(`${safeName}-eur`);
+        
+                    if (liveRates[code]) {
+                        // Quy đổi từ tiền tệ X sang USD và EUR
+                        usdDisplay.innerText = (val * (1 / liveRates[code])).toFixed(4);
+                        eurDisplay.innerText = (val * (liveRates['EUR'] / liveRates[code])).toFixed(4);
+                    }
+                }
             });
         }
         
