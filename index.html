@@ -907,6 +907,21 @@
         
         .convert-btn:hover { transform: rotate(180deg); }
 
+        .curr-part-7 {
+            margin-top: 15px;
+            text-align: center;
+            font-family: 'Casio-font', monospace; /* Hoặc font digital bạn đang dùng */
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6); /* Màu chữ hơi mờ */
+        }
+        
+        .update-label {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 
@@ -1119,6 +1134,12 @@
                         <div class="p6-left"><img src="https://www.countryflags.com/wp-content/uploads/united-states-of-america-flag-png-large.png"></div>
                         <div class="p6-mid curr-result">0.00</div>
                         <div class="p6-right">USD</div>
+                    </div>
+
+                    <div class="curr-part-7">
+                        <div class="update-label">Last Updated</div>
+                        <div class="update-date">0000/00/00</div>
+                        <div class="update-time">00:00:00</div>
                     </div>
                 </div>
             </div>
@@ -1731,6 +1752,24 @@
                         
                         const currentRate = (unitP5 === "USD") ? rateUSDToEUR : (1 / rateUSDToEUR);
                         result.textContent = (amount * currentRate).toFixed(4);
+
+                        const updateDateEl = box.querySelector('.update-date');
+                        const updateTimeEl = box.querySelector('.update-time');
+                        
+                        if (updateDateEl && updateTimeEl) {
+                            const now = new Date(data.time_last_update_utc); 
+                            
+                            const yyyy = now.getFullYear();
+                            const mm = String(now.getMonth() + 1).padStart(2, '0');
+                            const dd = String(now.getDate()).padStart(2, '0');
+                            
+                            const hh = String(now.getHours()).padStart(2, '0');
+                            const min = String(now.getMinutes()).padStart(2, '0');
+                            const ss = String(now.getSeconds()).padStart(2, '0');
+        
+                            updateDateEl.textContent = `${yyyy}/${mm}/${dd}`;
+                            updateTimeEl.textContent = `${hh}:${min}:${ss}`;
+                        }
                     };
         
                     // Sự kiện nhập liệu
