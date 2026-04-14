@@ -1837,15 +1837,24 @@
         
         let liveRates = {};
         
+        // API mới cập nhật nhanh hơn và ít bị kẹt cache
+        const NEW_API_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json";
+
         async function initCurrency() {
             try {
-                // 1. Lấy dữ liệu tỷ giá trước để có giá trị cho các box lớn
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                // 1. Lấy dữ liệu tỷ giá từ nguồn mới
+                const response = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
                 const data = await response.json();
-                liveRates = data.rates;
+                
+                // Chuẩn hóa dữ liệu từ Fawazahmed0 (data.usd[code]) về dạng liveRates[code] của bạn
+                liveRates = {};
+                for (const curr in data.usd) {
+                    liveRates[curr.toUpperCase()] = data.usd[curr];
+                }
+
                 const rateUSDToEUR = liveRates.EUR;
         
-                // 2. Tìm và thiết lập logic cho các Box lớn (USD/EUR)
+                // 2. Thiết lập logic cho các Box lớn (USD/EUR)
                 document.querySelectorAll('.currency-main-box').forEach(box => {
                     const input = box.querySelector('.curr-input');
                     const result = box.querySelector('.curr-result');
@@ -1857,8 +1866,8 @@
                         const currentRate = (unitP5 === "USD") ? rateUSDToEUR : (1 / rateUSDToEUR);
                         result.textContent = (amount * currentRate).toFixed(4);
                         
-                        // Cập nhật thời gian riêng cho box này mỗi khi tính toán
-                        updateBoxTimestamp(box, data.time_last_updated);
+                        // Cập nhật timestamp (lấy từ field data.date của API mới)
+                        updateBoxTimestamp(box, data.date);
                     };
         
                     input.addEventListener('input', calculate);
@@ -1866,7 +1875,6 @@
                     swapBtn.addEventListener('click', () => {
                         const p5 = box.querySelector('.curr-part-5');
                         const p6 = box.querySelector('.curr-part-6');
-        
                         const img5 = p5.querySelector('img').src;
                         const txt5 = p5.querySelector('.p5-right').textContent;
                         const img6 = p6.querySelector('img').src;
@@ -1881,10 +1889,10 @@
                         swapBtn.style.transform = (swapBtn.style.transform === 'rotate(180deg)') ? 'rotate(0deg)' : 'rotate(180deg)';
                     });
         
-                    calculate(); // Chạy lần đầu
+                    calculate();
                 });
         
-                // 3. Khởi chạy phần Grid 48 quốc gia
+                // 3. Khởi chạy Grid
                 startWanderCurrency();
         
             } catch (e) {
@@ -1892,19 +1900,21 @@
             }
         }
         
-        // Hàm bổ trợ cập nhật Ngày/Giờ cho Box lớn
-        function updateBoxTimestamp(box, timestamp) {
+        function updateBoxTimestamp(box, apiDateStr) {
             const updateDateEl = box.querySelector('.update-date');
             const updateTimeEl = box.querySelector('.update-time');
             
             if (updateDateEl && updateTimeEl) {
-                const dateObj = new Date(timestamp * 1000);
+                // API mới trả về date dạng "YYYY-MM-DD"
+                const dateObj = new Date(apiDateStr);
+                const now = new Date(); // Lấy giờ hiện tại để hiển thị độ tươi mới
+                
                 const yyyy = dateObj.getFullYear();
                 const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
                 const dd = String(dateObj.getDate()).padStart(2, '0');
-                const hh = String(dateObj.getHours()).padStart(2, '0');
-                const min = String(dateObj.getMinutes()).padStart(2, '0');
-                const ss = String(dateObj.getSeconds()).padStart(2, '0');
+                const hh = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
         
                 updateDateEl.textContent = `${yyyy}/${mm}/${dd}`;
                 updateTimeEl.textContent = `${hh}:${min}:${ss}`;
@@ -1912,55 +1922,60 @@
         }
         
         async function startWanderCurrency() {
-            const flagRes = await fetch('flag.json');
-            const flagData = await flagRes.json();
-            const container = document.getElementById('currencyGrid');
-            if (!container) return;
+            try {
+                const flagRes = await fetch('flag.json');
+                const flagData = await flagRes.json();
+                const container = document.getElementById('currencyGrid');
+                if (!container) return;
         
-            countryList.forEach(name => {
-                const d = flagData[name];
-                if (!d) return;
+                container.innerHTML = ''; // Đảm bảo không render trùng lặp khi gọi lại
+                countryList.forEach(name => {
+                    const d = flagData[name];
+                    if (!d) return;
         
-                const safeName = name.replace(/\s+/g, '');
-                const card = document.createElement('div');
-                card.className = 'country-card';
-                card.innerHTML = `
-                    <div class="card-part-1"><img src="${d.flag}"></div>
-                    <div class="card-part-2">${name}</div>
-                    <div class="card-part-3">${d.currency}</div>
-                    <div class="card-part-4">${d.symbol}</div>
-                    <input type="number" class="card-input" value="1" 
-                           id="in-${safeName}" 
-                           data-curr="${d.currency}" 
-                           oninput="syncCalculations()">
-                    <div class="conv-row">
-                        <div class="conv-left">$</div>
-                        <div id="${safeName}-usd" class="conv-mid">-</div>
-                        <div class="conv-right">USD</div>
-                    </div>
-                    <div class="conv-row">
-                        <div class="conv-left">€</div>
-                        <div id="${safeName}-eur" class="conv-mid">-</div>
-                        <div class="conv-right">EUR</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+                    const safeName = name.replace(/\s+/g, '');
+                    const card = document.createElement('div');
+                    card.className = 'country-card';
+                    card.innerHTML = `
+                        <div class="card-part-1"><img src="${d.flag}"></div>
+                        <div class="card-part-2">${name}</div>
+                        <div class="card-part-3">${d.currency}</div>
+                        <div class="card-part-4">${d.symbol}</div>
+                        <input type="number" class="card-input" value="1" 
+                               id="in-${safeName}" 
+                               data-curr="${d.currency}" 
+                               oninput="syncCalculations()">
+                        <div class="conv-row">
+                            <div class="conv-left">$</div>
+                            <div id="${safeName}-usd" class="conv-mid">-</div>
+                            <div class="conv-right">USD</div>
+                        </div>
+                        <div class="conv-row">
+                            <div class="conv-left">€</div>
+                            <div id="${safeName}-eur" class="conv-mid">-</div>
+                            <div class="conv-right">EUR</div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
         
-            // Sau khi render xong thì lấy tỷ giá cho grid
-            updateFromWiseAPI();
+                updateFromWiseAPI();
+            } catch (e) { console.error("Lỗi Grid:", e); }
         }
         
         async function updateFromWiseAPI() {
             try {
-                const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                const res = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
                 const data = await res.json();
-                liveRates = data.rates;
+                
+                liveRates = {};
+                for (const curr in data.usd) {
+                    liveRates[curr.toUpperCase()] = data.usd[curr];
+                }
         
-                // Cập nhật Footer (LAST UPDATED chung ở cuối trang)
-                const dateObj = new Date(data.time_last_updated * 1000);
-                const dateStr = dateObj.toISOString().split('T')[0].replace(/-/g, '/');
-                const timeStr = dateObj.toTimeString().split(' ')[0];
+                const dateStr = data.date.replace(/-/g, '/');
+                const now = new Date();
+                const timeStr = now.toTimeString().split(' ')[0];
         
                 const lastDateEl = document.getElementById('last-date');
                 const lastTimeEl = document.getElementById('last-time');
@@ -1980,7 +1995,7 @@
                 const input = document.getElementById(`in-${safeName}`);
                 
                 if (input && liveRates) {
-                    const code = input.getAttribute('data-curr');
+                    const code = input.getAttribute('data-curr').toUpperCase();
                     const val = parseFloat(input.value) || 0;
                     const usdDisplay = document.getElementById(`${safeName}-usd`);
                     const eurDisplay = document.getElementById(`${safeName}-eur`);
@@ -1993,13 +2008,10 @@
             });
         }
         
-        // Khởi chạy hệ thống
         initCurrency();
         
-        // Thiết lập tự động cập nhật mỗi 5 phút (300.000 ms)
         setInterval(() => {
-            updateFromWiseAPI(); // Cập nhật grid và footer
-            // Có thể gọi lại initCurrency() hoặc viết hàm riêng để refresh box lớn nếu cần
+            updateFromWiseAPI();
         }, 300000);
         
     </script>
