@@ -859,12 +859,15 @@
         
         .bank-line {
             position: relative;
-            min-height: 2.4em; /* Đủ chỗ cho 2 dòng (tên chính + phòng hờ) */
-            line-height: 1.2em;
+            font-size: 1.1vw; 
+            min-height: 2.6vw; 
+            line-height: 1.3vw;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
+            text-align: center;
+            width: 100%;
         }
 
         #bank-logo {
@@ -874,15 +877,16 @@
             object-fit: contain;
         }
         
-        #bank-name { font-weight: bold; text-transform: uppercase; }
-        #bank-abbr { opacity: 0.8; }
-        #bank-country { font-size: 0.9em; opacity: 0.6; }
+        #bank-name { font-size: 1.2vw; font-weight: bold; text-transform: uppercase; }
+        #bank-abbr { font-size: 1vw;, opacity: 0.8; }
+        #bank-country { font-size: 0.9vw; opacity: 0.6; }
         
         /* Dòng phòng hờ để không phá bố cục */
         .placeholder-line {
-            height: 1.2em;
+            height: 1.3vw;
             width: 100%;
             visibility: hidden;
+            pointer-events: none; /* Đảm bảo không cản trở tương tác chuột */
         }
         
         .curr-part-1 { 
@@ -996,18 +1000,18 @@
         .convert-btn:hover { transform: rotate(180deg); }
 
         .curr-part-7 {
-            margin-top: 15px;
+            margin-top: 1.2vw;
             text-align: center;
             font-family: 'Casio-font', monospace;
-            font-size: 12px;
+            font-size: 0.8vw;
             /* Chỉnh lại thành màu đen */
             color: #000000; 
         }
         
         .update-label {
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 0.08vw;
+            margin-bottom: 0.3vw;
             font-weight: bold;
             /* Đảm bảo label cũng là màu đen */
             color: #000000; 
