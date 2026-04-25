@@ -2119,8 +2119,8 @@
         let allBanks = [];
         let currentBankPlaylist = [];
         let bankIdx = 0;
+        let slideshowTimeout;
         
-        // Thêm hàm xáo trộn (Shuffle) nếu bạn chưa có trong file
         function shuffleArray(array) {
             let arr = [...array];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -2131,71 +2131,67 @@
         }
         
         function initBankSlideshow() {
+            // Mỗi lần load/reload trang sẽ fetch dữ liệu mới nhất
             fetch("bank.json?v=" + Date.now())
                 .then(r => r.json())
                 .then(data => {
-                    allBanks = data;
+                    allBanks = data; // Ở đây allBanks sẽ nhận toàn bộ số lượng phần tử thực tế (15, 20, 100...)
                     startNewBankCycle();
-                });
+                })
+                .catch(err => console.error("Không thể đọc file JSON:", err));
         }
         
         function startNewBankCycle() {
+            // Tạo một lượt phát mới với thứ tự ngẫu nhiên từ toàn bộ danh sách vừa tải
             currentBankPlaylist = shuffleArray(allBanks);
             bankIdx = 0;
             showNextBank();
         }
         
         function showNextBank() {
-            if (currentBankPlaylist.length === 0) return;
+            // Kiểm tra nếu đã đi hết "Playlist" hiện tại
+            if (bankIdx >= currentBankPlaylist.length) {
+                startNewBankCycle(); // Tự động xáo trộn lại và chạy lượt mới
+                return;
+            }
         
             const bank = currentBankPlaylist[bankIdx];
+            const elements = {
+                logo: document.getElementById("bank-logo"),
+                name: document.getElementById("bank-name"),
+                abbr: document.getElementById("bank-abbr"),
+                country: document.getElementById("bank-country")
+            };
         
-            const logoImg = document.getElementById("bank-logo");
-            const nameEl = document.getElementById("bank-name");
-            const abbrEl = document.getElementById("bank-abbr");
-            const countryEl = document.getElementById("bank-country");
+            // 1. Hiệu ứng ẩn
+            Object.values(elements).forEach(el => { if (el) el.style.opacity = 0; });
         
-            const elements = [logoImg, nameEl, abbrEl, countryEl];
-        
-            // Bước 1: Ẩn tất cả đi
-            elements.forEach(el => { if(el) el.style.opacity = 0; });
-        
-            // Bước 2: Chuẩn bị dữ liệu mới nhưng chưa cho hiện
-            // Chúng ta tạo một "lời hứa" (Promise) chờ hình tải xong
+            // 2. Tải ảnh và cập nhật nội dung
             const imageLoadPromise = new Promise((resolve) => {
-                if (!logoImg) { resolve(); return; }
-                
-                logoImg.onload = () => resolve(); // Hình tải xong thành công
-                logoImg.onerror = () => resolve(); // Lỗi cũng cho qua để hiện text
-                logoImg.src = bank.logo_url;
+                if (!elements.logo || !bank.logo_url) { resolve(); return; }
+                elements.logo.onload = () => resolve();
+                elements.logo.onerror = () => resolve();
+                elements.logo.src = bank.logo_url;
             });
         
-            // Bước 3: Đợi hình tải xong (hoặc tối thiểu 200ms) rồi mới hiện
             imageLoadPromise.then(() => {
-                // Cập nhật text cùng lúc với hình đã sẵn sàng
-                if (nameEl) nameEl.textContent = bank.bank_name;
-                if (abbrEl) abbrEl.textContent = bank.abbreviation;
-                if (countryEl) countryEl.textContent = bank.country;
+                if (elements.name) elements.name.textContent = bank.bank_name;
+                if (elements.abbr) elements.abbr.textContent = bank.abbreviation;
+                if (elements.country) elements.country.textContent = bank.country;
         
-                // Chỉ khi hình Taiwan (hoặc bất cứ ngân hàng nào) tải xong, mới hiện lên
+                // 3. Hiệu ứng hiện
                 setTimeout(() => {
-                    elements.forEach(el => { if(el) el.style.opacity = 1; });
-                }, 50); 
+                    Object.values(elements).forEach(el => { if (el) el.style.opacity = 1; });
+                }, 50);
+        
+                // 4. Tăng chỉ số và đặt lịch chạy hình tiếp theo sau 5s
+                bankIdx++;
+                
+                clearTimeout(slideshowTimeout);
+                slideshowTimeout = setTimeout(showNextBank, 5000);
             });
-        
-            bankIdx++;
-        
-            // Bước 4: Thiết lập 5s cho hình kế tiếp
-            setTimeout(() => {
-                if (bankIdx >= currentBankPlaylist.length) {
-                    startNewBankCycle();
-                } else {
-                    showNextBank();
-                }
-            }, 5000);
         }
         
-        // Chạy khởi tạo
         initBankSlideshow();
         
     </script>
