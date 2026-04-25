@@ -2155,19 +2155,12 @@
             const abbrEl = document.getElementById("bank-abbr");
             const countryEl = document.getElementById("bank-country");
         
-            // Hiệu ứng mờ dần (áp dụng cho cả text để đồng bộ)
-            const elements = [logoImg, nameEl, abbrEl, countryEl];
-            elements.forEach(el => { if(el) el.style.opacity = 0; });
-        
             setTimeout(() => {
                 // SỬA TẠI ĐÂY: Khớp với key trong file JSON của bạn
                 if (logoImg) logoImg.src = bank.logo_url;       // bank.logo -> bank.logo_url
                 if (nameEl) nameEl.textContent = bank.bank_name; // bank.name -> bank.bank_name
                 if (abbrEl) abbrEl.textContent = bank.abbreviation; // bank.abbr -> bank.abbreviation
                 if (countryEl) countryEl.textContent = bank.country;
-        
-                elements.forEach(el => { if(el) el.style.opacity = 1; });
-            }, 200);
         
             bankIdx++;
         
