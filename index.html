@@ -788,17 +788,43 @@
         
         /* Container chứa 2 ô chủ */
         .currency-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Chia tỉ lệ 1:1 */
             justify-content: center;
             gap: 10vw; /* Khoảng cách hài hòa giữa 2 ô chủ */
             width: 100%;
+            align-items: start;
+        }
+
+        /* Khung trái trên chứa 2 ô quốc gia */
+        .currency-top-left {
+            display: flex;
+            flex-direction: column; /* Xếp chồng 2 ô lên nhau */
+            gap: 15px;
         }
         
+        /* Nếu bạn muốn 2 ô US và EU nằm cạnh nhau bên trong khung trái:
+        .currency-top-left {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        } 
+        */
+        
+        /* Đảm bảo các box bên trong chiếm hết chiều ngang khung trái */
         .currency-main-box {
+            width: 100%;
+            /* Giữ nguyên các style cũ của bạn */
             flex: 0 0 25vw; /* Ép độ rộng ô chủ cố định để 2 bên bằng nhau chằn chặn */
             display: flex;
             flex-direction: column;
             align-items: stretch;
+        }
+        
+        /* Khung phải trên (để trống hoặc chứa nội dung khác) */
+        .currency-top-right {
+            display: flex;
+            flex-direction: column;
         }
         
         .curr-part-1 { 
