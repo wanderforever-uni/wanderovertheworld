@@ -76,5 +76,17 @@
     "bank_name": "Swiss National Bank",
     "abbreviation": "SNB",
     "logo_url": "https://images.seeklogo.com/logo-png/31/1/swiss-national-bank-logo-png_seeklogo-311373.png"
+  },
+  {
+    "country": "United Arab Emirates",
+    "bank_name": "Central Bank of the United Arab Emirates",
+    "abbreviation": "CBUAE",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/fr/6/63/UAE_Central_Bank_Logo.png?_=20250712212805"
+  },
+  {
+    "country": "Qatar",
+    "bank_name": "Qatar Central Bank",
+    "abbreviation": "QCB",
+    "logo_url": "https://www.qcb.gov.qa/assets/img/useful-links/QCB_New_Logo.png"
   }
 ]
