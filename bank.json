@@ -1,0 +1,80 @@
+[
+  {
+    "country": "United States",
+    "bank_name": "Federal Reserve",
+    "abbreviation": "FED",
+    "logo_url": "https://www.logo.wine/a/logo/Federal_Reserve/Federal_Reserve-Logo.wine.svg"
+  },
+  {
+    "country": "European Union",
+    "bank_name": "European Central Bank",
+    "abbreviation": "ECB",
+    "logo_url": "https://1000logos.net/wp-content/uploads/2021/05/European-Central-Bank-logo-500x300.png"
+  },
+  {
+    "country": "China",
+    "bank_name": "People's Bank of China",
+    "abbreviation": "PBOC",
+    "logo_url": "https://icons.veryicon.com/png/o/business/bank-logo-collection/peoples-bank-of-china-portfolio.png"
+  },
+  {
+    "country": "Japan",
+    "bank_name": "Bank of Japan",
+    "abbreviation": "BOJ",
+    "logo_url": "https://images.seeklogo.com/logo-png/31/1/bank-of-japan-logo-png_seeklogo-311367.png"
+  },
+  {
+    "country": "South Korea",
+    "bank_name": "Bank of Korea",
+    "abbreviation": "BOK",
+    "logo_url": "https://iconlogovector.com/uploads/images/2025/08/lg-68a9166fbc47d-Bank-of-Korea.webp"
+  },
+  {
+    "country": "Taiwan",
+    "bank_name": "Central Bank of the Republic of China",
+    "abbreviation": "CBC",
+    "logo_url": "https://www.clipartmax.com/png/middle/86-863644_from-wikipedia-the-free-encyclopedia-central-bank-of-the-republic-of-china.png"
+  },
+  {
+    "country": "United Kingdom",
+    "bank_name": "Bank of England",
+    "abbreviation": "BOE",
+    "logo_url": "https://wp.logos-download.com/wp-content/uploads/2022/11/Bank_of_England_Logo-700x482.png"
+  },
+  {
+    "country": "Australia",
+    "bank_name": "Reserve Bank of Australia",
+    "abbreviation": "RBA",
+    "logo_url": "https://e7.pngegg.com/pngimages/82/55/png-clipart-reserve-bank-of-australia-central-bank-commonwealth-bank-australian-prudential-regulation-authority-australia-text-trademark.png"
+  },
+  {
+    "country": "Canada",
+    "bank_name": "Bank of Canada",
+    "abbreviation": "BOC",
+    "logo_url": "https://iconape.com/wp-content/png_logo_vector/bank-of-canada-logo.png"
+  },
+  {
+    "country": "New Zealand",
+    "bank_name": "Reserve Bank of New Zealand",
+    "abbreviation": "RBNZ",
+    "logo_url": "https://cdn.brandfetch.io/iddjcsZ5xW/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1768748249964"
+  },
+  {
+    "country": "France",
+    "bank_name": "Banque de France",
+    "abbreviation": "BDF",
+    "logo_url": "https://images.seeklogo.com/logo-png/61/1/banque-de-france-logo-png_seeklogo-617226.png"
+  },
+  {
+    "country": "Germany",
+    "bank_name": "Deutsche Bundesbank",
+    "abbreviation": "BBK",
+    "logo_url": "https://cdn.brandfetch.io/id3AQGIurE/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1681545049630"
+  },
+  {
+    "country": "Switzerland",
+    "bank_name": "Swiss National Bank",
+    "abbreviation": "SNB",
+    "logo_url": "https://images.seeklogo.com/logo-png/31/1/swiss-national-bank-logo-png_seeklogo-311373.png"
+  }
+]
