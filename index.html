@@ -823,7 +823,59 @@
         
         /* 4. Cột phải để trống */
         .column-right {
-            /* Không cần đặt nội dung, flex: 1 sẽ tự giữ chỗ cho nó */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #bank-info-box {
+            width: 80%; /* Tự động theo màn hình */
+            text-align: center;
+        }
+        
+        /* Phần 1: Khung hình vuông */
+        .bank-logo-frame {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Giữ khung luôn vuông */
+            margin-bottom: 1.5vw; /* Khoảng cách vừa nhìn */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .bank-logo-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Khớp theo cạnh lớn hơn, giữ đúng tỉ lệ */
+        }
+        
+        /* Phần 2: Các dòng thông tin */
+        .bank-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5vw;
+        }
+        
+        .bank-line {
+            position: relative;
+            min-height: 2.4em; /* Đủ chỗ cho 2 dòng (tên chính + phòng hờ) */
+            line-height: 1.2em;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        #bank-name { font-weight: bold; text-transform: uppercase; }
+        #bank-abbr { opacity: 0.8; }
+        #bank-country { font-size: 0.9em; opacity: 0.6; }
+        
+        /* Dòng phòng hờ để không phá bố cục */
+        .placeholder-line {
+            height: 1.2em;
+            width: 100%;
+            visibility: hidden;
         }
         
         .curr-part-1 { 
@@ -1255,7 +1307,25 @@
                 </div>
         
             </div> <div class="top-column column-right">
-            </div>
+                        <div id="bank-info-box">
+                            <div class="bank-logo-frame">
+                                <img id="bank-logo" src="" alt="Bank Logo">
+                            </div>
+                            <div class="bank-details">
+                                <div class="bank-line bank-name-line">
+                                    <div id="bank-name"></div>
+                                    <div class="placeholder-line"></div> </div>
+                                <div class="bank-line bank-abbr-line">
+                                    <div id="bank-abbr"></div>
+                                    <div class="placeholder-line"></div>
+                                </div>
+                                <div class="bank-line bank-country-line">
+                                    <div id="bank-country"></div>
+                                    <div class="placeholder-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
         
         </div>
         <div class="currency-grid-container" id="currencyGrid"></div>
@@ -2037,6 +2107,64 @@
         setInterval(() => {
             updateFromWiseAPI();
         }, 300000);
+
+        /* --- BANK LOGIC --- */
+        let allBanks = [];
+        let currentBankPlaylist = [];
+        let bankIdx = 0;
+        
+        function initBankSlideshow() {
+            fetch("bank.json?v=" + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    allBanks = data;
+                    startNewBankCycle();
+                });
+        }
+        
+        function startNewBankCycle() {
+            // Xáo trộn danh sách cho lượt mới
+            currentBankPlaylist = shuffleArray(allBanks);
+            bankIdx = 0;
+            showNextBank();
+        }
+        
+        function showNextBank() {
+            if (currentBankPlaylist.length === 0) return;
+        
+            const bank = currentBankPlaylist[bankIdx];
+            
+            // Cập nhật DOM
+            const logoImg = document.getElementById("bank-logo");
+            const nameEl = document.getElementById("bank-name");
+            const abbrEl = document.getElementById("bank-abbr");
+            const countryEl = document.getElementById("bank-country");
+        
+            // Hiệu ứng chuyển cảnh nhẹ (nếu muốn)
+            logoImg.style.opacity = 0;
+            
+            setTimeout(() => {
+                logoImg.src = bank.logo;
+                nameEl.textContent = bank.name;
+                abbrEl.textContent = bank.abbr; // Tên viết tắt
+                countryEl.textContent = bank.country;
+                logoImg.style.opacity = 1;
+            }, 200);
+        
+            bankIdx++;
+        
+            // Thiết lập thời gian 5s cho hình tiếp theo
+            setTimeout(() => {
+                if (bankIdx >= currentBankPlaylist.length) {
+                    startNewBankCycle(); // Sang lượt mới với thứ tự ngẫu nhiên mới
+                } else {
+                    showNextBank(); // Tiếp tục hình tiếp theo trong lượt
+                }
+            }, 5000);
+        }
+        
+        // Chạy khởi tạo
+        initBankSlideshow();
         
     </script>
 </body>
