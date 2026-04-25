@@ -866,6 +866,13 @@
             justify-content: flex-start;
             align-items: center;
         }
+
+        #bank-logo {
+            transition: opacity 0.3s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
         
         #bank-name { font-weight: bold; text-transform: uppercase; }
         #bank-abbr { opacity: 0.8; }
@@ -2113,6 +2120,16 @@
         let currentBankPlaylist = [];
         let bankIdx = 0;
         
+        // Thêm hàm xáo trộn (Shuffle) nếu bạn chưa có trong file
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
         function initBankSlideshow() {
             fetch("bank.json?v=" + Date.now())
                 .then(r => r.json())
@@ -2123,7 +2140,6 @@
         }
         
         function startNewBankCycle() {
-            // Xáo trộn danh sách cho lượt mới
             currentBankPlaylist = shuffleArray(allBanks);
             bankIdx = 0;
             showNextBank();
@@ -2133,32 +2149,33 @@
             if (currentBankPlaylist.length === 0) return;
         
             const bank = currentBankPlaylist[bankIdx];
-            
-            // Cập nhật DOM
+        
             const logoImg = document.getElementById("bank-logo");
             const nameEl = document.getElementById("bank-name");
             const abbrEl = document.getElementById("bank-abbr");
             const countryEl = document.getElementById("bank-country");
         
-            // Hiệu ứng chuyển cảnh nhẹ (nếu muốn)
-            logoImg.style.opacity = 0;
-            
+            // Hiệu ứng mờ dần (áp dụng cho cả text để đồng bộ)
+            const elements = [logoImg, nameEl, abbrEl, countryEl];
+            elements.forEach(el => { if(el) el.style.opacity = 0; });
+        
             setTimeout(() => {
-                logoImg.src = bank.logo;
-                nameEl.textContent = bank.name;
-                abbrEl.textContent = bank.abbr; // Tên viết tắt
-                countryEl.textContent = bank.country;
-                logoImg.style.opacity = 1;
+                // SỬA TẠI ĐÂY: Khớp với key trong file JSON của bạn
+                if (logoImg) logoImg.src = bank.logo_url;       // bank.logo -> bank.logo_url
+                if (nameEl) nameEl.textContent = bank.bank_name; // bank.name -> bank.bank_name
+                if (abbrEl) abbrEl.textContent = bank.abbreviation; // bank.abbr -> bank.abbreviation
+                if (countryEl) countryEl.textContent = bank.country;
+        
+                elements.forEach(el => { if(el) el.style.opacity = 1; });
             }, 200);
         
             bankIdx++;
         
-            // Thiết lập thời gian 5s cho hình tiếp theo
             setTimeout(() => {
                 if (bankIdx >= currentBankPlaylist.length) {
-                    startNewBankCycle(); // Sang lượt mới với thứ tự ngẫu nhiên mới
+                    startNewBankCycle(); 
                 } else {
-                    showNextBank(); // Tiếp tục hình tiếp theo trong lượt
+                    showNextBank(); 
                 }
             }, 5000);
         }
