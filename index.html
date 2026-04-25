@@ -2119,7 +2119,7 @@
         let allBanks = [];
         let currentBankPlaylist = [];
         let bankIdx = 0;
-        let slideshowTimeout;
+        let slideshowTimer = null; // Biến quản lý duy nhất để không bị chồng luồng
         
         function shuffleArray(array) {
             let arr = [...array];
@@ -2130,66 +2130,75 @@
             return arr;
         }
         
-        function initBankSlideshow() {
-            // Mỗi lần load/reload trang sẽ fetch dữ liệu mới nhất
-            fetch("bank.json?v=" + Date.now())
-                .then(r => r.json())
-                .then(data => {
-                    allBanks = data; // Ở đây allBanks sẽ nhận toàn bộ số lượng phần tử thực tế (15, 20, 100...)
-                    startNewBankCycle();
-                })
-                .catch(err => console.error("Không thể đọc file JSON:", err));
+        async function initBankSlideshow() {
+            try {
+                const r = await fetch("bank.json?v=" + Date.now());
+                allBanks = await r.json();
+                startNewBankCycle();
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu:", err);
+            }
         }
         
         function startNewBankCycle() {
-            // Tạo một lượt phát mới với thứ tự ngẫu nhiên từ toàn bộ danh sách vừa tải
             currentBankPlaylist = shuffleArray(allBanks);
             bankIdx = 0;
             showNextBank();
         }
         
         function showNextBank() {
-            // Kiểm tra nếu đã đi hết "Playlist" hiện tại
+            // 1. Dọn dẹp bộ đếm cũ để tránh bị "giật" do nhiều luồng chạy đè lên nhau
+            if (slideshowTimer) clearTimeout(slideshowTimer);
+        
             if (bankIdx >= currentBankPlaylist.length) {
-                startNewBankCycle(); // Tự động xáo trộn lại và chạy lượt mới
+                startNewBankCycle();
                 return;
             }
         
             const bank = currentBankPlaylist[bankIdx];
-            const elements = {
-                logo: document.getElementById("bank-logo"),
-                name: document.getElementById("bank-name"),
-                abbr: document.getElementById("bank-abbr"),
-                country: document.getElementById("bank-country")
-            };
+            const logoImg = document.getElementById("bank-logo");
+            const nameEl = document.getElementById("bank-name");
+            const abbrEl = document.getElementById("bank-abbr");
+            const countryEl = document.getElementById("bank-country");
+            const elements = [logoImg, nameEl, abbrEl, countryEl];
         
-            // 1. Hiệu ứng ẩn
-            Object.values(elements).forEach(el => { if (el) el.style.opacity = 0; });
-        
-            // 2. Tải ảnh và cập nhật nội dung
-            const imageLoadPromise = new Promise((resolve) => {
-                if (!elements.logo || !bank.logo_url) { resolve(); return; }
-                elements.logo.onload = () => resolve();
-                elements.logo.onerror = () => resolve();
-                elements.logo.src = bank.logo_url;
+            // 2. Ẩn nội dung cũ ngay lập tức (hiệu ứng mờ dần)
+            elements.forEach(el => { 
+                if(el) {
+                    el.style.transition = "opacity 0.5s ease"; // Đảm bảo có transition cho mượt
+                    el.style.opacity = 0; 
+                }
             });
         
-            imageLoadPromise.then(() => {
-                if (elements.name) elements.name.textContent = bank.bank_name;
-                if (elements.abbr) elements.abbr.textContent = bank.abbreviation;
-                if (elements.country) elements.country.textContent = bank.country;
+            // 3. Đợi một chút cho hiệu ứng ẩn hoàn tất rồi mới thay đổi nguồn dữ liệu
+            setTimeout(() => {
+                const imageLoadPromise = new Promise((resolve) => {
+                    if (!logoImg) { resolve(); return; }
+                    
+                    logoImg.onload = () => resolve();
+                    logoImg.onerror = () => {
+                        console.warn(`Không tải được ảnh: ${bank.logo_url}`);
+                        resolve(); 
+                    };
+                    logoImg.src = bank.logo_url;
+                });
         
-                // 3. Hiệu ứng hiện
-                setTimeout(() => {
-                    Object.values(elements).forEach(el => { if (el) el.style.opacity = 1; });
-                }, 50);
+                imageLoadPromise.then(() => {
+                    // Cập nhật text khi ảnh đã sẵn sàng trong bộ nhớ đệm
+                    if (nameEl) nameEl.textContent = bank.bank_name;
+                    if (abbrEl) abbrEl.textContent = bank.abbreviation;
+                    if (countryEl) countryEl.textContent = bank.country;
         
-                // 4. Tăng chỉ số và đặt lịch chạy hình tiếp theo sau 5s
-                bankIdx++;
-                
-                clearTimeout(slideshowTimeout);
-                slideshowTimeout = setTimeout(showNextBank, 5000);
-            });
+                    // 4. Hiện nội dung mới lên mượt mà
+                    setTimeout(() => {
+                        elements.forEach(el => { if(el) el.style.opacity = 1; });
+                    }, 100);
+        
+                    // 5. Thiết lập 5s cho hình tiếp theo
+                    bankIdx++;
+                    slideshowTimer = setTimeout(showNextBank, 5000);
+                });
+            }, 500); // Đợi 0.5s cho hình cũ ẩn hẳn rồi mới nạp hình mới
         }
         
         initBankSlideshow();
