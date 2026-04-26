@@ -1082,6 +1082,31 @@
         .conv-row { display: flex; align-items: center; width: 100%; margin-bottom: 0.4vw; }
         .conv-left, .conv-right { flex: 1.5; text-align: center; font-weight: bold; font-size: 0.7vw; }
         .conv-mid { flex: 7; text-align: center; font-size: 0.9vw; border-bottom: 1px dashed #bbb; }
+
+        .nav-btn {
+            width: 3vw; /* Độ rộng phù hợp để không chiếm chỗ của 8 ô chính */
+            height: 100%; /* Sẽ tự cao bằng khung tỉ giá */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            user-select: none;
+        }
+        
+        .nav-btn:hover {
+            opacity: 0.5;
+        }
+        
+        .arrow {
+            font-size: 2vw; /* Kích thước mũi tên theo vw */
+            font-weight: bold;
+        }
+        
+        /* Đảm bảo khung bao ngoài dư ra một xíu ở trên và dưới */
+        .rate-frame-wrapper {
+            padding: 1vw 0; 
+        }
         
         /* Bộ 3 dòng chân trang */
         .grid-footer {
@@ -1339,7 +1364,18 @@
                     </div>
         
         </div>
-        <div class="currency-grid-container" id="currencyGrid"></div>
+        <div class="rate-frame-wrapper">
+            <div class="nav-btn btn-left" onclick="changeSet(-1)">
+                <span class="arrow">&#10094;</span>
+            </div>
+        
+            <div id="rate-display-container" class="rate-grid-sub">
+                </div>
+        
+            <div class="nav-btn btn-right" onclick="changeSet(1)">
+                <span class="arrow">&#10095;</span>
+            </div>
+        </div>
 
         <div class="grid-footer">
             <div class="footer-bold">LAST UPDATED</div>
@@ -2206,6 +2242,60 @@
         }
         
         initBankSlideshow();
+
+        let currentSetIndex = 0; // Bắt đầu ở bộ 0
+
+        const rateSets = {
+            "0": ["CHINA", "MACAU", "HONG KONG", "TAIWAN", "JAPAN", "SOUTH KOREA", "THAILAND", "SINGAPORE"],
+            "1": ["UNITED KINGDOM", "CANADA", "AUSTRALIA", "NEW ZEALAND", "RUSSIA", "KUWAIT", "UNITED ARAB EMIRATES", "QATAR"],
+            "-1": ["TURKEY", "SWITZERLAND", "INDIA", "BRAZIL", "SOUTH AFRICA", "SWEDEN", "MADAGASCAR", "MALDIVES"]
+        };
+        
+        // Hàm chuyển bộ
+        function changeSet(direction) {
+            const setKeys = Object.keys(rateSets).map(Number).sort((a, b) => a - b); 
+            // setKeys sẽ là [-1, 0, 1]
+            
+            let currentIndexInKeys = setKeys.indexOf(currentSetIndex);
+            currentIndexInKeys += direction;
+        
+            // Logic vòng lặp vô tận (Infinite Loop)
+            if (currentIndexInKeys >= setKeys.length) {
+                currentIndexInKeys = 0; // Quay về bộ nhỏ nhất (-1)
+            } else if (currentIndexInKeys < 0) {
+                currentIndexInKeys = setKeys.length - 1; // Quay về bộ lớn nhất (1)
+            }
+        
+            currentSetIndex = setKeys[currentIndexInKeys];
+            renderRateSet(currentSetIndex);
+        }
+        
+        // Hàm hiển thị
+        async function renderRateSet(setKey) {
+            const container = document.getElementById("rate-display-container");
+            container.innerHTML = ""; // Xóa bộ cũ
+        
+            const countries = rateSets[setKey];
+            
+            // Giả sử bạn đã có biến global 'currencyData' từ file json và 'exchangeRates' từ API
+            countries.forEach(countryName => {
+                // Tìm thông tin quốc gia từ file flag.json (đã load sẵn)
+                const countryData = allFlagsData.find(f => f.name.toUpperCase() === countryName);
+                const rate = latestRates[countryData?.code] || 0;
+        
+                const item = document.createElement("div");
+                item.className = "rate-item";
+                item.innerHTML = `
+                    <img src="${countryData?.flag || ''}" alt="${countryName}">
+                    <div class="p-name">${countryName}</div>
+                    <div class="p-rate">${rate.toFixed(2)}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // Khởi tạo lần đầu khi tải trang
+        // window.onload = () => renderRateSet(0);
         
     </script>
 </body>
