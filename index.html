@@ -2119,12 +2119,41 @@
         }
         
         function updateBoxTimestamp(box, apiDateStr) {
-            const updateDateEl = box.querySelector('.update-date');
-            const updateTimeEl = box.querySelector('.update-time');
-            if (updateDateEl && updateTimeEl) {
-                const now = new Date();
-                updateDateEl.textContent = apiDateStr.replace(/-/g, '/');
-                updateTimeEl.textContent = now.toTimeString().split(' ')[0];
+            const rateDateEl = document.getElementById('rate-last-date');
+            const rateTimeEl = document.getElementById('rate-last-time');
+        
+            const now = new Date();
+            // Chuyển "2026-04-25" từ API thành "2026/04/25"
+            const formattedDate = apiDateStr.replace(/-/g, '/');
+            const formattedTime = now.toTimeString().split(' ')[0];
+        
+            // Cập nhật cho Box (Left/Right)
+            const boxDate = box.querySelector('.update-date');
+            const boxTime = box.querySelector('.update-time');
+            if (boxDate) boxDate.textContent = formattedDate;
+            if (boxTime) boxTime.textContent = formattedTime;
+        
+            // Cập nhật cho Khung Tỉ Giá
+            if (rateDateEl) rateDateEl.textContent = formattedDate;
+            if (rateTimeEl) rateTimeEl.textContent = formattedTime;
+        }
+        
+        // Trong hàm initCurrency, sau khi fetch được data, phải gọi update ngay:
+        async function initCurrency() {
+            try {
+                const response = await fetch(NEW_API_URL);
+                const data = await response.json();
+                
+                // ... (logic xử lý liveRates của bạn) ...
+        
+                // Cập nhật timestamp ngay lập tức cho toàn bộ các thành phần
+                document.querySelectorAll('.currency-main-box').forEach(box => {
+                    updateBoxTimestamp(box, data.date);
+                });
+        
+                renderRateSet(0);
+            } catch (e) {
+                console.error(e);
             }
         }
         
