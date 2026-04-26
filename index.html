@@ -1135,13 +1135,24 @@
         /* Bộ 3 dòng chân trang */
         .grid-footer {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-direction: row;      /* Ép nằm ngang trên 1 dòng */
+            justify-content: center;  /* Căn giữa toàn bộ dòng */
+            align-items: baseline;    /* Để chữ và số khớp chân nhau */
+            gap: 0.5vw;               /* Khoảng cách giữa chữ và số */
             width: 100%;
-            margin-top: 5vw;
+            margin-top: 3vw;          /* Giảm bớt khoảng cách nếu 5vw quá thưa */
         }
-        .footer-bold { font-weight: bold; font-size: 1.2vw; margin-bottom: 0.3vw; }
-        .footer-casio { font-family: 'Courier New', monospace; font-size: 1.5vw; }
+        
+        /* Sửa lại các class con để đồng bộ font và kích thước */
+        .footer-bold { 
+            font-weight: bold; 
+            font-size: 1.1vw; 
+        }
+        
+        .footer-casio { 
+            font-family: 'Courier New', monospace; 
+            font-size: 1.1vw; /* Để kích thước bằng với chữ LAST UPDATED cho đều */
+        }
         
     </style>
 </head>
