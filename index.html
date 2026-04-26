@@ -1992,7 +1992,7 @@
         
         let currentSetIndex = 0;
         let liveRates = {};
-        let allFlagsData = {}; // Lưu trữ dữ liệu từ flag.json toàn cục
+        let allFlagsData = {}; 
         const NEW_API_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json";
         
         async function initCurrency() {
@@ -2010,8 +2010,9 @@
                 const flagRes = await fetch('flag.json');
                 allFlagsData = await flagRes.json();
         
-                // 3. Thiết lập các Box chuyển đổi lớn (USD/EUR)
+                // 3. Thiết lập các Box chuyển đổi (USD/EUR) và Footer
                 setupMainCurrencyBoxes(data.date);
+                updateGridFooterTimestamp(data.date); // Cập nhật thời gian cho Footer Grid
         
                 // 4. Render bộ tỉ giá mặc định (Bộ 0)
                 renderRateSet(0);
@@ -2021,20 +2022,16 @@
             }
         }
         
-        // Hàm render 8 ô dựa trên bộ hiện tại - ĐẢM BẢO GIỮ NGUYÊN CSS GỐC
+        // Hàm render 8 ô quốc gia
         function renderRateSet(setIndex) {
             const grid = document.getElementById("currencyGrid");
             if (!grid) return;
             
-            // Bước quan trọng nhất để mất hàng dưới: Xóa sạch container trước khi vẽ
             grid.innerHTML = ""; 
-        
             const countries = rateSets[setIndex.toString()];
         
             countries.forEach(name => {
-                // Tìm dữ liệu trong flag.json theo tên (Case-insensitive)
                 const d = allFlagsData[Object.keys(allFlagsData).find(key => key.toUpperCase() === name.toUpperCase())];
-                
                 if (!d) return;
         
                 const code = d.currency.toUpperCase();
@@ -2044,7 +2041,6 @@
                 const card = document.createElement("div");
                 card.className = "country-card";
                 
-                // Giữ nguyên cấu trúc HTML 7 phần của bạn
                 card.innerHTML = `
                     <div class="card-part-1"><img src="${d.flag}"></div>
                     <div class="card-part-2">${name}</div>
@@ -2066,21 +2062,16 @@
             });
         }
         
-        // Logic điều hướng bộ (vòng lặp vô tận)
         function changeSet(direction) {
             const keys = Object.keys(rateSets).map(Number).sort((a, b) => a - b);
             let idx = keys.indexOf(currentSetIndex);
-            
             idx += direction;
-        
             if (idx >= keys.length) idx = 0;
             if (idx < 0) idx = keys.length - 1;
-        
             currentSetIndex = keys[idx];
             renderRateSet(currentSetIndex);
         }
         
-        // Hàm bổ trợ thiết lập các box USD/EUR lớn phía trên
         function setupMainCurrencyBoxes(apiDate) {
             document.querySelectorAll('.currency-main-box').forEach(box => {
                 const input = box.querySelector('.curr-input');
@@ -2098,7 +2089,6 @@
         
                 input.addEventListener('input', calculate);
                 swapBtn.addEventListener('click', () => {
-                    // Logic swap giao diện của bạn
                     const p5 = box.querySelector('.curr-part-5');
                     const p6 = box.querySelector('.curr-part-6');
                     const img5 = p5.querySelector('img').src;
@@ -2118,6 +2108,7 @@
             });
         }
         
+        // Cập nhật thời gian cho 2 Box USD/EUR phía trên
         function updateBoxTimestamp(box, apiDateStr) {
             const updateDateEl = box.querySelector('.update-date');
             const updateTimeEl = box.querySelector('.update-time');
@@ -2128,17 +2119,34 @@
             }
         }
         
-        // Khởi chạy hệ thống
+        // Cập nhật thời gian cho phần LAST UPDATED ở Footer Grid
+        function updateGridFooterTimestamp(apiDateStr) {
+            const lastDateEl = document.getElementById('last-date');
+            const lastTimeEl = document.getElementById('last-time');
+            if (lastDateEl && lastTimeEl) {
+                const now = new Date();
+                lastDateEl.textContent = apiDateStr.replace(/-/g, '/');
+                lastTimeEl.textContent = now.toTimeString().split(' ')[0];
+            }
+        }
+        
         initCurrency();
         
-        // Cập nhật lại tỉ giá sau mỗi 5 phút (không render lại toàn bộ để tránh giật lag)
+        // Tự động cập nhật mỗi 5 phút
         setInterval(async () => {
-            const response = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
-            const data = await response.json();
-            for (const curr in data.usd) {
-                liveRates[curr.toUpperCase()] = data.usd[curr];
+            try {
+                const response = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
+                const data = await response.json();
+                for (const curr in data.usd) {
+                    liveRates[curr.toUpperCase()] = data.usd[curr];
+                }
+                // Cập nhật thời gian mới cho cả box và footer
+                document.querySelectorAll('.currency-main-box').forEach(box => updateBoxTimestamp(box, data.date));
+                updateGridFooterTimestamp(data.date);
+                renderRateSet(currentSetIndex);
+            } catch (e) {
+                console.error("Lỗi cập nhật định kỳ:", e);
             }
-            renderRateSet(currentSetIndex);
         }, 300000);
 
         /* --- BANK LOGIC --- */
@@ -2228,10 +2236,7 @@
         }
         
         initBankSlideshow();
-
-       
-        
-        
+  
     </script>
 </body>
 </html>
