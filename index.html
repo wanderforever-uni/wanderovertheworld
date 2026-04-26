@@ -980,6 +980,9 @@
             font-size: 1.2vw;
             outline: none;
             background: transparent;
+            display: block;           /* Đảm bảo margin auto hoạt động */
+            margin: 0 auto;           /* Căn giữa khung input */
+            padding-left: 1.5vw;      /* Bù trừ khoảng trống của mũi tên bên phải */
         }
         
         .curr-convert-icon {
@@ -1087,6 +1090,10 @@
             background: transparent;
             outline: none;
             margin-bottom: 1.2vw;
+            display: block;           /* Đảm bảo margin auto hoạt động */
+            margin-left: auto;        /* Kết hợp với margin-right auto để vào giữa */
+            margin-right: auto;
+            padding-left: 1.2vw;      /* Bù trừ khoảng trống của mũi tên bên phải */
         }
         
         /* Phần 6 & 7: Quy đổi (Tỉ lệ 1.5 - 7 - 1.5) */
