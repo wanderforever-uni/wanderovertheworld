@@ -1147,11 +1147,13 @@
         .footer-bold { 
             font-weight: bold; 
             font-size: 1.1vw; 
+            white-space: nowrap;
         }
         
         .footer-casio { 
             font-family: 'Courier New', monospace; 
             font-size: 1.1vw; /* Để kích thước bằng với chữ LAST UPDATED cho đều */
+            white-space: nowrap;
         }
         
     </style>
@@ -1413,7 +1415,10 @@
         </div>
 
         <div class="grid-footer">
-            LAST UPDATED: <span id="last-date">--/--/----</span> - <span id="last-time">--:--:--</span>
+            <span class="footer-bold">LAST UPDATED:</span>
+            <span class="footer-casio">
+                <span id="last-date">--/--/----</span> - <span id="last-time">--:--:--</span>
+            </span>
         </div>
     </div>
     
