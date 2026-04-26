@@ -2165,6 +2165,22 @@
         }
         
         initCurrency();
+        // Áp dụng cho cả .curr-input và .card-input
+        document.addEventListener('focusin', (e) => {
+            if (e.target.classList.contains('curr-input') || e.target.classList.contains('card-input')) {
+                if (e.target.value === "1") {
+                    e.target.value = ""; // Click vào là xóa trắng số 1 để gõ luôn
+                }
+            }
+        });
+        
+        document.addEventListener('focusout', (e) => {
+            if (e.target.classList.contains('curr-input') || e.target.classList.contains('card-input')) {
+                if (e.target.value === "") {
+                    e.target.value = "1"; // Nếu không gõ gì mà thoát ra thì trả về số 1
+                }
+            }
+        });
         
         // Tự động cập nhật mỗi 5 phút
         setInterval(async () => {
