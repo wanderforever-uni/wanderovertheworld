@@ -1017,13 +1017,24 @@
             color: #000000; 
         }
 
+        /* Khung bao không viền, ngang bằng currency */
+        .rate-frame-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: auto;
+            padding: 1.5vw 0; /* Rìa trên dưới dư ra một xíu */
+            gap: 1vw;
+        }
+
         /* Container chính cho 12 dòng x 4 ô */
         .currency-grid-container {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 4vw 1.2vw;
-            margin: 5vw 0;
+            gap: 1.2vw;
+            margin: 0;
             width: 100%;
+            flex-grow: 1;
         }
         
         .country-card {
@@ -1090,6 +1101,8 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            align-self: stretch;
+            background: transparent; /* Không viền */
             transition: opacity 0.3s;
             user-select: none;
         }
@@ -1369,7 +1382,7 @@
                 <span class="arrow">&#10094;</span>
             </div>
         
-            <div id="rate-display-container" class="rate-grid-sub">
+            <div class="currency-grid-container" id="currencyGrid">
                 </div>
         
             <div class="nav-btn btn-right" onclick="changeSet(1)">
@@ -2243,59 +2256,75 @@
         
         initBankSlideshow();
 
-        let currentSetIndex = 0; // Bắt đầu ở bộ 0
-
+        // Cấu hình các bộ quốc gia
         const rateSets = {
             "0": ["CHINA", "MACAU", "HONG KONG", "TAIWAN", "JAPAN", "SOUTH KOREA", "THAILAND", "SINGAPORE"],
             "1": ["UNITED KINGDOM", "CANADA", "AUSTRALIA", "NEW ZEALAND", "RUSSIA", "KUWAIT", "UNITED ARAB EMIRATES", "QATAR"],
             "-1": ["TURKEY", "SWITZERLAND", "INDIA", "BRAZIL", "SOUTH AFRICA", "SWEDEN", "MADAGASCAR", "MALDIVES"]
         };
         
-        // Hàm chuyển bộ
-        function changeSet(direction) {
-            const setKeys = Object.keys(rateSets).map(Number).sort((a, b) => a - b); 
-            // setKeys sẽ là [-1, 0, 1]
-            
-            let currentIndexInKeys = setKeys.indexOf(currentSetIndex);
-            currentIndexInKeys += direction;
+        let currentSetIndex = 0; // Mặc định bộ 0
         
-            // Logic vòng lặp vô tận (Infinite Loop)
-            if (currentIndexInKeys >= setKeys.length) {
-                currentIndexInKeys = 0; // Quay về bộ nhỏ nhất (-1)
-            } else if (currentIndexInKeys < 0) {
-                currentIndexInKeys = setKeys.length - 1; // Quay về bộ lớn nhất (1)
-            }
+        // Hàm render 8 ô dựa trên bộ hiện tại
+        function renderRateSet(setIndex) {
+            const grid = document.getElementById("currencyGrid");
+            if (!grid) return;
+            grid.innerHTML = ""; 
         
-            currentSetIndex = setKeys[currentIndexInKeys];
-            renderRateSet(currentSetIndex);
-        }
+            const countries = rateSets[setIndex.toString()];
         
-        // Hàm hiển thị
-        async function renderRateSet(setKey) {
-            const container = document.getElementById("rate-display-container");
-            container.innerHTML = ""; // Xóa bộ cũ
+            countries.forEach(name => {
+                // Tìm dữ liệu từ flag.json (giả sử biến là allFlagsData)
+                const data = allFlagsData.find(f => f.name.toUpperCase() === name.toUpperCase());
+                if (!data) return;
         
-            const countries = rateSets[setKey];
-            
-            // Giả sử bạn đã có biến global 'currencyData' từ file json và 'exchangeRates' từ API
-            countries.forEach(countryName => {
-                // Tìm thông tin quốc gia từ file flag.json (đã load sẵn)
-                const countryData = allFlagsData.find(f => f.name.toUpperCase() === countryName);
-                const rate = latestRates[countryData?.code] || 0;
+                // Lấy tỉ giá (giả sử hàm lấy tỉ giá của bạn là getRate)
+                const rate = typeof getLatestRate === 'function' ? getLatestRate(data.code) : "0.00";
         
-                const item = document.createElement("div");
-                item.className = "rate-item";
-                item.innerHTML = `
-                    <img src="${countryData?.flag || ''}" alt="${countryName}">
-                    <div class="p-name">${countryName}</div>
-                    <div class="p-rate">${rate.toFixed(2)}</div>
+                const card = document.createElement("div");
+                card.className = "country-card";
+                card.innerHTML = `
+                    <div class="card-part-1"><img src="${data.flag}"></div>
+                    <div class="card-part-2">${data.name}</div>
+                    <div class="card-part-3">${data.currencyName || 'CURRENCY'}</div>
+                    <div class="card-part-4">${data.symbol || ''} ${data.code}</div>
+                    <input class="card-input" type="text" value="${rate}" readonly>
+                    <div class="conv-row">
+                        <div class="conv-left">1</div>
+                        <div class="conv-mid">${data.code}</div>
+                        <div class="conv-right">USD</div>
+                    </div>
+                    <div class="conv-row">
+                        <div class="conv-left">${rate}</div>
+                        <div class="conv-mid">---</div>
+                        <div class="conv-right">1.00</div>
+                    </div>
                 `;
-                container.appendChild(item);
+                grid.appendChild(card);
             });
         }
         
-        // Khởi tạo lần đầu khi tải trang
-        // window.onload = () => renderRateSet(0);
+        // Logic chuyển đổi bộ vô tận
+        function changeSet(direction) {
+            // Lấy danh sách các bộ hiện có: [-1, 0, 1]
+            const keys = Object.keys(rateSets).map(Number).sort((a, b) => a - b);
+            let idx = keys.indexOf(currentSetIndex);
+            
+            idx += direction;
+        
+            // Vòng lặp vô tận
+            if (idx >= keys.length) idx = 0;
+            if (idx < 0) idx = keys.length - 1;
+        
+            currentSetIndex = keys[idx];
+            renderRateSet(currentSetIndex);
+        }
+        
+        // Chạy lần đầu khi load trang
+        document.addEventListener("DOMContentLoaded", () => {
+            // Đảm bảo dữ liệu flag.json đã load xong trước khi gọi
+            renderRateSet(0); 
+        });
         
     </script>
 </body>
