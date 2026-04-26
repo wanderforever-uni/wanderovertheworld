@@ -2057,7 +2057,7 @@
                     <div class="card-part-2">${name}</div>
                     <div class="card-part-3">${d.currency}</div>
                     <div class="card-part-4">${d.symbol}</div>
-                    <input class="card-input" type="text" value="1" readonly>
+                    <input class="card-input" type="number" value="1" step="any" inputmode="decimal">
                     <div class="conv-row">
                         <div class="conv-left">$</div>
                         <div class="conv-mid">${rateToUSD}</div>
@@ -2070,6 +2070,15 @@
                     </div>
                 `;
                 grid.appendChild(card);
+                const inputEl = card.querySelector('.card-input');
+                const midEls = card.querySelectorAll('.conv-mid'); // midEls[0] là USD, midEls[1] là EUR
+                
+                inputEl.addEventListener('input', () => {
+                    const amount = parseFloat(inputEl.value) || 0;
+                    // baseRateToUSD và baseRateToEUR là biến bạn đã tính ở trên (rateToUSD, rateToEUR)
+                    midEls[0].textContent = (amount * (1 / liveRates[code])).toFixed(4);
+                    midEls[1].textContent = (amount * (liveRates['EUR'] / liveRates[code])).toFixed(4);
+                });
             });
         }
         
