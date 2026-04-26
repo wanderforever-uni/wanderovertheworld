@@ -1984,188 +1984,161 @@
         });
 
         /* --- 8. CURRENCY LOGIC --- */
-        const countryList = [
-            "China", "Macau", "Hong Kong", "Taiwan", "Japan", "South Korea", "Thailand", "Singapore",
-            "United Kingdom", "Canada", "Australia", "Russia", "United Arab Emirates", "Kuwait", "Turkey", "Switzerland"
-        ];
+        const rateSets = {
+            "0": ["CHINA", "MACAU", "HONG KONG", "TAIWAN", "JAPAN", "SOUTH KOREA", "THAILAND", "SINGAPORE"],
+            "1": ["UNITED KINGDOM", "CANADA", "AUSTRALIA", "NEW ZEALAND", "RUSSIA", "KUWAIT", "UNITED ARAB EMIRATES", "QATAR"],
+            "-1": ["TURKEY", "SWITZERLAND", "INDIA", "BRAZIL", "SOUTH AFRICA", "SWEDEN", "MADAGASCAR", "MALDIVES"]
+        };
         
+        let currentSetIndex = 0;
         let liveRates = {};
-        
-        // API mới cập nhật nhanh hơn và ít bị kẹt cache
+        let allFlagsData = {}; // Lưu trữ dữ liệu từ flag.json toàn cục
         const NEW_API_URL = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json";
-
+        
         async function initCurrency() {
             try {
-                // 1. Lấy dữ liệu tỷ giá từ nguồn mới
+                // 1. Lấy dữ liệu tỷ giá
                 const response = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
                 const data = await response.json();
                 
-                // Chuẩn hóa dữ liệu từ Fawazahmed0 (data.usd[code]) về dạng liveRates[code] của bạn
                 liveRates = {};
                 for (const curr in data.usd) {
                     liveRates[curr.toUpperCase()] = data.usd[curr];
                 }
-
-                const rateUSDToEUR = liveRates.EUR;
         
-                // 2. Thiết lập logic cho các Box lớn (USD/EUR)
-                document.querySelectorAll('.currency-main-box').forEach(box => {
-                    const input = box.querySelector('.curr-input');
-                    const result = box.querySelector('.curr-result');
-                    const swapBtn = box.querySelector('.convert-btn');
+                // 2. Lấy dữ liệu flag.json
+                const flagRes = await fetch('flag.json');
+                allFlagsData = await flagRes.json();
         
-                    const calculate = () => {
-                        const amount = parseFloat(input.value) || 0;
-                        const unitP5 = box.querySelector('.p5-right').textContent.trim();
-                        const currentRate = (unitP5 === "USD") ? rateUSDToEUR : (1 / rateUSDToEUR);
-                        result.textContent = (amount * currentRate).toFixed(4);
-                        
-                        // Cập nhật timestamp (lấy từ field data.date của API mới)
-                        updateBoxTimestamp(box, data.date);
-                    };
+                // 3. Thiết lập các Box chuyển đổi lớn (USD/EUR)
+                setupMainCurrencyBoxes(data.date);
         
-                    input.addEventListener('input', calculate);
-        
-                    swapBtn.addEventListener('click', () => {
-                        const p5 = box.querySelector('.curr-part-5');
-                        const p6 = box.querySelector('.curr-part-6');
-                        const img5 = p5.querySelector('img').src;
-                        const txt5 = p5.querySelector('.p5-right').textContent;
-                        const img6 = p6.querySelector('img').src;
-                        const txt6 = p6.querySelector('.p6-right').textContent;
-        
-                        p5.querySelector('img').src = img6;
-                        p5.querySelector('.p5-right').textContent = txt6;
-                        p6.querySelector('img').src = img5;
-                        p6.querySelector('.p6-right').textContent = txt5;
-        
-                        calculate();
-                        swapBtn.style.transform = (swapBtn.style.transform === 'rotate(180deg)') ? 'rotate(0deg)' : 'rotate(180deg)';
-                    });
-        
-                    calculate();
-                });
-        
-                // 3. Khởi chạy Grid
-                startWanderCurrency();
+                // 4. Render bộ tỉ giá mặc định (Bộ 0)
+                renderRateSet(0);
         
             } catch (e) {
                 console.error("Lỗi khởi tạo Currency:", e);
             }
         }
         
-        function updateBoxTimestamp(box, apiDateStr) {
-            const updateDateEl = box.querySelector('.update-date');
-            const updateTimeEl = box.querySelector('.update-time');
+        // Hàm render 8 ô dựa trên bộ hiện tại - ĐẢM BẢO GIỮ NGUYÊN CSS GỐC
+        function renderRateSet(setIndex) {
+            const grid = document.getElementById("currencyGrid");
+            if (!grid) return;
             
-            if (updateDateEl && updateTimeEl) {
-                // API mới trả về date dạng "YYYY-MM-DD"
-                const dateObj = new Date(apiDateStr);
-                const now = new Date(); // Lấy giờ hiện tại để hiển thị độ tươi mới
+            // Bước quan trọng nhất để mất hàng dưới: Xóa sạch container trước khi vẽ
+            grid.innerHTML = ""; 
+        
+            const countries = rateSets[setIndex.toString()];
+        
+            countries.forEach(name => {
+                // Tìm dữ liệu trong flag.json theo tên (Case-insensitive)
+                const d = allFlagsData[Object.keys(allFlagsData).find(key => key.toUpperCase() === name.toUpperCase())];
                 
-                const yyyy = dateObj.getFullYear();
-                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const dd = String(dateObj.getDate()).padStart(2, '0');
-                const hh = String(now.getHours()).padStart(2, '0');
-                const min = String(now.getMinutes()).padStart(2, '0');
-                const ss = String(now.getSeconds()).padStart(2, '0');
+                if (!d) return;
         
-                updateDateEl.textContent = `${yyyy}/${mm}/${dd}`;
-                updateTimeEl.textContent = `${hh}:${min}:${ss}`;
-            }
-        }
+                const code = d.currency.toUpperCase();
+                const rateToUSD = liveRates[code] ? (1 / liveRates[code]).toFixed(4) : "0.0000";
+                const rateToEUR = liveRates[code] ? (liveRates['EUR'] / liveRates[code]).toFixed(4) : "0.0000";
         
-        async function startWanderCurrency() {
-            try {
-                const flagRes = await fetch('flag.json');
-                const flagData = await flagRes.json();
-                const container = document.getElementById('currencyGrid');
-                if (!container) return;
-        
-                container.innerHTML = ''; // Đảm bảo không render trùng lặp khi gọi lại
-                countryList.forEach(name => {
-                    const d = flagData[name];
-                    if (!d) return;
-        
-                    const safeName = name.replace(/\s+/g, '');
-                    const card = document.createElement('div');
-                    card.className = 'country-card';
-                    card.innerHTML = `
-                        <div class="card-part-1"><img src="${d.flag}"></div>
-                        <div class="card-part-2">${name}</div>
-                        <div class="card-part-3">${d.currency}</div>
-                        <div class="card-part-4">${d.symbol}</div>
-                        <input type="number" class="card-input" value="1" 
-                               id="in-${safeName}" 
-                               data-curr="${d.currency}" 
-                               oninput="syncCalculations()">
-                        <div class="conv-row">
-                            <div class="conv-left">$</div>
-                            <div id="${safeName}-usd" class="conv-mid">-</div>
-                            <div class="conv-right">USD</div>
-                        </div>
-                        <div class="conv-row">
-                            <div class="conv-left">€</div>
-                            <div id="${safeName}-eur" class="conv-mid">-</div>
-                            <div class="conv-right">EUR</div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-        
-                updateFromWiseAPI();
-            } catch (e) { console.error("Lỗi Grid:", e); }
-        }
-        
-        async function updateFromWiseAPI() {
-            try {
-                const res = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
-                const data = await res.json();
+                const card = document.createElement("div");
+                card.className = "country-card";
                 
-                liveRates = {};
-                for (const curr in data.usd) {
-                    liveRates[curr.toUpperCase()] = data.usd[curr];
-                }
-        
-                const dateStr = data.date.replace(/-/g, '/');
-                const now = new Date();
-                const timeStr = now.toTimeString().split(' ')[0];
-        
-                const lastDateEl = document.getElementById('last-date');
-                const lastTimeEl = document.getElementById('last-time');
-                
-                if (lastDateEl) lastDateEl.innerText = dateStr;
-                if (lastTimeEl) lastTimeEl.innerText = timeStr;
-        
-                syncCalculations();
-            } catch (e) {
-                console.error("Lỗi cập nhật API Grid:", e);
-            }
-        }
-        
-        function syncCalculations() {
-            countryList.forEach(name => {
-                const safeName = name.replace(/\s+/g, '');
-                const input = document.getElementById(`in-${safeName}`);
-                
-                if (input && liveRates) {
-                    const code = input.getAttribute('data-curr').toUpperCase();
-                    const val = parseFloat(input.value) || 0;
-                    const usdDisplay = document.getElementById(`${safeName}-usd`);
-                    const eurDisplay = document.getElementById(`${safeName}-eur`);
-        
-                    if (liveRates[code]) {
-                        usdDisplay.innerText = (val * (1 / liveRates[code])).toFixed(4);
-                        eurDisplay.innerText = (val * (liveRates['EUR'] / liveRates[code])).toFixed(4);
-                    }
-                }
+                // Giữ nguyên cấu trúc HTML 7 phần của bạn
+                card.innerHTML = `
+                    <div class="card-part-1"><img src="${d.flag}"></div>
+                    <div class="card-part-2">${name}</div>
+                    <div class="card-part-3">${d.currency}</div>
+                    <div class="card-part-4">${d.symbol} ${code}</div>
+                    <input class="card-input" type="text" value="1" readonly>
+                    <div class="conv-row">
+                        <div class="conv-left">$</div>
+                        <div class="conv-mid">${rateToUSD}</div>
+                        <div class="conv-right">USD</div>
+                    </div>
+                    <div class="conv-row">
+                        <div class="conv-left">€</div>
+                        <div class="conv-mid">${rateToEUR}</div>
+                        <div class="conv-right">EUR</div>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
         }
         
+        // Logic điều hướng bộ (vòng lặp vô tận)
+        function changeSet(direction) {
+            const keys = Object.keys(rateSets).map(Number).sort((a, b) => a - b);
+            let idx = keys.indexOf(currentSetIndex);
+            
+            idx += direction;
+        
+            if (idx >= keys.length) idx = 0;
+            if (idx < 0) idx = keys.length - 1;
+        
+            currentSetIndex = keys[idx];
+            renderRateSet(currentSetIndex);
+        }
+        
+        // Hàm bổ trợ thiết lập các box USD/EUR lớn phía trên
+        function setupMainCurrencyBoxes(apiDate) {
+            document.querySelectorAll('.currency-main-box').forEach(box => {
+                const input = box.querySelector('.curr-input');
+                const result = box.querySelector('.curr-result');
+                const swapBtn = box.querySelector('.convert-btn');
+        
+                const calculate = () => {
+                    const amount = parseFloat(input.value) || 0;
+                    const unitP5 = box.querySelector('.p5-right').textContent.trim();
+                    const rateUSDToEUR = liveRates.EUR || 0.92;
+                    const currentRate = (unitP5 === "USD") ? rateUSDToEUR : (1 / rateUSDToEUR);
+                    result.textContent = (amount * currentRate).toFixed(4);
+                    updateBoxTimestamp(box, apiDate);
+                };
+        
+                input.addEventListener('input', calculate);
+                swapBtn.addEventListener('click', () => {
+                    // Logic swap giao diện của bạn
+                    const p5 = box.querySelector('.curr-part-5');
+                    const p6 = box.querySelector('.curr-part-6');
+                    const img5 = p5.querySelector('img').src;
+                    const txt5 = p5.querySelector('.p5-right').textContent;
+                    const img6 = p6.querySelector('img').src;
+                    const txt6 = p6.querySelector('.p6-right').textContent;
+        
+                    p5.querySelector('img').src = img6;
+                    p5.querySelector('.p5-right').textContent = txt6;
+                    p6.querySelector('img').src = img5;
+                    p6.querySelector('.p6-right').textContent = txt5;
+        
+                    calculate();
+                    swapBtn.style.transform = (swapBtn.style.transform === 'rotate(180deg)') ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+                calculate();
+            });
+        }
+        
+        function updateBoxTimestamp(box, apiDateStr) {
+            const updateDateEl = box.querySelector('.update-date');
+            const updateTimeEl = box.querySelector('.update-time');
+            if (updateDateEl && updateTimeEl) {
+                const now = new Date();
+                updateDateEl.textContent = apiDateStr.replace(/-/g, '/');
+                updateTimeEl.textContent = now.toTimeString().split(' ')[0];
+            }
+        }
+        
+        // Khởi chạy hệ thống
         initCurrency();
         
-        setInterval(() => {
-            updateFromWiseAPI();
+        // Cập nhật lại tỉ giá sau mỗi 5 phút (không render lại toàn bộ để tránh giật lag)
+        setInterval(async () => {
+            const response = await fetch(`${NEW_API_URL}?t=${Date.now()}`);
+            const data = await response.json();
+            for (const curr in data.usd) {
+                liveRates[curr.toUpperCase()] = data.usd[curr];
+            }
+            renderRateSet(currentSetIndex);
         }, 300000);
 
         /* --- BANK LOGIC --- */
@@ -2256,75 +2229,8 @@
         
         initBankSlideshow();
 
-        // Cấu hình các bộ quốc gia
-        const rateSets = {
-            "0": ["CHINA", "MACAU", "HONG KONG", "TAIWAN", "JAPAN", "SOUTH KOREA", "THAILAND", "SINGAPORE"],
-            "1": ["UNITED KINGDOM", "CANADA", "AUSTRALIA", "NEW ZEALAND", "RUSSIA", "KUWAIT", "UNITED ARAB EMIRATES", "QATAR"],
-            "-1": ["TURKEY", "SWITZERLAND", "INDIA", "BRAZIL", "SOUTH AFRICA", "SWEDEN", "MADAGASCAR", "MALDIVES"]
-        };
+       
         
-        let currentSetIndex = 0; // Mặc định bộ 0
-        
-        // Hàm render 8 ô dựa trên bộ hiện tại
-        function renderRateSet(setIndex) {
-            const grid = document.getElementById("currencyGrid");
-            if (!grid) return;
-            grid.innerHTML = ""; 
-        
-            const countries = rateSets[setIndex.toString()];
-        
-            countries.forEach(name => {
-                // Tìm dữ liệu từ flag.json (giả sử biến là allFlagsData)
-                const data = allFlagsData.find(f => f.name.toUpperCase() === name.toUpperCase());
-                if (!data) return;
-        
-                // Lấy tỉ giá (giả sử hàm lấy tỉ giá của bạn là getRate)
-                const rate = typeof getLatestRate === 'function' ? getLatestRate(data.code) : "0.00";
-        
-                const card = document.createElement("div");
-                card.className = "country-card";
-                card.innerHTML = `
-                    <div class="card-part-1"><img src="${data.flag}"></div>
-                    <div class="card-part-2">${data.name}</div>
-                    <div class="card-part-3">${data.currencyName || 'CURRENCY'}</div>
-                    <div class="card-part-4">${data.symbol || ''} ${data.code}</div>
-                    <input class="card-input" type="text" value="${rate}" readonly>
-                    <div class="conv-row">
-                        <div class="conv-left">1</div>
-                        <div class="conv-mid">${data.code}</div>
-                        <div class="conv-right">USD</div>
-                    </div>
-                    <div class="conv-row">
-                        <div class="conv-left">${rate}</div>
-                        <div class="conv-mid">---</div>
-                        <div class="conv-right">1.00</div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-        
-        // Logic chuyển đổi bộ vô tận
-        function changeSet(direction) {
-            // Lấy danh sách các bộ hiện có: [-1, 0, 1]
-            const keys = Object.keys(rateSets).map(Number).sort((a, b) => a - b);
-            let idx = keys.indexOf(currentSetIndex);
-            
-            idx += direction;
-        
-            // Vòng lặp vô tận
-            if (idx >= keys.length) idx = 0;
-            if (idx < 0) idx = keys.length - 1;
-        
-            currentSetIndex = keys[idx];
-            renderRateSet(currentSetIndex);
-        }
-        
-        // Chạy lần đầu khi load trang
-        document.addEventListener("DOMContentLoaded", () => {
-            // Đảm bảo dữ liệu flag.json đã load xong trước khi gọi
-            renderRateSet(0); 
-        });
         
     </script>
 </body>
