@@ -39,5 +39,7 @@
   {"name":"Jetstar Asia Airways","country":"Singapore","logo":"https://www.logo.wine/a/logo/Jetstar_Asia_Airways/Jetstar_Asia_Airways-Logo.wine.svg"},
   {"name":"Philippine Airlines","country":"Philippines","logo":"https://www.logo.wine/a/logo/Philippine_Airlines/Philippine_Airlines-Logo.wine.svg"},
   {"name":"Royal Brunei Airlines","country":"Brunei","logo":"https://www.logo.wine/a/logo/Royal_Brunei_Airlines/Royal_Brunei_Airlines-Logo.wine.svg"},
-  {"name":"Nok Air","country":"Thailand","logo":"https://www.logo.wine/a/logo/Nok_Air/Nok_Air-Logo.wine.svg"}
+  {"name":"Nok Air","country":"Thailand","logo":"https://www.logo.wine/a/logo/Nok_Air/Nok_Air-Logo.wine.svg"},
+  {"name":"TUI Airways","country":"United Kingdom","logo":"https://www.logo.wine/a/logo/TUI_Airways/TUI_Airways-Logo.wine.svg"}
+,
 ]
